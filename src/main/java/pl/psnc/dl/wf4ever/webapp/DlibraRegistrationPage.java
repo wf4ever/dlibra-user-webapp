@@ -1,30 +1,25 @@
 package pl.psnc.dl.wf4ever.webapp;
 
 import org.apache.wicket.Session;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.openid4java.discovery.DiscoveryInformation;
 
+import pl.psnc.dl.wf4ever.webapp.model.DlibraService;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 import pl.psnc.dl.wf4ever.webapp.model.RegistrationModel;
 import pl.psnc.dl.wf4ever.webapp.model.RegistrationService;
 
-/**
- * This class represents the OpenIdRegistrationSavePage, which  
- * receives the authentication response from the OpenID Provider (OP)
- * and verifies the response with openid4java. It also provides a way to save 
- * the information retrieved from the OP somewhere (well, a hook for that has 
- * been provided).
- *  
- * @author J Steven Perry
- * @author http://makotoconsulting.com
- *
- */
-public class OpenIdRegistrationSavePage
+public class DlibraRegistrationPage
 	extends WebPage
 {
 
@@ -37,7 +32,7 @@ public class OpenIdRegistrationSavePage
 	/**
 	 * Default Constructor
 	 */
-	public OpenIdRegistrationSavePage()
+	public DlibraRegistrationPage()
 	{
 		this(new PageParameters());
 	}
@@ -46,65 +41,43 @@ public class OpenIdRegistrationSavePage
 	/**
 	 * Constructor called by Wicket with an auth response (since the response
 	 * has parameters associated with it... LOTS of them!). And, by the way,
-	 * the auth response is the Request for this classl (not to be confusing).
+	 * the auth response is the Request for this class (not to be confusing).
 	 * 
 	 * @param pageParameters The request parameters (which are the response
 	 *  parameters from the OP).
 	 */
-	public OpenIdRegistrationSavePage(PageParameters pageParameters)
+	public DlibraRegistrationPage(PageParameters pageParameters)
 	{
 		RegistrationModel registrationModel = new RegistrationModel();
 		if (!pageParameters.isEmpty()) {
-			//
-			// If this is a return trip (the OP will redirect here once authentication
-			/// is compelete), then verify the response. If it looks good, send the
-			/// user to the RegistrationSuccessPage. Otherwise, display a message.
-			//
 			String isReturn = pageParameters.get("is_return").toString();
 			if ("true".equals(isReturn)) {
-				//
-				// Grab the session object so we can let openid4java do verification.
-				//
 				Session session = getSession();
 				DiscoveryInformation discoveryInformation = (DiscoveryInformation) session
 						.getAttribute(RegistrationService.DISCOVERY_INFORMATION);
 
-				//
-				// Delegate to the Service object to do verification. It will return
-				/// the RegistrationModel to use to display the information that was
-				/// retrieved from the OP about the User-Supplied identifier. The
-				/// RegistrationModel reference will be null if there was a problem
-				/// (check the logs for more information if this happens).
-				//
 				registrationModel = RegistrationService.processReturn(
 					discoveryInformation, pageParameters,
-					RegistrationService.getReturnToUrl());
+					WicketUtils.getReturnToUrl(this));
 				if (registrationModel == null) {
-					//
-					// Oops, something went wrong. Display a message on the screen.
-					/// Check the logs for more information.
-					//
 					error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider. You will have to enter all information by hand into the text fields provided.");
+					return;
 				}
 			}
 		}
 		add(new OpenIdRegistrationInformationDisplayForm("form",
 				registrationModel));
+
+		DlibraUserModel userModel = DlibraService
+				.createDlibraUserModel(registrationModel.getOpenId());
+
+		add(new UserInfoDisplayForm("dLibraForm", userModel));
 	}
 
-	/**
-	 * The Form subclass for this page.
-	 *  
-	 * @author J Steven Perry
-	 * @author http://makotoconsulting.com
-	 */
 	public static class OpenIdRegistrationInformationDisplayForm
 		extends Form<RegistrationModel>
 	{
 
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -1045594133856989168L;
 
 
@@ -121,53 +94,80 @@ public class OpenIdRegistrationSavePage
 		{
 			super(id, new CompoundPropertyModel<RegistrationModel>(
 					registrationModel));
-			//
+
 			TextField<String> openId = new TextField<String>("openId");
 			openId.setEnabled(false);
 			add(openId);
-			//
+
 			TextField<String> fullName = new RequiredTextField<String>(
 					"fullName");
 			add(fullName);
-			//
+
 			TextField<String> emailAddress = new RequiredTextField<String>(
 					"emailAddress");
 			add(emailAddress);
-			//
+
 			TextField<String> country = new TextField<String>("country");
 			add(country);
-			//
+
 			TextField<String> language = new TextField<String>("language");
 			add(language);
-			//
+
 			Button saveButton = new Button("saveButton") {
 
 				public void onSubmit()
 				{
-					// Store registration in the DB
-					if (saveRegistrationInfo()) {
-						info("Registration Info saved.");
-					}
-					else {
-						error("Registration Info could not be saved!");
-					}
+					// TODO, maybe
 				}
 			};
+			saveButton.setEnabled(false);
 			add(saveButton);
 		}
 
+	}
 
-		/**
-		 * This is a hook where you would place code to save the registration
-		 * information.
-		 * 
-		 * @return returns true if the information was successfully saved, false
-		 *  otherwise.
-		 */
-		private boolean saveRegistrationInfo()
+	public static class UserInfoDisplayForm
+		extends Form<DlibraUserModel>
+	{
+
+		private static final long serialVersionUID = 8454343676077898053L;
+
+
+		@SuppressWarnings("serial")
+		public UserInfoDisplayForm(String id, final DlibraUserModel model)
 		{
-			// TODO: Fill in implementation to save code to the DB
-			return true;
+			super(id, new CompoundPropertyModel<DlibraUserModel>(model));
+
+			final Label message = new Label("message");
+			message.setOutputMarkupId(true);
+			add(message);
+
+			Button actionButton = new AjaxButton("registerButton",
+					new PropertyModel<String>(model, "buttonText")) {
+
+				@Override
+				protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
+				{
+					if (model.isRegistered()) {
+						DlibraService.deleteWorkspace(model);
+					}
+					else {
+						DlibraService.createWorkspace(model);
+					}
+					target.add(message);
+					target.add(this);
+				}
+
+
+				@Override
+				protected void onError(AjaxRequestTarget arg0, Form< ? > arg1)
+				{
+					// TODO Auto-generated method stub
+
+				}
+			};
+			actionButton.setOutputMarkupId(true);
+			add(actionButton);
 		}
 	}
 }

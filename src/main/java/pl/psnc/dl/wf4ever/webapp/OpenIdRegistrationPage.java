@@ -48,17 +48,9 @@ public class OpenIdRegistrationPage
 		this(new PageParameters());
 	}
 
-	private String returnToUrl;
-
-
 	public OpenIdRegistrationPage(PageParameters pageParameters)
 	{
-		returnToUrl = RegistrationService.getReturnToUrl();
-		//
-		// If this is a new call, then use the OpenIdRegistrationForm, which
-		/// only allows the user to enter their OpenID.
-		//
-		add(new OpenIdRegistrationForm("form", this, returnToUrl));
+		add(new OpenIdRegistrationForm("form", this, WicketUtils.getReturnToUrl(this)));
 	}
 
 	/**
@@ -99,6 +91,7 @@ public class OpenIdRegistrationPage
 			Button confirmOpenIdButton = new Button("confirmOpenIdButton") {
 
 				private static final long serialVersionUID = -723600550506568627L;
+
 
 				public void onSubmit()
 				{

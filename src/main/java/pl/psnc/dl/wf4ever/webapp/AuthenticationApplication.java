@@ -4,11 +4,8 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 
 /**
- * Quick and dirty little class that serves as the requisite Application
- * class for this Wicket application.
- * 
- * @author J Steven Perry
- * @author http://makotoconsulting.com
+ * This application is based on OpenID/Wicket app presented by J Steven Perry, 
+ * http://makotoconsulting.com
  */
 public class AuthenticationApplication
 	extends WebApplication
@@ -27,8 +24,8 @@ public class AuthenticationApplication
 		//
 		// Mount the classes. It makes the URLs so much cleaner-looking
 		//
-		mountPage("/register", OpenIdRegistrationPage.class);
-		mountPage("/save", OpenIdRegistrationSavePage.class);
+		mountPage("/authenticate", OpenIdRegistrationPage.class);
+		mountPage("/register", DlibraRegistrationPage.class);
 	}
 
 

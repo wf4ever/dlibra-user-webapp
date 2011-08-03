@@ -29,16 +29,9 @@ import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
 
 /**
- * Consolidates business logic from the UI code for Registration activities.
- * 
  * Most of this code modeled after ConsumerServlet, part of the openid4java 
  * sample code available at 
- * http://code.google.com/p/openid4java/wiki/SampleConsumer.
- * Some of this code was outright copied :->.
- * 
- * @author J Steven Perry
- * @author http://makotoconsulting.com
- *
+ * http://code.google.com/p/openid4java/wiki/SampleConsumer, some code added by J Steven Perry.
  */
 public class RegistrationService
 {
@@ -396,18 +389,4 @@ public class RegistrationService
 	}
 
 
-	/**
-	 * Generates the returnToUrl parameter that is passed to the OP. The
-	 * User Agent (i.e., the browser) will be directed to this page following
-	 * authentication.
-	 * 
-	 * @param representedPage The RegistrationPage object whose cover is to be
-	 *  cracked open to get at the raw HttpServlet goodies inside.
-	 *  
-	 * @return String - the returnToUrl to be used for the authentication request.
-	 */
-	public static String getReturnToUrl()
-	{
-		return "http://localhost:8081/rosrs/openid/save?is_return=true";
-	}
 }

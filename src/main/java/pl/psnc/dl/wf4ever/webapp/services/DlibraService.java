@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp.model;
+package pl.psnc.dl.wf4ever.webapp.services;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -20,6 +20,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 
 /**
  * @author piotrhol
@@ -96,8 +98,8 @@ public class DlibraService
 		}
 
 		try {
-			DerbyService.insertUser(model.getOpenID(), username, password);
-			model.setAccessToken(DerbyService.getAccessToken(model.getOpenID()));
+			DerbyService.insertUser(model.getOpenId(), username, password);
+			model.setAccessToken(DerbyService.getAccessToken(model.getOpenId()));
 		}
 		catch (SQLException e1) {
 			log.error("Error when inserting username and password", e1);
@@ -123,10 +125,10 @@ public class DlibraService
 	{
 		String username;
 		try {
-			username = DerbyService.getUsername(model.getOpenID());
+			username = DerbyService.getUsername(model.getOpenId());
 		}
 		catch (IllegalArgumentException e) {
-			log.error("Deleting workspace for openID " + model.getOpenID()
+			log.error("Deleting workspace for openID " + model.getOpenId()
 					+ " but not found");
 			return;
 		}
@@ -147,7 +149,7 @@ public class DlibraService
 			log.error(e);
 		}
 		try {
-			DerbyService.deleteUser(model.getOpenID());
+			DerbyService.deleteUser(model.getOpenId());
 		}
 		catch (SQLException e) {
 			log.error("Error when deleting username and password", e);
@@ -166,12 +168,13 @@ public class DlibraService
 	}
 
 
-	public static DlibraUserModel createDlibraUserModel(String openId)
+	public static DlibraUserModel createDlibraUserModel(String openId, String myExpId)
 	{
 		DlibraUserModel model = new DlibraUserModel(openId);
 		if (DerbyService.userExists(openId)) {
 			model.setAccessToken(DerbyService.getAccessToken(openId));
 		}
+		model.setMyExpId(myExpId);
 		return model;
 	}
 

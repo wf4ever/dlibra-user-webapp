@@ -14,8 +14,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
 
-import pl.psnc.dl.wf4ever.webapp.model.RegistrationModel;
-import pl.psnc.dl.wf4ever.webapp.model.RegistrationService;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUserModel;
+import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 
 /**
  * This class is used to gather information from the user to register them
@@ -48,9 +48,15 @@ public class OpenIdRegistrationPage
 		this(new PageParameters());
 	}
 
+
 	public OpenIdRegistrationPage(PageParameters pageParameters)
 	{
-		add(new OpenIdRegistrationForm("form", this, WicketUtils.getReturnToUrl(this)));
+		if (!pageParameters.get(OpenIdService.MY_EXP_ID).isNull()) {
+			getSession().setAttribute(OpenIdService.MY_EXP_ID,
+				pageParameters.get(OpenIdService.MY_EXP_ID).toString());
+		}
+		add(new OpenIdRegistrationForm("form", this,
+				WicketUtils.getOpenIdCallbackUrl(this)));
 	}
 
 	/**
@@ -60,7 +66,7 @@ public class OpenIdRegistrationPage
 	 * @author http://makotoconsulting.com
 	 */
 	public static class OpenIdRegistrationForm
-		extends Form<RegistrationModel>
+		extends Form<OpenIdUserModel>
 	{
 
 		private static final long serialVersionUID = 3828134783479387778L;
@@ -69,18 +75,18 @@ public class OpenIdRegistrationPage
 		public OpenIdRegistrationForm(String id,
 				final OpenIdRegistrationPage owningPage, String returnToUrl)
 		{
-			this(id, owningPage, returnToUrl, new RegistrationModel());
+			this(id, owningPage, returnToUrl, new OpenIdUserModel());
 		}
 
 
 		public OpenIdRegistrationForm(String id,
 				final OpenIdRegistrationPage owningPage,
-				final String returnToUrl, final RegistrationModel formModel)
+				final String returnToUrl, final OpenIdUserModel formModel)
 		{
 
 			super(id);
 			//
-			setModel(new CompoundPropertyModel<RegistrationModel>(formModel));
+			setModel(new CompoundPropertyModel<OpenIdUserModel>(formModel));
 			//
 			TextField<String> openId = new RequiredTextField<String>("openId");
 			openId.setLabel(new Model<String>("Your Open ID"));
@@ -97,15 +103,15 @@ public class OpenIdRegistrationPage
 				{
 					// Delegate to Open ID code
 					String userSuppliedIdentifier = formModel.getOpenId();
-					DiscoveryInformation discoveryInformation = RegistrationService
+					DiscoveryInformation discoveryInformation = OpenIdService
 							.performDiscoveryOnUserSuppliedIdentifier(userSuppliedIdentifier);
 					// Store the disovery results in session.
 					Session session = owningPage.getSession();
 					session.setAttribute(
-						RegistrationService.DISCOVERY_INFORMATION,
+						OpenIdService.DISCOVERY_INFORMATION,
 						discoveryInformation);
 					// Create the AuthRequest
-					AuthRequest authRequest = RegistrationService
+					AuthRequest authRequest = OpenIdService
 							.createOpenIdAuthRequest(discoveryInformation,
 								returnToUrl);
 					// Now take the AuthRequest and forward it on to the OP

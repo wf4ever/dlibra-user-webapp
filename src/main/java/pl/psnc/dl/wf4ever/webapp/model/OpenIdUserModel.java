@@ -2,7 +2,7 @@ package pl.psnc.dl.wf4ever.webapp.model;
 
 import java.io.Serializable;
 
-public class RegistrationModel
+public class OpenIdUserModel
 	implements Serializable
 {
 

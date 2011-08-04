@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp.model;
+package pl.psnc.dl.wf4ever.webapp.services;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

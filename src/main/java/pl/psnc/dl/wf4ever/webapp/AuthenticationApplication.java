@@ -21,9 +21,6 @@ public class AuthenticationApplication
 	public void init()
 	{
 		super.init();
-		//
-		// Mount the classes. It makes the URLs so much cleaner-looking
-		//
 		mountPage("/authenticate", OpenIdRegistrationPage.class);
 		mountPage("/register", DlibraRegistrationPage.class);
 	}

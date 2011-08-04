@@ -9,15 +9,16 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.openid4java.discovery.DiscoveryInformation;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
-import pl.psnc.dl.wf4ever.webapp.model.RegistrationModel;
-import pl.psnc.dl.wf4ever.webapp.model.RegistrationService;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUserModel;
+import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
+import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 
 public class DlibraRegistrationPage
 	extends WebPage
@@ -48,17 +49,17 @@ public class DlibraRegistrationPage
 	 */
 	public DlibraRegistrationPage(PageParameters pageParameters)
 	{
-		RegistrationModel registrationModel = new RegistrationModel();
+		OpenIdUserModel registrationModel = new OpenIdUserModel();
 		if (!pageParameters.isEmpty()) {
 			String isReturn = pageParameters.get("is_return").toString();
 			if ("true".equals(isReturn)) {
 				Session session = getSession();
 				DiscoveryInformation discoveryInformation = (DiscoveryInformation) session
-						.getAttribute(RegistrationService.DISCOVERY_INFORMATION);
+						.getAttribute(OpenIdService.DISCOVERY_INFORMATION);
 
-				registrationModel = RegistrationService.processReturn(
+				registrationModel = OpenIdService.processReturn(
 					discoveryInformation, pageParameters,
-					WicketUtils.getReturnToUrl(this));
+					WicketUtils.getOpenIdCallbackUrl(this));
 				if (registrationModel == null) {
 					error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider. You will have to enter all information by hand into the text fields provided.");
 					return;
@@ -68,14 +69,17 @@ public class DlibraRegistrationPage
 		add(new OpenIdRegistrationInformationDisplayForm("form",
 				registrationModel));
 
-		DlibraUserModel userModel = DlibraService
-				.createDlibraUserModel(registrationModel.getOpenId());
+		DlibraUserModel userModel = DlibraService.createDlibraUserModel(
+			registrationModel.getOpenId(),
+			(String) getSession().getAttribute(OpenIdService.MY_EXP_ID));
 
 		add(new UserInfoDisplayForm("dLibraForm", userModel));
+		add(new MyExpImportForm("myExpImportForm", userModel));
+		add(new FeedbackPanel("feedback"));
 	}
 
-	public static class OpenIdRegistrationInformationDisplayForm
-		extends Form<RegistrationModel>
+	private class OpenIdRegistrationInformationDisplayForm
+		extends Form<OpenIdUserModel>
 	{
 
 		private static final long serialVersionUID = -1045594133856989168L;
@@ -90,9 +94,9 @@ public class DlibraRegistrationPage
 		 */
 		@SuppressWarnings("serial")
 		public OpenIdRegistrationInformationDisplayForm(String id,
-				RegistrationModel registrationModel)
+				OpenIdUserModel registrationModel)
 		{
-			super(id, new CompoundPropertyModel<RegistrationModel>(
+			super(id, new CompoundPropertyModel<OpenIdUserModel>(
 					registrationModel));
 
 			TextField<String> openId = new TextField<String>("openId");
@@ -126,7 +130,7 @@ public class DlibraRegistrationPage
 
 	}
 
-	public static class UserInfoDisplayForm
+	private class UserInfoDisplayForm
 		extends Form<DlibraUserModel>
 	{
 
@@ -170,4 +174,35 @@ public class DlibraRegistrationPage
 			add(actionButton);
 		}
 	}
+
+	private class MyExpImportForm
+		extends Form<DlibraUserModel>
+	{
+
+		private static final long serialVersionUID = 8454343676077898053L;
+
+
+		public MyExpImportForm(String id, DlibraUserModel model)
+		{
+			super(id, new CompoundPropertyModel<DlibraUserModel>(model));
+
+			TextField<String> myExpId = new RequiredTextField<String>("myExpId");
+			add(myExpId);
+
+			@SuppressWarnings("serial")
+			final Button importButton = new Button("myExpImportButton") {
+
+				@Override
+				public void onSubmit()
+				{
+					// TODO Auto-generated method stub
+					super.onSubmit();
+				}
+			};
+			importButton.setOutputMarkupId(true);
+			add(importButton);
+
+		}
+	}
+
 }

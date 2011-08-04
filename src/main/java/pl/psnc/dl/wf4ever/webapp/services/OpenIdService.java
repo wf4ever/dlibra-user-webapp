@@ -1,4 +1,4 @@
-package pl.psnc.dl.wf4ever.webapp.model;
+package pl.psnc.dl.wf4ever.webapp.services;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,18 +28,22 @@ import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
 
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUserModel;
+
 /**
  * Most of this code modeled after ConsumerServlet, part of the openid4java 
  * sample code available at 
  * http://code.google.com/p/openid4java/wiki/SampleConsumer, some code added by J Steven Perry.
  */
-public class RegistrationService
+public class OpenIdService
 {
 
 	private static final Logger log = Logger
-			.getLogger(RegistrationService.class);
+			.getLogger(OpenIdService.class);
 
 	public static final String DISCOVERY_INFORMATION = "openid-disc";
+
+	public static final String MY_EXP_ID = "myExpId";
 
 	public static final Map<String, String> axFields = new HashMap<String, String>();
 	static {
@@ -61,6 +65,7 @@ public class RegistrationService
 	}
 
 	public static final Set<String> sRegFields = new HashSet<String>();
+
 	static {
 		sRegFields.add("email");
 		sRegFields.add("fullname");
@@ -221,11 +226,11 @@ public class RegistrationService
 	 *  information returned, make sure your Default profile is completely filled
 	 *  out.
 	 */
-	public static RegistrationModel processReturn(
+	public static OpenIdUserModel processReturn(
 			DiscoveryInformation discoveryInformation,
 			PageParameters pageParameters, String returnToUrl)
 	{
-		RegistrationModel ret = null;
+		OpenIdUserModel ret = null;
 		try {
 			// Verify the Information returned from the OP
 			/// This is required according to the spec
@@ -242,7 +247,7 @@ public class RegistrationService
 							.getExtension(AxMessage.OPENID_NS_AX);
 					if (extension instanceof FetchResponse) {
 						if (ret == null) {
-							ret = new RegistrationModel();
+							ret = new OpenIdUserModel();
 						}
 						provisionRegistrationModel(verifiedIdentifier,
 							(FetchResponse) extension, ret);
@@ -256,7 +261,7 @@ public class RegistrationService
 							.getExtension(SRegMessage.OPENID_NS_SREG);
 					if (extension instanceof SRegResponse) {
 						if (ret == null) {
-							ret = new RegistrationModel();
+							ret = new OpenIdUserModel();
 						}
 						provisionRegistrationModel(verifiedIdentifier,
 							(SRegResponse) extension, ret);
@@ -281,7 +286,7 @@ public class RegistrationService
 
 	private static void provisionRegistrationModel(
 			Identifier verifiedIdentifier, FetchResponse axResponse,
-			RegistrationModel ret)
+			OpenIdUserModel ret)
 	{
 		ret.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;
@@ -327,7 +332,7 @@ public class RegistrationService
 
 	private static void provisionRegistrationModel(
 			Identifier verifiedIdentifier, SRegResponse res,
-			RegistrationModel ret)
+			OpenIdUserModel ret)
 	{
 		ret.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;

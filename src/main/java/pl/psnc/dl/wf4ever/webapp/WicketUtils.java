@@ -21,7 +21,7 @@ public class WicketUtils
 	 * authentication.
 	 * 
 	 */
-	public static String getReturnToUrl(WebPage page)
+	public static String getOpenIdCallbackUrl(WebPage page)
 	{
 		PageParameters params = new PageParameters();
 		params.add("is_return", "true");

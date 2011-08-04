@@ -15,24 +15,26 @@ public class DlibraUserModel
 
 	private static final long serialVersionUID = 3184540866229897863L;
 
-	private String openID;
+	private String openId;
 
 	private String accessToken;
+	
+	private String myExpId;
 
 
 	public DlibraUserModel(String openID)
 	{
 		super();
-		this.openID = openID;
+		this.openId = openID;
 	}
 
 
 	/**
 	 * @return the openID
 	 */
-	public String getOpenID()
+	public String getOpenId()
 	{
-		return openID;
+		return openId;
 	}
 
 
@@ -81,6 +83,24 @@ public class DlibraUserModel
 	public boolean isRegistered()
 	{
 		return this.accessToken != null;
+	}
+
+
+	/**
+	 * @return the myExpId
+	 */
+	public String getMyExpId()
+	{
+		return myExpId;
+	}
+
+
+	/**
+	 * @param myExpId the myExpId to set
+	 */
+	public void setMyExpId(String myExpId)
+	{
+		this.myExpId = myExpId;
 	}
 
 }

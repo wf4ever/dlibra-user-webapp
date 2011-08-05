@@ -31,7 +31,7 @@ public class MyExpImportPage
 	{
 		if (pageParameters.get("is_return") != null) {
 			if (pageParameters.get(OAUTH_VERIFIER) == null) {
-				String home = urlFor(OpenIdRegistrationPage.class, null)
+				String home = urlFor(AuthenticationPage.class, null)
 						.toString();
 				getRequestCycle().scheduleRequestHandlerAfterCurrent(
 					new RedirectRequestHandler(home));

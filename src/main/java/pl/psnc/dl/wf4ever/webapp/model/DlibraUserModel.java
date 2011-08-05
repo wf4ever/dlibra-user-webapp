@@ -18,14 +18,15 @@ public class DlibraUserModel
 	private String openId;
 
 	private String accessToken;
-	
+
 	private String myExpId;
 
+	private OpenIdDataModel openIdData;
 
-	public DlibraUserModel(String openID)
+
+	public void setOpenId(String openId)
 	{
-		super();
-		this.openId = openID;
+		this.openId = openId;
 	}
 
 
@@ -59,8 +60,8 @@ public class DlibraUserModel
 	public String getMessage()
 	{
 		if (isRegistered()) {
-			return "You are registered in dLibra. "
-					+ "Your access token is " + accessToken + ".";
+			return "You are registered in dLibra. " + "Your access token is "
+					+ accessToken + ".";
 		}
 		else {
 			return "You are not registered in dLibra. By registering you will receive "
@@ -101,6 +102,24 @@ public class DlibraUserModel
 	public void setMyExpId(String myExpId)
 	{
 		this.myExpId = myExpId;
+	}
+
+
+	/**
+	 * @return the openIdData
+	 */
+	public OpenIdDataModel getOpenIdData()
+	{
+		return openIdData;
+	}
+
+
+	/**
+	 * @param openIdData the openIdData to set
+	 */
+	public void setOpenIdData(OpenIdDataModel openIdData)
+	{
+		this.openIdData = openIdData;
 	}
 
 }

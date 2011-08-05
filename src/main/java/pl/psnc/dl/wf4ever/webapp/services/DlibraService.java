@@ -74,7 +74,7 @@ public class DlibraService
 	{
 		String username = generateUsername();
 		String password = generatePassword();
-		
+
 		if (userExistsInDlibra(username)) {
 			log.error("Duplicate username generated!");
 			return;
@@ -116,7 +116,7 @@ public class DlibraService
 	private static String generateUsername()
 	{
 		Date now = new Date();
-		String base ="openID" + now.getTime(); 
+		String base = "openID" + now.getTime();
 		return base.substring(0, Math.min(USERNAME_LENGTH, base.length()));
 	}
 
@@ -168,14 +168,11 @@ public class DlibraService
 	}
 
 
-	public static DlibraUserModel createDlibraUserModel(String openId, String myExpId)
+	public static void provisionAuthenticatedUserModel(DlibraUserModel model)
 	{
-		DlibraUserModel model = new DlibraUserModel(openId);
-		if (DerbyService.userExists(openId)) {
-			model.setAccessToken(DerbyService.getAccessToken(openId));
+		if (DerbyService.userExists(model.getOpenId())) {
+			model.setAccessToken(DerbyService.getAccessToken(model.getOpenId()));
 		}
-		model.setMyExpId(myExpId);
-		return model;
 	}
 
 }

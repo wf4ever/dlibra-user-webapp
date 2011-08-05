@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:wicket="http://wicket.apache.org/" xml:lang="en" lang="en">
+<body>
+	<wicket:extend>
+		<div class="post">
+			<h2 class="title">Authentication</h2>
+			<div class="entry">
+				<p>Please enter and confirm your OpenID below to register with
+					this site.</p>
+				<form id="OpenIdRegistrationForm" wicket:id="form">
+					<label>Your Open ID:</label> <input class="biginput" type="text"
+						wicket:id="openId" /> <input type="submit"
+						wicket:id="confirmOpenIdButton" value="Confirm OpenID" />
+				</form>
+				<p>For Google, type in "https://www.google.com/accounts/o8/id"</p>
+			</div>
+		</div>
+	</wicket:extend>
+</body>
+</html>

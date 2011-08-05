@@ -7,11 +7,11 @@ import org.apache.wicket.protocol.http.WebApplication;
  * This application is based on OpenID/Wicket app presented by J Steven Perry, 
  * http://makotoconsulting.com
  */
-public class AuthenticationApplication
+public class UserManagementApplication
 	extends WebApplication
 {
 
-	public AuthenticationApplication()
+	public UserManagementApplication()
 	{
 		super();
 	}
@@ -21,7 +21,7 @@ public class AuthenticationApplication
 	public void init()
 	{
 		super.init();
-		mountPage("/authenticate", OpenIdRegistrationPage.class);
+		mountPage("/authenticate", AuthenticationPage.class);
 		mountPage("/register", DlibraRegistrationPage.class);
 	}
 
@@ -32,7 +32,7 @@ public class AuthenticationApplication
 	 */
 	public Class< ? extends WebPage> getHomePage()
 	{
-		return OpenIdRegistrationPage.class;
+		return DlibraRegistrationPage.class;
 	}
 
 }

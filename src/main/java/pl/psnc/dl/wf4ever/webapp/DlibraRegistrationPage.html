@@ -1,24 +1,15 @@
 <?xml version="1.0"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:wicket="http://wicket.apache.org/" xml:lang="en" lang="en">
-<head>
-<wicket:head>
-	<link href="styles/formlayout.css" rel="stylesheet" type="text/css" />
-</wicket:head>
-</head>
 <body>
-	<div id="container">
-		<div id="pageHeader">
-			<h1>dLibra User Management Service</h1>
-		</div>
-		<div id="content">
-			<div id="explanation">
-				<h1>Please review your registration info below.</h1>
-			</div>
-			<div id="rest">
+	<wicket:extend>
+		<div class="post">
+			<h2 class="title">Welcome!</h2>
+			<div class="entry">
 				<p>
 					<span wicket:id="feedback">&nbsp;</span>
 				</p>
+<!-- 				<p>Please review your registration info below.</p>
 				<form id="OpenIdRegistrationSuccessForm" wicket:id="form">
 					<table border="0">
 						<tr>
@@ -53,7 +44,7 @@
 						</tr>
 					</table>
 				</form>
-				<form wicket:id="dLibraForm">
+ -->				<form wicket:id="dLibraForm">
 					<p wicket:id="message">Hello!</p>
 					<table border="0">
 						<tr>
@@ -80,7 +71,6 @@
 				</form>
 			</div>
 		</div>
-	</div>
-
+	</wicket:extend>
 </body>
 </html>

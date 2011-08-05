@@ -28,7 +28,8 @@ import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
 
-import pl.psnc.dl.wf4ever.webapp.model.OpenIdUserModel;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdDataModel;
 
 /**
  * Most of this code modeled after ConsumerServlet, part of the openid4java 
@@ -38,8 +39,7 @@ import pl.psnc.dl.wf4ever.webapp.model.OpenIdUserModel;
 public class OpenIdService
 {
 
-	private static final Logger log = Logger
-			.getLogger(OpenIdService.class);
+	private static final Logger log = Logger.getLogger(OpenIdService.class);
 
 	public static final String DISCOVERY_INFORMATION = "openid-disc";
 
@@ -205,6 +205,7 @@ public class OpenIdService
 	/**
 	 * Processes the returned information from an authentication request
 	 * from the OP.
+	 * @param model 
 	 * 
 	 * @param discoveryInformation DiscoveryInformation that was created earlier
 	 *  in the conversation (by openid4java). This will need to be verified with
@@ -226,11 +227,10 @@ public class OpenIdService
 	 *  information returned, make sure your Default profile is completely filled
 	 *  out.
 	 */
-	public static OpenIdUserModel processReturn(
+	public static void processReturn(DlibraUserModel model,
 			DiscoveryInformation discoveryInformation,
 			PageParameters pageParameters, String returnToUrl)
 	{
-		OpenIdUserModel ret = null;
 		try {
 			// Verify the Information returned from the OP
 			/// This is required according to the spec
@@ -246,11 +246,11 @@ public class OpenIdService
 					MessageExtension extension = authSuccess
 							.getExtension(AxMessage.OPENID_NS_AX);
 					if (extension instanceof FetchResponse) {
-						if (ret == null) {
-							ret = new OpenIdUserModel();
+						if (model.getOpenIdData() == null) {
+							model.setOpenIdData(new OpenIdDataModel());
 						}
 						provisionRegistrationModel(verifiedIdentifier,
-							(FetchResponse) extension, ret);
+							(FetchResponse) extension, model.getOpenIdData());
 					}
 				}
 				else {
@@ -260,11 +260,11 @@ public class OpenIdService
 					MessageExtension extension = authSuccess
 							.getExtension(SRegMessage.OPENID_NS_SREG);
 					if (extension instanceof SRegResponse) {
-						if (ret == null) {
-							ret = new OpenIdUserModel();
+						if (model.getOpenIdData() == null) {
+							model.setOpenIdData(new OpenIdDataModel());
 						}
 						provisionRegistrationModel(verifiedIdentifier,
-							(SRegResponse) extension, ret);
+							(SRegResponse) extension, model.getOpenIdData());
 					}
 				}
 				else {
@@ -280,13 +280,12 @@ public class OpenIdService
 			log.error(message, e);
 			throw new RuntimeException(message, e);
 		}
-		return ret;
 	}
 
 
 	private static void provisionRegistrationModel(
 			Identifier verifiedIdentifier, FetchResponse axResponse,
-			OpenIdUserModel ret)
+			OpenIdDataModel ret)
 	{
 		ret.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;
@@ -331,8 +330,7 @@ public class OpenIdService
 
 
 	private static void provisionRegistrationModel(
-			Identifier verifiedIdentifier, SRegResponse res,
-			OpenIdUserModel ret)
+			Identifier verifiedIdentifier, SRegResponse res, OpenIdDataModel ret)
 	{
 		ret.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;
@@ -392,6 +390,5 @@ public class OpenIdService
 		}
 		return consumerManager;
 	}
-
 
 }

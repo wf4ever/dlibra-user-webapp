@@ -1,7 +1,6 @@
 package pl.psnc.dl.wf4ever.webapp;
 
 import org.apache.wicket.Session;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
@@ -14,27 +13,11 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
 
-import pl.psnc.dl.wf4ever.webapp.model.OpenIdUserModel;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 
-/**
- * This class is used to gather information from the user to register them
- * with the Site. This page is used to get one piece of information: the
- * user's OpenID. The user enters their OpenID, and the RegistrationService
- * takes over to verify their ID - redirecting them to the OpenID Provider (OP)
- * to be signed in, if necessary - then redirects them back here. 
- * If the authentication succeeds, then the user is taken to the 
- * RegistrationSuccessPage, where they can then look at the information 
- * retrieved from the OP, make any changes to the information and then save
- * it to the DB (this part is left as an exercise to the reader, since it is
- * beyond the scope of the article).
- * 
- * @author J Steven Perry
- * @author http://makotoconsulting.com
- *
- */
-public class OpenIdRegistrationPage
-	extends WebPage
+public class AuthenticationPage
+	extends TemplatePage
 {
 
 	/**
@@ -43,20 +26,22 @@ public class OpenIdRegistrationPage
 	private static final long serialVersionUID = -8975579933617712699L;
 
 
-	public OpenIdRegistrationPage()
+	public AuthenticationPage()
 	{
 		this(new PageParameters());
 	}
 
 
-	public OpenIdRegistrationPage(PageParameters pageParameters)
+	public AuthenticationPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
+		DlibraUserModel model = getDlibraUserModel();
 		if (!pageParameters.get(OpenIdService.MY_EXP_ID).isNull()) {
-			getSession().setAttribute(OpenIdService.MY_EXP_ID,
-				pageParameters.get(OpenIdService.MY_EXP_ID).toString());
+			model.setMyExpId(pageParameters.get(OpenIdService.MY_EXP_ID)
+					.toString());
 		}
 		add(new OpenIdRegistrationForm("form", this,
-				WicketUtils.getOpenIdCallbackUrl(this)));
+				WicketUtils.getOpenIdCallbackUrl(this), model));
 	}
 
 	/**
@@ -66,27 +51,20 @@ public class OpenIdRegistrationPage
 	 * @author http://makotoconsulting.com
 	 */
 	public static class OpenIdRegistrationForm
-		extends Form<OpenIdUserModel>
+		extends Form<DlibraUserModel>
 	{
 
 		private static final long serialVersionUID = 3828134783479387778L;
 
 
 		public OpenIdRegistrationForm(String id,
-				final OpenIdRegistrationPage owningPage, String returnToUrl)
-		{
-			this(id, owningPage, returnToUrl, new OpenIdUserModel());
-		}
-
-
-		public OpenIdRegistrationForm(String id,
-				final OpenIdRegistrationPage owningPage,
-				final String returnToUrl, final OpenIdUserModel formModel)
+				final AuthenticationPage owningPage, final String returnToUrl,
+				final DlibraUserModel model)
 		{
 
 			super(id);
 			//
-			setModel(new CompoundPropertyModel<OpenIdUserModel>(formModel));
+			setModel(new CompoundPropertyModel<DlibraUserModel>(model));
 			//
 			TextField<String> openId = new RequiredTextField<String>("openId");
 			openId.setLabel(new Model<String>("Your Open ID"));
@@ -102,13 +80,12 @@ public class OpenIdRegistrationPage
 				public void onSubmit()
 				{
 					// Delegate to Open ID code
-					String userSuppliedIdentifier = formModel.getOpenId();
+					String userSuppliedIdentifier = model.getOpenId();
 					DiscoveryInformation discoveryInformation = OpenIdService
 							.performDiscoveryOnUserSuppliedIdentifier(userSuppliedIdentifier);
 					// Store the disovery results in session.
 					Session session = owningPage.getSession();
-					session.setAttribute(
-						OpenIdService.DISCOVERY_INFORMATION,
+					session.setAttribute(OpenIdService.DISCOVERY_INFORMATION,
 						discoveryInformation);
 					// Create the AuthRequest
 					AuthRequest authRequest = OpenIdService

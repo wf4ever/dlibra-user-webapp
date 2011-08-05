@@ -34,11 +34,11 @@ public class DlibraService
 
 	private static final String ROSRS_SCHEME = "http";
 
-	private static final String ROSRS_HOST = "localhost";
+	private static final String ROSRS_HOST = "calatola.man.poznan.pl";
 
-	private static final int ROSRS_PORT = 8081;
+	private static final int ROSRS_PORT = 80;
 
-	private static final String ROSRS_PATH = "/rosrs";
+	private static final String ROSRS_PATH = "/rosrs3";
 
 	private static final int PASSWORD_LENGTH = 20;
 

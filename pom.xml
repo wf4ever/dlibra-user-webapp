@@ -105,19 +105,9 @@
 			<version>4.1.1</version>
 		</dependency>
 		<dependency>
-			<groupId>net.oauth.core</groupId>
-			<artifactId>oauth</artifactId>
-			<version>20100527</version>
-		</dependency>
-		<dependency>
-			<groupId>net.oauth.core</groupId>
-			<artifactId>oauth-consumer</artifactId>
-			<version>20100601</version>
-		</dependency>
-		<dependency>
-			<groupId>net.oauth.core</groupId>
-			<artifactId>oauth-httpclient4</artifactId>
-			<version>20100601</version>
+			<groupId>org.scribe</groupId>
+			<artifactId>scribe</artifactId>
+			<version>1.2.1</version>
 		</dependency>
 	</dependencies>
 

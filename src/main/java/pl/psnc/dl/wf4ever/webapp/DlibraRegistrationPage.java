@@ -12,12 +12,16 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.openid4java.discovery.DiscoveryInformation;
+import org.scribe.model.Token;
+import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 import pl.psnc.dl.wf4ever.webapp.model.OpenIdUserModel;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
+import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 
 public class DlibraRegistrationPage
@@ -28,6 +32,8 @@ public class DlibraRegistrationPage
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	public static final String REQUEST_TOKEN = "requestToken";
 
 
 	/**
@@ -76,6 +82,19 @@ public class DlibraRegistrationPage
 		add(new UserInfoDisplayForm("dLibraForm", userModel));
 		add(new MyExpImportForm("myExpImportForm", userModel));
 		add(new FeedbackPanel("feedback"));
+	}
+
+
+	private void startMyExpImport()
+	{
+		String oauthCallbackURL = WicketUtils.getMyExpImportCallbackUrl(this);
+
+		OAuthService service = MyExpApi.getOAuthService(oauthCallbackURL);
+		Token requestToken = service.getRequestToken();
+		getSession().setAttribute(REQUEST_TOKEN, requestToken);
+		String authorizationUrl = service.getAuthorizationUrl(requestToken);
+		getRequestCycle().scheduleRequestHandlerAfterCurrent(
+			new RedirectRequestHandler(authorizationUrl));
 	}
 
 	private class OpenIdRegistrationInformationDisplayForm
@@ -195,8 +214,7 @@ public class DlibraRegistrationPage
 				@Override
 				public void onSubmit()
 				{
-					// TODO Auto-generated method stub
-					super.onSubmit();
+					startMyExpImport();
 				}
 			};
 			importButton.setOutputMarkupId(true);

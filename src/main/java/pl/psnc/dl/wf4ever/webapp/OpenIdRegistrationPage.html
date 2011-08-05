@@ -6,20 +6,24 @@
       <link href="styles/formlayout.css" rel="stylesheet" type="text/css" />
     </wicket:head>
   </head>
-  <body>
-    <form id="OpenIdRegistrationForm" wicket:id="form">
-      <h1>Please enter and confirm your OpenID below to register with this site.</h1>
-      <br />
-      <table border="0">
-        <tr>
-          <td><label>Your Open ID:</label></td>
-          <td>
-            <input class="biginput" type="text" wicket:id="openId"/>
-            <input type="submit" wicket:id="confirmOpenIdButton" value="Confirm OpenID"/>
-          </td>
-        </tr>
-      </table>
-    </form>
-    <p>For Google, type in "https://www.google.com/accounts/o8/id"</p>    
-  </body>
+<body>
+<div id="container">
+  <div id="pageHeader">
+      <h1>dLibra User Management Service</h1>
+  </div>
+  <div id="content">
+    <div id="explanation">
+        <p>Please enter and confirm your OpenID below to register with this site.</p>
+    </div>
+    <div id="rest">
+        <form id="OpenIdRegistrationForm" wicket:id="form">
+        <label>Your Open ID:</label>
+        <input class="biginput" type="text" wicket:id="openId"/>
+        <input type="submit" wicket:id="confirmOpenIdButton" value="Confirm OpenID"/>
+        </form>
+        <p>For Google, type in "https://www.google.com/accounts/o8/id"</p>    
+    </div>
+ </div>
+</div>
+</body>
 </html>

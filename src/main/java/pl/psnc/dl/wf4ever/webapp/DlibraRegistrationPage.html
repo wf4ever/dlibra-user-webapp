@@ -7,76 +7,80 @@
 </wicket:head>
 </head>
 <body>
-	<h1>Please review your registration info below.</h1>
-	<br />
-	<p><span wicket:id="feedback">&nbsp;</span></p>
-	<form id="OpenIdRegistrationSuccessForm" wicket:id="form">
-		<table border="0">
-			<tr>
-				<td><label>Your Open ID:</label>
-				</td>
-				<td><input class="biginput" type="text" wicket:id="openId" />
-				</td>
-			</tr>
-			<tr>
-				<td><label>Name:</label>
-				</td>
-				<td><input class="biginput" type="text" wicket:id="fullName" />
-				</td>
-			</tr>
-			<tr>
-				<td><label>Email Address:</label>
-				</td>
-				<td><input class="biginput" type="text"
-					wicket:id="emailAddress" />
-				</td>
-			</tr>
-			<tr>
-				<td><label>Country:</label>
-				</td>
-				<td><input class="biginput" type="text" wicket:id="country" />
-				</td>
-			</tr>
-			<tr>
-				<td><label>Language:</label>
-				</td>
-				<td><input class="biginput" type="text" wicket:id="language" />
-				</td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td><input class="bigbutton" type="submit"
-					wicket:id="saveButton" value="Save" />
-				</td>
-			</tr>
-		</table>
-	</form>
-	<form wicket:id="dLibraForm">
-		<p wicket:id="message">Hello!</p>
-		<table border="0">
-			<tr>
-				<td>&nbsp;</td>
-				<td><input class="bigbutton" type="submit"
-					wicket:id="registerButton" value="Action" />
-				</td>
-			</tr>
-		</table>
-	</form>
-	<form wicket:id="myExpImportForm">
-		<table border="0">
-			<tr>
-				<td><label>Your myExperiment ID:</label>
-				</td>
-				<td><input class="biginput" type="text" wicket:id="myExpId" />
-				</td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td><input class="bigbutton" type="submit"
-					wicket:id="myExpImportButton" value="Import data from myExperiment" />
-				</td>
-			</tr>
-		</table>
-	</form>
+	<div id="container">
+		<div id="pageHeader">
+			<h1>dLibra User Management Service</h1>
+		</div>
+		<div id="content">
+			<div id="explanation">
+				<h1>Please review your registration info below.</h1>
+			</div>
+			<div id="rest">
+				<p>
+					<span wicket:id="feedback">&nbsp;</span>
+				</p>
+				<form id="OpenIdRegistrationSuccessForm" wicket:id="form">
+					<table border="0">
+						<tr>
+							<td><label>Your Open ID:</label></td>
+							<td><input class="biginput" type="text" wicket:id="openId" />
+							</td>
+						</tr>
+						<tr>
+							<td><label>Name:</label></td>
+							<td><input class="biginput" type="text" wicket:id="fullName" />
+							</td>
+						</tr>
+						<tr>
+							<td><label>Email Address:</label></td>
+							<td><input class="biginput" type="text"
+								wicket:id="emailAddress" /></td>
+						</tr>
+						<tr>
+							<td><label>Country:</label></td>
+							<td><input class="biginput" type="text" wicket:id="country" />
+							</td>
+						</tr>
+						<tr>
+							<td><label>Language:</label></td>
+							<td><input class="biginput" type="text" wicket:id="language" />
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input class="bigbutton" type="submit"
+								wicket:id="saveButton" value="Save" /></td>
+						</tr>
+					</table>
+				</form>
+				<form wicket:id="dLibraForm">
+					<p wicket:id="message">Hello!</p>
+					<table border="0">
+						<tr>
+							<td>&nbsp;</td>
+							<td><input class="bigbutton" type="submit"
+								wicket:id="registerButton" value="Action" /></td>
+						</tr>
+					</table>
+				</form>
+				<form wicket:id="myExpImportForm">
+					<table border="0">
+						<tr>
+							<td><label>Your myExperiment ID:</label></td>
+							<td><input class="biginput" type="text" wicket:id="myExpId" />
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input class="bigbutton" type="submit"
+								wicket:id="myExpImportButton"
+								value="Import data from myExperiment" /></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+
 </body>
 </html>

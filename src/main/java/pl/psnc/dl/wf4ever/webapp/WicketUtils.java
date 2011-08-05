@@ -33,4 +33,17 @@ public class WicketUtils
 							.toString()));
 	}
 
+
+	public static String getMyExpImportCallbackUrl(WebPage page)
+	{
+		PageParameters params = new PageParameters();
+		params.add("is_return", "true");
+		return RequestCycle
+				.get()
+				.getUrlRenderer()
+				.renderFullUrl(
+					Url.parse(page.urlFor(MyExpImportPage.class, params)
+							.toString()));
+	}
+
 }

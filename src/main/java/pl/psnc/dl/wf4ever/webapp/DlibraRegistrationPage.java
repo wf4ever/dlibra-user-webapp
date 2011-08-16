@@ -68,7 +68,7 @@ public class DlibraRegistrationPage
 					error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider. You will have to enter all information by hand into the text fields provided.");
 				}
 				DlibraService.provisionAuthenticatedUserModel(model);
-				sidebarPanel.userDetails.setDefaultModelObject(model.getOpenIdData());
+				logIn(model);
 			}
 		}
 

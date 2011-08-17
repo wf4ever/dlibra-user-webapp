@@ -11,7 +11,9 @@ import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
+import pl.psnc.dl.wf4ever.webapp.services.Constants;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
+import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
 /**
  * @author piotrhol
@@ -23,9 +25,7 @@ public class MyExpImportPage
 
 	private static final long serialVersionUID = 4637256013660809942L;
 
-	private static final String OAUTH_VERIFIER = "oauth_verifier";
-
-	private static final String ACCESS_TOKEN = "accessToken";
+	private static final String OAUTH_VERIFIER = "oauth_token";
 
 
 	public MyExpImportPage(PageParameters pageParameters)
@@ -41,12 +41,12 @@ public class MyExpImportPage
 		Verifier verifier = new Verifier(pageParameters.get(OAUTH_VERIFIER)
 				.toString());
 		Token requestToken = (Token) getSession().getAttribute(
-			DlibraRegistrationPage.REQUEST_TOKEN);
+			Constants.SESSION_REQUEST_TOKEN);
 
 		OAuthService service = MyExpApi.getOAuthService(WicketUtils
 				.getCompleteUrl(this, MyExpImportPage.class, true));
 		Token accessToken = service.getAccessToken(requestToken, verifier);
-		getSession().setAttribute(ACCESS_TOKEN, accessToken);
+		getSession().setAttribute(Constants.SESSION_ACCESS_TOKEN, accessToken);
 
 		add(new Label("accessToken", new Model<String>(accessToken.toString())));
 	}

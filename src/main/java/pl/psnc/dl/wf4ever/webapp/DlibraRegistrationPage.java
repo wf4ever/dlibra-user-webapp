@@ -18,9 +18,11 @@ import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.services.Constants;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
+import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
 public class DlibraRegistrationPage
 	extends TemplatePage
@@ -30,8 +32,6 @@ public class DlibraRegistrationPage
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	public static final String REQUEST_TOKEN = "requestToken";
 
 
 	/**
@@ -60,7 +60,7 @@ public class DlibraRegistrationPage
 			if ("true".equals(isReturn)) {
 				Session session = getSession();
 				DiscoveryInformation discoveryInformation = (DiscoveryInformation) session
-						.getAttribute(OpenIdService.DISCOVERY_INFORMATION);
+						.getAttribute(Constants.SESSION_DISCOVERY_INFORMATION);
 
 				OpenIdService.processReturn(model, discoveryInformation,
 					pageParameters, WicketUtils.getCompleteUrl(this,
@@ -86,7 +86,8 @@ public class DlibraRegistrationPage
 
 		OAuthService service = MyExpApi.getOAuthService(oauthCallbackURL);
 		Token requestToken = service.getRequestToken();
-		getSession().setAttribute(REQUEST_TOKEN, requestToken);
+		getSession()
+				.setAttribute(Constants.SESSION_REQUEST_TOKEN, requestToken);
 		String authorizationUrl = service.getAuthorizationUrl(requestToken);
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
 			new RedirectRequestHandler(authorizationUrl));

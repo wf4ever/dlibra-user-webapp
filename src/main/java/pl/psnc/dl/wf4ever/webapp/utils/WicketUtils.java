@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp;
+package pl.psnc.dl.wf4ever.webapp.utils;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.Url;

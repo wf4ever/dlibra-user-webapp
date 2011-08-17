@@ -41,10 +41,6 @@ public class OpenIdService
 
 	private static final Logger log = Logger.getLogger(OpenIdService.class);
 
-	public static final String DISCOVERY_INFORMATION = "openid-disc";
-
-	public static final String MY_EXP_ID = "myExpId";
-
 	public static final Map<String, String> axFields = new HashMap<String, String>();
 	static {
 		axFields.put("FirstName", "http://axschema.org/namePerson/first");

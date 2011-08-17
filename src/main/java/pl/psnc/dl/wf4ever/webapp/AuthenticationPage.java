@@ -14,7 +14,9 @@ import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.services.Constants;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
+import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
 public class AuthenticationPage
 	extends TemplatePage
@@ -36,8 +38,8 @@ public class AuthenticationPage
 	{
 		super(pageParameters);
 		DlibraUserModel model = getDlibraUserModel();
-		if (!pageParameters.get(OpenIdService.MY_EXP_ID).isNull()) {
-			model.setMyExpId(pageParameters.get(OpenIdService.MY_EXP_ID)
+		if (!pageParameters.get(Constants.SESSION_MY_EXP_ID).isNull()) {
+			model.setMyExpId(pageParameters.get(Constants.SESSION_MY_EXP_ID)
 					.toString());
 		}
 		add(new OpenIdRegistrationForm("form", this,
@@ -86,7 +88,7 @@ public class AuthenticationPage
 							.performDiscoveryOnUserSuppliedIdentifier(userSuppliedIdentifier);
 					// Store the disovery results in session.
 					Session session = owningPage.getSession();
-					session.setAttribute(OpenIdService.DISCOVERY_INFORMATION,
+					session.setAttribute(Constants.SESSION_DISCOVERY_INFORMATION,
 						discoveryInformation);
 					// Create the AuthRequest
 					AuthRequest authRequest = OpenIdService

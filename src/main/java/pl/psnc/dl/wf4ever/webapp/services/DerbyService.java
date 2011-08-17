@@ -29,11 +29,6 @@ public class DerbyService
 
 	private static final String dbName = "rosrs_users"; // the name of the database
 
-	static {
-		loadDriver();
-		initDB(false);
-	}
-
 
 	public static String getUsername(String openID)
 	{
@@ -170,7 +165,7 @@ public class DerbyService
 	 * example, if we are in an embedded environment, we load Derby's
 	 * embedded Driver, <code>org.apache.derby.jdbc.EmbeddedDriver</code>.
 	 */
-	private static void loadDriver()
+	public static void loadDriver()
 	{
 		/*
 		 *  The JDBC driver is loaded by loading its class.
@@ -202,7 +197,7 @@ public class DerbyService
 	}
 
 
-	private static void initDB(boolean recreate)
+	public static void initDB(boolean recreate)
 	{
 		Connection conn = null;
 		try {
@@ -241,6 +236,18 @@ public class DerbyService
 			log.error("Error when closing connection", e);
 		}
 
+	}
+
+
+	public static void shutdownDB()
+	{
+		try {
+			DriverManager.getConnection(protocol + ";shutdown=true");
+			log.debug("Database shut down");
+		}
+		catch (SQLException e) {
+			log.error("Error when shutting down derby", e);
+		}
 	}
 
 }

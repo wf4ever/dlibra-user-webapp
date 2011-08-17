@@ -44,9 +44,10 @@ public class MyExpApi
 	 * @see org.scribe.builder.api.DefaultApi10a#getAuthorizationUrl(org.scribe.model.Token)
 	 */
 	@Override
-	public String getAuthorizationUrl(Token arg0)
+	public String getAuthorizationUrl(Token requestToken)
 	{
-		return "http://www.myexperiment.org/oauth/authorize";
+		return "http://www.myexperiment.org/oauth/authorize?oauth_token="
+				+ requestToken.getToken();
 	}
 
 

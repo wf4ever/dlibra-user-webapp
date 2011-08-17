@@ -41,7 +41,8 @@ public class AuthenticationPage
 					.toString());
 		}
 		add(new OpenIdRegistrationForm("form", this,
-				WicketUtils.getOpenIdCallbackUrl(this), model));
+				WicketUtils.getCompleteUrl(this, DlibraRegistrationPage.class,
+					true), model));
 	}
 
 	/**

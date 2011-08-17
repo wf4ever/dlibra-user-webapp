@@ -23,6 +23,7 @@ public class UserManagementApplication
 		super.init();
 		mountPage("/authenticate", AuthenticationPage.class);
 		mountPage("/register", DlibraRegistrationPage.class);
+		mountPage("/oauth", MyExpImportPage.class);
 	}
 
 

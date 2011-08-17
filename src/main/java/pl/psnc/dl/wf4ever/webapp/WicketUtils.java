@@ -21,29 +21,18 @@ public class WicketUtils
 	 * authentication.
 	 * 
 	 */
-	public static String getOpenIdCallbackUrl(WebPage page)
+	public static String getCompleteUrl(WebPage page, Class<? extends WebPage> pageClass,
+			boolean isReturn)
 	{
 		PageParameters params = new PageParameters();
-		params.add("is_return", "true");
+		if (isReturn) {
+			params.add("is_return", "true");
+		}
 		return RequestCycle
 				.get()
 				.getUrlRenderer()
 				.renderFullUrl(
-					Url.parse(page.urlFor(DlibraRegistrationPage.class, params)
-							.toString()));
-	}
-
-
-	public static String getMyExpImportCallbackUrl(WebPage page)
-	{
-		PageParameters params = new PageParameters();
-		params.add("is_return", "true");
-		return RequestCycle
-				.get()
-				.getUrlRenderer()
-				.renderFullUrl(
-					Url.parse(page.urlFor(MyExpImportPage.class, params)
-							.toString()));
+					Url.parse(page.urlFor(pageClass, params).toString()));
 	}
 
 }

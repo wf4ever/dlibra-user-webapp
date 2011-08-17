@@ -3,7 +3,8 @@
  */
 package pl.psnc.dl.wf4ever.webapp;
 
-import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.scribe.model.Token;
@@ -17,7 +18,7 @@ import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
  *
  */
 public class MyExpImportPage
-	extends WebPage
+	extends TemplatePage
 {
 
 	private static final long serialVersionUID = 4637256013660809942L;
@@ -29,24 +30,25 @@ public class MyExpImportPage
 
 	public MyExpImportPage(PageParameters pageParameters)
 	{
-		if (pageParameters.get("is_return") != null) {
-			if (pageParameters.get(OAUTH_VERIFIER) == null) {
-				String home = urlFor(AuthenticationPage.class, null)
-						.toString();
-				getRequestCycle().scheduleRequestHandlerAfterCurrent(
-					new RedirectRequestHandler(home));
+		super(pageParameters);
 
-			}
-			Verifier verifier = new Verifier(pageParameters.get(OAUTH_VERIFIER)
-					.toString());
-			Token requestToken = (Token) getSession().getAttribute(
-				DlibraRegistrationPage.REQUEST_TOKEN);
+		if (pageParameters.get(OAUTH_VERIFIER) == null) {
+			String home = urlFor(AuthenticationPage.class, null).toString();
+			getRequestCycle().scheduleRequestHandlerAfterCurrent(
+				new RedirectRequestHandler(home));
 
-			OAuthService service = MyExpApi.getOAuthService(WicketUtils
-					.getMyExpImportCallbackUrl(this));
-			Token accessToken = service.getAccessToken(requestToken, verifier);
-			getSession().setAttribute(ACCESS_TOKEN, accessToken);
 		}
+		Verifier verifier = new Verifier(pageParameters.get(OAUTH_VERIFIER)
+				.toString());
+		Token requestToken = (Token) getSession().getAttribute(
+			DlibraRegistrationPage.REQUEST_TOKEN);
+
+		OAuthService service = MyExpApi.getOAuthService(WicketUtils
+				.getCompleteUrl(this, MyExpImportPage.class, true));
+		Token accessToken = service.getAccessToken(requestToken, verifier);
+		getSession().setAttribute(ACCESS_TOKEN, accessToken);
+
+		add(new Label("accessToken", new Model<String>(accessToken.toString())));
 	}
 
 }

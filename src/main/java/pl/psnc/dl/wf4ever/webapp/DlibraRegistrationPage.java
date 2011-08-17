@@ -63,7 +63,8 @@ public class DlibraRegistrationPage
 						.getAttribute(OpenIdService.DISCOVERY_INFORMATION);
 
 				OpenIdService.processReturn(model, discoveryInformation,
-					pageParameters, WicketUtils.getOpenIdCallbackUrl(this));
+					pageParameters, WicketUtils.getCompleteUrl(this,
+						DlibraRegistrationPage.class, true));
 				if (model.getOpenIdData() == null) {
 					error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider. You will have to enter all information by hand into the text fields provided.");
 				}
@@ -71,7 +72,6 @@ public class DlibraRegistrationPage
 				logIn(model);
 			}
 		}
-
 
 		add(new UserInfoDisplayForm("dLibraForm", model));
 		add(new MyExpImportForm("myExpImportForm", model));
@@ -81,7 +81,8 @@ public class DlibraRegistrationPage
 
 	private void startMyExpImport()
 	{
-		String oauthCallbackURL = WicketUtils.getMyExpImportCallbackUrl(this);
+		String oauthCallbackURL = WicketUtils.getCompleteUrl(this,
+			MyExpImportPage.class, false);
 
 		OAuthService service = MyExpApi.getOAuthService(oauthCallbackURL);
 		Token requestToken = service.getRequestToken();

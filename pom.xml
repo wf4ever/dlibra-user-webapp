@@ -6,7 +6,7 @@
 	<artifactId>webapp</artifactId>
 	<packaging>war</packaging>
 	<version>0.1.0-SNAPSHOT</version>
-	<name>dLibra Wf4Ever Web Application</name>
+	<name>dLibra Wf4Ever User Management Service</name>
 	<description></description>
 
 	<organization>
@@ -112,7 +112,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>webapp</finalName>
+		<finalName>users</finalName>
 		<resources>
 			<resource>
 				<filtering>false</filtering>

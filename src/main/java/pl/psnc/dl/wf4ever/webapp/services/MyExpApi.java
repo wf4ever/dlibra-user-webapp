@@ -16,9 +16,9 @@ public class MyExpApi
 	extends DefaultApi10a
 {
 
-	private static final String CONSUMER_KEY = "aaa";
+	private static final String CONSUMER_KEY = "kA9xe84b4sGDDcLfMCBrw";
 
-	private static final String SHARED_SECRET = "bbb";
+	private static final String SHARED_SECRET = "IqywoxpYNsWgz8seUONNgxnhohziFvjdsqZHdsQE";
 
 
 	public static OAuthService getOAuthService(String oauthCallbackURL)
@@ -36,7 +36,7 @@ public class MyExpApi
 	@Override
 	public String getAccessTokenEndpoint()
 	{
-		return "http://www.myexperiment.org/oauth/new";
+		return "http://www.myexperiment.org/oauth/access_token";
 	}
 
 
@@ -46,7 +46,7 @@ public class MyExpApi
 	@Override
 	public String getAuthorizationUrl(Token arg0)
 	{
-		return "http://www.myexperiment.org/oauth/new";
+		return "http://www.myexperiment.org/oauth/authorize";
 	}
 
 
@@ -56,7 +56,7 @@ public class MyExpApi
 	@Override
 	public String getRequestTokenEndpoint()
 	{
-		return "http://www.myexperiment.org/oauth/new";
+		return "http://www.myexperiment.org/oauth/request_token";
 	}
 
 }

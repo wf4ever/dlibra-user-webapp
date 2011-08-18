@@ -6,7 +6,7 @@ package pl.psnc.dl.wf4ever.webapp;
 import org.apache.wicket.markup.html.panel.Panel;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class LoggedOutPanel

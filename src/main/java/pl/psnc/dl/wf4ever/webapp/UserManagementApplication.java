@@ -4,8 +4,9 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 
 /**
- * This application is based on OpenID/Wicket app presented by J Steven Perry, 
- * http://makotoconsulting.com
+ * 
+ * @author Piotr Hołubowicz
+ *
  */
 public class UserManagementApplication
 	extends WebApplication

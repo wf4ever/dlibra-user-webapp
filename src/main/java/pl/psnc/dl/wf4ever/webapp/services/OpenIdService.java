@@ -35,7 +35,9 @@ import pl.psnc.dl.wf4ever.webapp.model.OpenIdDataModel;
  * Most of this code modeled after ConsumerServlet, part of the openid4java 
  * sample code available at 
  * http://code.google.com/p/openid4java/wiki/SampleConsumer, some code added by J Steven Perry.
- */
+ * 
+ * @author Piotr Hołubowicz
+*/
 public class OpenIdService
 {
 
@@ -201,27 +203,6 @@ public class OpenIdService
 	/**
 	 * Processes the returned information from an authentication request
 	 * from the OP.
-	 * @param model 
-	 * 
-	 * @param discoveryInformation DiscoveryInformation that was created earlier
-	 *  in the conversation (by openid4java). This will need to be verified with
-	 *  openid4java to make sure everything went smoothly and there are no
-	 *  possible problems. This object was probably stored in session and retrieved
-	 *  for use in calling this method.
-	 *  
-	 * @param pageParameters PageParameters passed to the page handling the
-	 *  return verification.
-	 *  
-	 * @param returnToUrl The "return to" URL that was passed to the OP. It must
-	 *  match exactly, or openid4java will issue a verification failed message
-	 *  in the logs.
-	 *  
-	 * @return RegistrationModel - null if there was a problem, or a RegistrationModel
-	 *  object, with parameters filled in as completely as possible from the
-	 *  information available from the OP. If you are using MyOpenID, most of the
-	 *  time what is returned is from your "Default" profile, so if you need more 
-	 *  information returned, make sure your Default profile is completely filled
-	 *  out.
 	 */
 	public static void processReturn(DlibraUserModel model,
 			DiscoveryInformation discoveryInformation,

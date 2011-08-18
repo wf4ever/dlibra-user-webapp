@@ -6,7 +6,7 @@ package pl.psnc.dl.wf4ever.webapp.model;
 import java.io.Serializable;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class DlibraUserModel

@@ -22,6 +22,11 @@ import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
+/**
+ * 
+ * @author Piotr Hołubowicz
+ *
+ */
 public class DlibraRegistrationPage
 	extends TemplatePage
 {

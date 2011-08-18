@@ -18,6 +18,11 @@ import pl.psnc.dl.wf4ever.webapp.services.Constants;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
+/**
+ * 
+ * @author Piotr Hołubowicz
+ *
+ */
 public class AuthenticationPage
 	extends TemplatePage
 {
@@ -88,7 +93,8 @@ public class AuthenticationPage
 							.performDiscoveryOnUserSuppliedIdentifier(userSuppliedIdentifier);
 					// Store the disovery results in session.
 					Session session = owningPage.getSession();
-					session.setAttribute(Constants.SESSION_DISCOVERY_INFORMATION,
+					session.setAttribute(
+						Constants.SESSION_DISCOVERY_INFORMATION,
 						discoveryInformation);
 					// Create the AuthRequest
 					AuthRequest authRequest = OpenIdService

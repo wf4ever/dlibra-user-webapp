@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.util.crypt.Base64;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class DerbyService

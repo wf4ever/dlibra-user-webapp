@@ -9,7 +9,7 @@ import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class MyExpApi

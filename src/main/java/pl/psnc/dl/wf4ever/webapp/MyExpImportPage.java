@@ -19,7 +19,7 @@ import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class MyExpImportPage

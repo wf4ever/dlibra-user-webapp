@@ -13,7 +13,7 @@ import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 import pl.psnc.dl.wf4ever.webapp.model.OpenIdDataModel;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class LoggedInPanel

@@ -2,6 +2,11 @@ package pl.psnc.dl.wf4ever.webapp.model;
 
 import java.io.Serializable;
 
+/**
+ * 
+ * @author Piotr Hołubowicz
+ *
+ */
 public class OpenIdDataModel
 	implements Serializable
 {

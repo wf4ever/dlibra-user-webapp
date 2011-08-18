@@ -9,7 +9,7 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class WicketUtils

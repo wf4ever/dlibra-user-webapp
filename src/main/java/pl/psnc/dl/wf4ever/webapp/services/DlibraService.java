@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class DlibraService

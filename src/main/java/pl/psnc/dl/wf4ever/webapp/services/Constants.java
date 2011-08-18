@@ -1,6 +1,10 @@
 package pl.psnc.dl.wf4ever.webapp.services;
 
-
+/**
+ * 
+ * @author Piotr Hołubowicz
+ *
+ */
 public class Constants
 {
 

@@ -9,7 +9,7 @@ import javax.servlet.ServletContextListener;
 import pl.psnc.dl.wf4ever.webapp.services.DerbyService;
 
 /**
- * @author piotrhol
+ * @author Piotr Hołubowicz
  *
  */
 public class ContextListener

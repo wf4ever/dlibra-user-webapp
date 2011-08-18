@@ -7,6 +7,11 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 
+/**
+ * 
+ * @author Piotr Hołubowicz
+ *
+ */
 public abstract class TemplatePage
 	extends WebPage
 {

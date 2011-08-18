@@ -10,8 +10,8 @@ import org.apache.wicket.markup.html.form.RadioChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.PropertyModel;
 
-import pl.psnc.dl.wf4ever.webapp.model.FileImportModel;
-import pl.psnc.dl.wf4ever.webapp.model.FileImportModel.ImportType;
+import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
+import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportType;
 
 /**
  * @author Piotr Hołubowicz
@@ -24,7 +24,7 @@ public class FileImportPanel
 	private static final long serialVersionUID = -3775797988389365540L;
 
 
-	public FileImportPanel(String id, FileImportModel model)
+	public FileImportPanel(String id, ImportModel model)
 	{
 		super(id);
 

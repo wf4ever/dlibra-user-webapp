@@ -25,9 +25,9 @@ import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
-import pl.psnc.dl.wf4ever.webapp.model.FileImportModel;
+import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
-import pl.psnc.dl.wf4ever.webapp.model.FileImportModel.ImportType;
+import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportType;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
@@ -109,7 +109,7 @@ public class MyExpImportPage
 			filesDiv.setVisible(false);
 			body.add(filesDiv);
 		} else {
-			FileImportModel fileImportModel = new FileImportModel(ImportType.ALL_AS_1_RO);
+			ImportModel fileImportModel = new ImportModel(ImportType.ALL_AS_1_RO);
 			Panel filesDiv = new FileImportPanel("filesDiv", fileImportModel);
 			body.add(filesDiv);
 		}

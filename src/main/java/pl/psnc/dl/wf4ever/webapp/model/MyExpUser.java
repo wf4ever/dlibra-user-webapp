@@ -3,6 +3,7 @@
  */
 package pl.psnc.dl.wf4ever.webapp.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "user")
 public class MyExpUser
+	implements Serializable
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4428655508723987304L;
 
 	private String uri;
 
@@ -34,7 +41,7 @@ public class MyExpUser
 	private String country;
 
 	private String website;
-	
+
 	private List<MyExpPack> packs = new ArrayList<MyExpPack>();
 
 	private List<MyExpWorkflow> workflows = new ArrayList<MyExpWorkflow>();
@@ -161,8 +168,8 @@ public class MyExpUser
 	/**
 	 * @return the workflows
 	 */
-	@XmlElementWrapper(name="workflows")
-	@XmlElement(name="workflow")
+	@XmlElementWrapper(name = "workflows")
+	@XmlElement(name = "workflow")
 	public List<MyExpWorkflow> getWorkflows()
 	{
 		return workflows;
@@ -181,8 +188,8 @@ public class MyExpUser
 	/**
 	 * @return the packs
 	 */
-	@XmlElementWrapper(name="packs")
-	@XmlElement(name="pack")
+	@XmlElementWrapper(name = "packs")
+	@XmlElement(name = "pack")
 	public List<MyExpPack> getPacks()
 	{
 		return packs;
@@ -201,8 +208,8 @@ public class MyExpUser
 	/**
 	 * @return the files
 	 */
-	@XmlElementWrapper(name="files")
-	@XmlElement(name="file")
+	@XmlElementWrapper(name = "files")
+	@XmlElement(name = "file")
 	public List<MyExpFile> getFiles()
 	{
 		return files;

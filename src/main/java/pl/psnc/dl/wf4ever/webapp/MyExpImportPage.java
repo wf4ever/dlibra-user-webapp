@@ -7,7 +7,10 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
 import org.scribe.model.Token;
+import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
@@ -48,7 +51,14 @@ public class MyExpImportPage
 		Token accessToken = service.getAccessToken(requestToken, verifier);
 		getSession().setAttribute(Constants.SESSION_ACCESS_TOKEN, accessToken);
 
-		add(new Label("accessToken", new Model<String>(accessToken.toString())));
+		OAuthRequest request = new OAuthRequest(Verb.GET, "http://www.myexperiment.org/whoami.xml");
+		service.signRequest(accessToken, request);
+		Response response = request.send();
+		
+		//TODO: continue here
+		Label userData = new Label("userName", new Model<String>(response.getBody()));
+		userData.setEscapeModelStrings(true);
+		add(userData);
 	}
 
 }

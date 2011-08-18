@@ -6,8 +6,6 @@ import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.RequiredTextField;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
@@ -148,9 +146,6 @@ public class DlibraRegistrationPage
 		public MyExpImportForm(String id, DlibraUserModel model)
 		{
 			super(id, new CompoundPropertyModel<DlibraUserModel>(model));
-
-			TextField<String> myExpId = new RequiredTextField<String>("myExpId");
-			add(myExpId);
 
 			@SuppressWarnings("serial")
 			final Button importButton = new Button("myExpImportButton") {

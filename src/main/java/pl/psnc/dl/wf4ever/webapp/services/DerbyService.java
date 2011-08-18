@@ -246,7 +246,8 @@ public class DerbyService
 			log.debug("Database shut down");
 		}
 		catch (SQLException e) {
-			log.error("Error when shutting down derby", e);
+			// It is expected
+			log.debug("Exception when shutting down derby: " + e.getMessage());
 		}
 	}
 

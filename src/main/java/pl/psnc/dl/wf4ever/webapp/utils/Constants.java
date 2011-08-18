@@ -1,4 +1,4 @@
-package pl.psnc.dl.wf4ever.webapp.services;
+package pl.psnc.dl.wf4ever.webapp.utils;
 
 /**
  * 

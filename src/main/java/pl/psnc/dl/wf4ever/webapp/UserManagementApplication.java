@@ -25,6 +25,7 @@ public class UserManagementApplication
 		mountPage("/authenticate", AuthenticationPage.class);
 		mountPage("/register", DlibraRegistrationPage.class);
 		mountPage("/oauth", MyExpImportPage.class);
+		mountPage("/error", ErrorPage.class);
 	}
 
 

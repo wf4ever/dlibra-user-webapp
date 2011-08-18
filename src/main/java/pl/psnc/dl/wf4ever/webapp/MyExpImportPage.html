@@ -1,16 +1,31 @@
 <?xml version="1.0"?>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:wicket="http://wicket.apache.org/" xml:lang="en" lang="en">
+	xmlns:wicket="http://wicket.apache.org/" lang="en">
 <body>
-	<wicket:extend>
+	<wicket:extend wicket:id="body">
 		<div class="post">
 			<h2 class="title">Authorization</h2>
 			<div class="entry">
 				<p>
-					You have successfully authorized this service to import your data
-					from myExperiment. You have been authorized as <strong
+					You have successfully authorized dLibra User Management Service to
+					import your data from myExperiment. You have been authorized as <strong
 						wicket:id="userName"></strong>.
 				</p>
+				<p>
+					<span wicket:id="packsCnt">0</span> packs, <span
+						wicket:id="workflowsCnt">0</span> workflows and <span
+						wicket:id="filesCnt">0</span> files have been found in your
+					myExperiment account.
+				</p>
+			</div>
+		</div>
+		<div class="post" wicket:id="filesDiv"></div>
+		<div class="post" wicket:id="startDiv">
+			<h2 class="title">Start import</h2>
+			<div class="entry">
+				<form wicket:id="startImportForm">
+					<input wicket:id="startImport" type="button" value="Go!" />
+				</form>
 			</div>
 		</div>
 	</wicket:extend>

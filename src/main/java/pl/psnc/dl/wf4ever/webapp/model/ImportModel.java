@@ -4,115 +4,47 @@
 package pl.psnc.dl.wf4ever.webapp.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Piotr Hołubowicz
  *
  */
-public abstract class ImportModel
+public class ImportModel
 	implements Serializable
 {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6654329540413067819L;
 
-	public enum ImportType {
-		ALL_AS_1_RO, ALL_AS_MANY_ROS, NOTHING, CUSTOM
-	};
+	private List<NewResearchObjectModel> researchObjects;
 
-	protected ImportType importType;
-
-	protected boolean resourceListVisible;
-
-	protected List< ? extends MyExpResource> resources;
-
-	protected String resourceName;
+	private MyExpUser myExpUser;
 
 
-	public ImportModel(ImportType fileImportType,
-			List< ? extends MyExpResource> resources, String resourceName)
+	public ImportModel(MyExpUser user)
 	{
 		super();
-		this.setImportType(fileImportType);
-		this.setResourceListVisible(false);
-		this.resources = resources;
-		this.resourceName = resourceName;
+		this.myExpUser = user;
+		this.researchObjects = new ArrayList<NewResearchObjectModel>();
 	}
 
 
 	/**
-	 * @return the fileImportType
+	 * @return the researchObjects
 	 */
-	public ImportType getImportType()
+	public List<NewResearchObjectModel> getResearchObjects()
 	{
-		return importType;
+		return researchObjects;
 	}
 
 
 	/**
-	 * @param importType the fileImportType to set
+	 * @return the myExpUser
 	 */
-	public void setImportType(ImportType importType)
+	public MyExpUser getMyExpUser()
 	{
-		this.importType = importType;
-	}
-
-
-	/**
-	 * @return the resourceListVisible
-	 */
-	public boolean isResourceListVisible()
-	{
-		return resourceListVisible;
-	}
-
-
-	/**
-	 * @param resourceListVisible the resourceListVisible to set
-	 */
-	public void setResourceListVisible(boolean resourceListVisible)
-	{
-		this.resourceListVisible = resourceListVisible;
-	}
-
-
-	public String getResourceListDisplayStyle()
-	{
-		if (isResourceListVisible()) {
-			return "display:block";
-		}
-		else {
-			return "display:none";
-		}
-	}
-
-
-	public String getHideShowResourceListLabel()
-	{
-		if (isResourceListVisible()) {
-			return "Hide " + resourceName.toLowerCase();
-		}
-		else {
-			return "Show " + resourceName.toLowerCase();
-		}
-	}
-
-
-	/**
-	 * @return the resources
-	 */
-	public List< ? extends MyExpResource> getResources()
-	{
-		return resources;
-	}
-
-
-	public String getResourceName()
-	{
-		return resourceName;
+		return myExpUser;
 	}
 
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<wicket:panel xmlns:wicket="http://wicket.apache.org">
+	<p>
+		<span wicket:id="resourceName">[Resources]</span> <a
+			wicket:id="resourceListLink">[<span
+			wicket:id="resourceListLinkLabel">[Hide/show]</span>]</a>
+	</p>
+	<div wicket:id="resourceList">
+		<form wicket:id="form">
+			<span wicket:id="group"> 
+				<input type="checkbox"
+					wicket:id="groupselector">check/uncheck all</input>
+				<table>
+					<tr wicket:id="resourceListView">
+						<td><input type="checkbox" wicket:id="checkbox" /></td>
+						<td><a wicket:id="link"><span wicket:id="title"></span></a></td>
+					</tr>
+				</table> 
+			</span>
+		</form>
+	</div>
+</wicket:panel>

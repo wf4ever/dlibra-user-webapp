@@ -14,7 +14,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -25,9 +24,12 @@ import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
+import pl.psnc.dl.wf4ever.webapp.model.FileImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
-import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportType;
+import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
+import pl.psnc.dl.wf4ever.webapp.model.PackImportModel;
+import pl.psnc.dl.wf4ever.webapp.model.WorkflowImportModel;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
@@ -104,14 +106,28 @@ public class MyExpImportPage
 		body.add(new Label("filesCnt", new Model<Integer>(myExpUser
 				.getFiles().size())));
 		
+		ImportModel fileImportModel = null;
 		if (myExpUser.getFiles().isEmpty()) {
-			WebMarkupContainer filesDiv = new WebMarkupContainer("filesDiv");
-			filesDiv.setVisible(false);
-			body.add(filesDiv);
+			body.add(createUnvisibileDiv("filesDiv"));
 		} else {
-			ImportModel fileImportModel = new ImportModel(ImportType.ALL_AS_1_RO);
-			Panel filesDiv = new FileImportPanel("filesDiv", fileImportModel);
-			body.add(filesDiv);
+			fileImportModel = new FileImportModel(ImportType.ALL_AS_1_RO, myExpUser.getFiles());
+			body.add(new ResourceImportPanel("filesDiv", fileImportModel));
+		}
+
+		ImportModel workflowImportModel = null;
+		if (myExpUser.getFiles().isEmpty()) {
+			body.add(createUnvisibileDiv("workflowsDiv"));
+		} else {
+			workflowImportModel = new WorkflowImportModel(ImportType.ALL_AS_1_RO, myExpUser.getWorkflows());
+			body.add(new ResourceImportPanel("workflowsDiv", workflowImportModel));
+		}
+		
+		ImportModel packImportModel = null;
+		if (myExpUser.getFiles().isEmpty()) {
+			body.add(createUnvisibileDiv("packsDiv"));
+		} else {
+			packImportModel = new PackImportModel(ImportType.ALL_AS_MANY_ROS, myExpUser.getPacks());
+			body.add(new ResourceImportPanel("packsDiv", packImportModel));
 		}
 
 		WebMarkupContainer startDiv = new WebMarkupContainer("startDiv");
@@ -125,6 +141,17 @@ public class MyExpImportPage
 			startImportForm.add(startImport);
 		}
 }
+
+
+	/**
+	 * @return
+	 */
+	private WebMarkupContainer createUnvisibileDiv(String id)
+	{
+		WebMarkupContainer filesDiv = new WebMarkupContainer(id);
+		filesDiv.setVisible(false);
+		return filesDiv;
+	}
 
 
 	private MyExpUser createMyExpUserModel(String xml)

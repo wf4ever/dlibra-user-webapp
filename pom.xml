@@ -114,6 +114,11 @@
 			<artifactId>wicket-extensions</artifactId>
 			<version>1.5-RC5.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

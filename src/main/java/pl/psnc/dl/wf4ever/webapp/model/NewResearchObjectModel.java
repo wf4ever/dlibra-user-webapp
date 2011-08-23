@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Piotr Hołubowicz
  *
@@ -14,6 +16,10 @@ import java.util.List;
 public class NewResearchObjectModel
 	implements Serializable
 {
+
+	public static final int NAME_MAX_LEN = 30;
+
+	public static final int CONTENT_DESC_MAX_LEN = 100;
 
 	private static final long serialVersionUID = -4038193471676170594L;
 
@@ -159,4 +165,69 @@ public class NewResearchObjectModel
 	{
 		this.packs = packs;
 	}
+
+
+	public MyExpResource getFirstResource()
+	{
+		if (!packs.isEmpty()) {
+			return packs.get(0);
+		}
+		else if (!workflows.isEmpty()) {
+			return workflows.get(0);
+		}
+		else if (!files.isEmpty()) {
+			return files.get(0);
+		}
+		return null;
+	}
+
+
+	public int getResourcesCount()
+	{
+		return files.size() + workflows.size() + packs.size();
+	}
+
+
+	public void setDefaultName()
+	{
+		MyExpResource resource = getFirstResource();
+		if (resource == null) {
+			name = "";
+		}
+		else {
+			name = StringUtils.left(resource.getTitle(), NAME_MAX_LEN)
+					.replace(' ', '_').replace('/', '_');
+			if (name.indexOf('_') > -1) {
+				name = name.substring(0, name.lastIndexOf('_'));
+			}
+		}
+	}
+
+
+	public String getContentDesc()
+	{
+		if (getResourcesCount() > 1) {
+			List<String> list = new ArrayList<String>();
+			if (!packs.isEmpty())
+				list.add("" + packs.size() + " packs");
+			if (!workflows.isEmpty())
+				list.add("" + workflows.size() + " workflows");
+			if (!files.isEmpty())
+				list.add("" + files.size() + " files");
+			return StringUtils.join(list, ", ");
+		}
+		else {
+			if (!packs.isEmpty())
+				return StringUtils.left("Pack: " + packs.get(0).getTitle(),
+					CONTENT_DESC_MAX_LEN);
+			if (!workflows.isEmpty())
+				return StringUtils.left("Workflow: " + workflows.get(0).getTitle(), 
+					CONTENT_DESC_MAX_LEN);
+			if (!files.isEmpty())
+				return StringUtils.left("File: " + files.get(0).getTitle(),
+					CONTENT_DESC_MAX_LEN);
+		}
+		return null;
+	}
+
 }

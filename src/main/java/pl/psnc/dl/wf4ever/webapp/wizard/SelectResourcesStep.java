@@ -33,7 +33,7 @@ public class SelectResourcesStep
 	public SelectResourcesStep(IDynamicWizardStep previousStep,
 			ImportModel model)
 	{
-		super(previousStep, "c", "D", new Model<ImportModel>(model));
+		super(previousStep, "Select resources", "", new Model<ImportModel>(model));
 
 		selectionModel = new ResourceSelectionModel();
 
@@ -90,8 +90,7 @@ public class SelectResourcesStep
 	@Override
 	public IDynamicWizardStep next()
 	{
-		// TODO Auto-generated method stub
-		return this;
+		return new ConfirmRONamesStep(this, (ImportModel) this.getDefaultModelObject());
 	}
 
 
@@ -107,7 +106,7 @@ public class SelectResourcesStep
 	{
 		super.applyState();
 		ImportModel model = (ImportModel) this.getDefaultModelObject();
-		model.getResearchObjects().addAll(selectionModel.createResearchObjects());
+		model.setResearchObjectsProcessed(selectionModel.createResearchObjects());
 	}
 
 	private class ImportTypeChoiceRenderer

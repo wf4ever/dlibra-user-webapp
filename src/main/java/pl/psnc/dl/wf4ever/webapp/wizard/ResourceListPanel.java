@@ -63,7 +63,7 @@ public class ResourceListPanel
 				"group", (List<MyExpResource>) selectedResources);
 		form.add(group);
 		group.add(new CheckGroupSelector("groupselector"));
-		group.add(new ListView<MyExpResource>("resourceListView", resources) {
+		ListView<MyExpResource> list = new ListView<MyExpResource>("resourceListView", resources) {
 
 			protected void populateItem(ListItem<MyExpResource> item)
 			{
@@ -74,7 +74,9 @@ public class ResourceListPanel
 				link.add(new Label("title", resource.getTitle()));
 				item.add(link);
 			}
-		});
+		};
+		list.setReuseItems(true);
+		group.add(list);
 
 		AjaxFallbackLink<String> link = new AjaxFallbackLink<String>(
 				"resourceListLink") {

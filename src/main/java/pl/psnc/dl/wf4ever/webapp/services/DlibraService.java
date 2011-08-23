@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
@@ -116,8 +117,7 @@ public class DlibraService
 	private static String generateUsername()
 	{
 		Date now = new Date();
-		String base = "openID" + now.getTime();
-		return base.substring(0, Math.min(USERNAME_LENGTH, base.length()));
+		return StringUtils.left("openID-" + now.getTime(), USERNAME_LENGTH);
 	}
 
 

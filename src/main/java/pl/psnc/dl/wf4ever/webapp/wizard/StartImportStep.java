@@ -23,7 +23,7 @@ public class StartImportStep
 
 	public StartImportStep(ImportModel model)
 	{
-		super(null, "a", "b", new Model<ImportModel>(model));
+		super(null, "Start", "", new Model<ImportModel>(model));
 
 		add(new Label("userName", new Model<String>(model.getMyExpUser()
 				.getName())));
@@ -33,8 +33,8 @@ public class StartImportStep
 				.getWorkflows().size())));
 		add(new Label("filesCnt", new Model<Integer>(model.getMyExpUser()
 				.getFiles().size())));
-		
-}
+
+	}
 
 
 	@Override
@@ -47,7 +47,8 @@ public class StartImportStep
 	@Override
 	public IDynamicWizardStep next()
 	{
-		return new SelectResourcesStep(this, (ImportModel) this.getDefaultModelObject());
+		return new SelectResourcesStep(this,
+				(ImportModel) this.getDefaultModelObject());
 	}
 
 }

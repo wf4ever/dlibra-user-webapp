@@ -121,7 +121,8 @@ public class MyExpImportPage
 		{
 			super(id);
 
-			DynamicWizardModel wizardModel = new DynamicWizardModel(new StartImportStep(model));
+			DynamicWizardModel wizardModel = new DynamicWizardModel(
+					new StartImportStep(model));
 			init(wizardModel);
 		}
 

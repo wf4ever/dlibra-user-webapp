@@ -16,4 +16,5 @@ public class Constants
 
 	public static final String SESSION_ACCESS_TOKEN = "accessToken";
 
+	public static final String SESSION_USER_MODEL = "userModel";
 }

@@ -6,6 +6,7 @@ import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 
 /**
  * 
@@ -17,8 +18,6 @@ public abstract class TemplatePage
 {
 
 	private static final long serialVersionUID = 4677896071331937974L;
-
-	public static final String USER_MODEL = "userModel";
 
 	protected Panel sidebarPanel;
 
@@ -48,18 +47,19 @@ public abstract class TemplatePage
 
 	protected DlibraUserModel getDlibraUserModel()
 	{
-		if (getSession().getAttribute(USER_MODEL) == null) {
+		if (getSession().getAttribute(Constants.SESSION_USER_MODEL) == null) {
 			DlibraUserModel model = new DlibraUserModel();
-			getSession().setAttribute(USER_MODEL, model);
+			getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
 		}
-		return (DlibraUserModel) getSession().getAttribute(USER_MODEL);
+		return (DlibraUserModel) getSession().getAttribute(
+			Constants.SESSION_USER_MODEL);
 	}
 
 
 	public boolean logIn(DlibraUserModel model)
 	{
 		try {
-			getSession().setAttribute(USER_MODEL, model);
+			getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
 			sidebarPanel.replaceWith(new LoggedInPanel("sidebar", model));
 			return true;
 		}
@@ -73,7 +73,7 @@ public abstract class TemplatePage
 	public void logOut()
 	{
 		DlibraUserModel model = new DlibraUserModel();
-		getSession().setAttribute(USER_MODEL, model);
+		getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
 		reloadPage();
 	}
 

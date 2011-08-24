@@ -1,31 +1,26 @@
-<?xml version="1.0"?>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:wicket="http://wicket.apache.org/" xml:lang="en" lang="en">
-<body>
-	<wicket:extend>
-		<div class="post">
-			<h2 class="title">Welcome!</h2>
-			<div class="entry">
+<?xml version="1.0" encoding="UTF-8"?>
+<wicket:extend xmlns:wicket="http://wicket.apache.org">
+	<div class="post">
+		<h2 class="title">Welcome!</h2>
+		<div class="entry">
+			<p>
+				<span wicket:id="feedback">&nbsp;</span>
+			</p>
+			<form wicket:id="dLibraForm">
+				<p wicket:id="message">Hello!</p>
+				<input class="bigbutton" type="submit" wicket:id="registerButton"
+					value="Action" />
+			</form>
+			<form wicket:id="myExpImportForm">
+				<p>You can import data from myExperiment to Wf4Ever. After
+					clicking the button below you will be redirected to myExperiment
+					page where you will be asked to give access to this service.</p>
 				<p>
-					<span wicket:id="feedback">&nbsp;</span>
+					<input class="bigbutton" type="submit"
+						wicket:id="myExpImportButton"
+						value="Import data from myExperiment" />
 				</p>
-				<form wicket:id="dLibraForm">
-					<p wicket:id="message">Hello!</p>
-					<input class="bigbutton" type="submit" wicket:id="registerButton"
-						value="Action" />
-				</form>
-				<form wicket:id="myExpImportForm">
-					<p>You can import data from myExperiment to Wf4Ever. After
-						clicking the button below you will be redirected to myExperiment
-						page where you will be asked to give access to this service.</p>
-					<p>
-						<input class="bigbutton" type="submit"
-							wicket:id="myExpImportButton"
-							value="Import data from myExperiment" />
-					</p>
-				</form>
-			</div>
+			</form>
 		</div>
-	</wicket:extend>
-</body>
-</html>
+	</div>
+</wicket:extend>

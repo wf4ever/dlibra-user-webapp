@@ -49,9 +49,8 @@ public class RODefinedStep
 
 		Form<RODefinedStep> form = new Form<RODefinedStep>("form",
 				new CompoundPropertyModel<RODefinedStep>(this));
-		add(form);
 		form.add(new CheckBox("addMoreROs"));
-
+		add(form);
 	}
 
 

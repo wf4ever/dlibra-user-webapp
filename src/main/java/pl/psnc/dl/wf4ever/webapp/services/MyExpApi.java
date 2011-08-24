@@ -30,6 +30,14 @@ public class MyExpApi
 	}
 
 
+	public static OAuthService getOAuthService()
+	{
+		return new ServiceBuilder().provider(MyExpApi.class)
+				.apiKey(MyExpApi.CONSUMER_KEY)
+				.apiSecret(MyExpApi.SHARED_SECRET).build();
+	}
+
+
 	/* (non-Javadoc)
 	 * @see org.scribe.builder.api.DefaultApi10a#getAccessTokenEndpoint()
 	 */

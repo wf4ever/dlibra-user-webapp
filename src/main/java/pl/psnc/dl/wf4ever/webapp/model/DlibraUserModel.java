@@ -22,6 +22,8 @@ public class DlibraUserModel
 	private String myExpId;
 
 	private OpenIdDataModel openIdData;
+	
+	private String username;
 
 
 	public void setOpenId(String openId)
@@ -121,5 +123,25 @@ public class DlibraUserModel
 	{
 		this.openIdData = openIdData;
 	}
+
+
+	/**
+	 * @return the username
+	 */
+	public String getUsername()
+	{
+		return username;
+	}
+
+
+	/**
+	 * @param username the username to set
+	 */
+	public void setUsername(String username)
+	{
+		this.username = username;
+	}
+
+
 
 }

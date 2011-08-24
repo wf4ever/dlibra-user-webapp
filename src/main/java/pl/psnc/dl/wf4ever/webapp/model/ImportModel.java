@@ -17,6 +17,10 @@ public class ImportModel
 	implements Serializable
 {
 
+	public enum ImportStatus {
+		NOT_STARTED, RUNNING, PAUSED, FINISHED
+	}
+
 	private static final long serialVersionUID = -6654329540413067819L;
 
 	private List<NewResearchObjectModel> researchObjects;
@@ -25,12 +29,12 @@ public class ImportModel
 
 	private MyExpUser myExpUser;
 
-	private String importStatus = "Import has not started";
+	private String message = "Import has not started";
 
-	private List<String> allImportStatuses = new ArrayList<String>();
+	private List<String> messages = new ArrayList<String>();
 
-	private boolean importActive;
-
+	private ImportStatus status = ImportStatus.NOT_STARTED;
+	
 	private boolean mergeROs = true;
 
 
@@ -87,48 +91,30 @@ public class ImportModel
 
 
 	/**
-	 * @return the importStatus
+	 * @return the message
 	 */
-	public String getImportStatus()
+	public String getMessage()
 	{
-		return importStatus;
+		return message;
 	}
 
 
 	/**
-	 * @param importStatus the importStatus to set
+	 * @param message the message to set
 	 */
-	public void setImportStatus(String importStatus)
+	public void setMessage(String message)
 	{
-		this.importStatus = importStatus;
-		allImportStatuses.add(importStatus);
+		this.message = message;
+		messages.add(message);
 	}
 
 
 	/**
-	 * @return the importActive
+	 * @return the messages
 	 */
-	public boolean isImportActive()
+	public String getMessages()
 	{
-		return importActive;
-	}
-
-
-	/**
-	 * @param importActive the importActive to set
-	 */
-	public void setImportActive(boolean importActive)
-	{
-		this.importActive = importActive;
-	}
-
-
-	/**
-	 * @return the allImportStatuses
-	 */
-	public String getAllImportStatuses()
-	{
-		return StringUtils.join(allImportStatuses, "\r\n");
+		return StringUtils.join(messages, "\r\n");
 	}
 
 
@@ -147,6 +133,24 @@ public class ImportModel
 	public void setMergeROs(boolean mergeROs)
 	{
 		this.mergeROs = mergeROs;
+	}
+
+
+	/**
+	 * @return the status
+	 */
+	public ImportStatus getStatus()
+	{
+		return status;
+	}
+
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(ImportStatus status)
+	{
+		this.status = status;
 	}
 
 }

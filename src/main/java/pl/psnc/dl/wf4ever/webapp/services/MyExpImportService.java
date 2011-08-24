@@ -19,6 +19,7 @@ import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
+import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportStatus;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpFile;
 import pl.psnc.dl.wf4ever.webapp.model.NewResearchObjectModel;
 
@@ -38,18 +39,18 @@ public class MyExpImportService
 	public static void startImport(ImportModel model, Token myExpAccessToken,
 			DlibraUserModel dLibraUser)
 	{
-		model.setImportActive(true);
+		model.setStatus(ImportStatus.RUNNING);
 		for (NewResearchObjectModel ro : model.getResearchObjects()) {
 			try {
 				importRO(model, ro, myExpAccessToken, dLibraUser);
 			}
 			catch (Exception e) {
 				log.error("Error during import", e);
-				model.setImportStatus(e.getMessage());
+				model.setMessage(e.getMessage());
 			}
 		}
-		model.setImportStatus("Finished");
-		model.setImportActive(false);
+		model.setMessage("Finished");
+		model.setStatus(ImportStatus.FINISHED);
 	}
 
 
@@ -63,18 +64,18 @@ public class MyExpImportService
 			Token token, DlibraUserModel dLibraUser)
 		throws Exception
 	{
-		model.setImportStatus(String.format(
+		model.setMessage(String.format(
 			"Creating a Research Object \"%s\"", ro.getName()));
 		if (!DlibraService.createResearchObjectAndVersion(ro.getName(),
 			dLibraUser, model.isMergeROs())) {
-			model.setImportStatus("Merged with an existing Research Object");
+			model.setMessage("Merged with an existing Research Object");
 		}
 		for (MyExpFile file : ro.getFiles()) {
 			OAuthRequest request = new OAuthRequest(Verb.GET, createUrl(file));
 			service.signRequest(token, request);
 			Response response = request.send();
 			MyExpFile fileWithContent = createMyExpFile(response.getBody());
-			model.setImportStatus(String.format("Importing file \"%s\"",
+			model.setMessage(String.format("Importing file \"%s\"",
 				fileWithContent.getFilename()));
 
 			DlibraService.sendResource(fileWithContent.getFilename(),

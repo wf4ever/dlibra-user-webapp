@@ -5,9 +5,10 @@ package pl.psnc.dl.wf4ever.webapp.wizard;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardStep;
 import org.apache.wicket.extensions.wizard.dynamic.IDynamicWizardStep;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -16,6 +17,7 @@ import org.scribe.model.Token;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
+import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportStatus;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpImportService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 
@@ -50,40 +52,39 @@ public class ImportDataStep
 			protected void onPostProcessTarget(AjaxRequestTarget target)
 			{
 				super.onPostProcessTarget(target);
-				if (!model.isImportActive()) {
+				if (model.getStatus() == ImportStatus.FINISHED) {
 					stop();
 					importStatus.remove(this);
 					target.add(importStatus);
 				}
 			}
 		};
-		AjaxLink<String> go = new AjaxLink<String>("go") {
+		add(new AjaxButton("go") {
 
 			@Override
-			public void onClick(AjaxRequestTarget target)
+			protected void onError(AjaxRequestTarget target, Form< ? > form)
 			{
-				Token accessToken = (Token) getSession().getAttribute(
-					Constants.SESSION_ACCESS_TOKEN);
-				DlibraUserModel userModel = (DlibraUserModel) getSession()
-						.getAttribute(Constants.SESSION_USER_MODEL);
-				MyExpImportService.startImport(model, accessToken, userModel);
-				importStatus.add(updater);
-				target.add(importStatus);
 			}
-		};
 
-		AjaxLink<String> stop = new AjaxLink<String>("stop") {
 
 			@Override
-			public void onClick(AjaxRequestTarget target)
+			protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
 			{
-				updater.stop();
-				importStatus.remove(updater);
-				target.add(importStatus);
+				if (model.getStatus() == ImportStatus.NOT_STARTED) {
+					Token accessToken = (Token) getSession().getAttribute(
+						Constants.SESSION_ACCESS_TOKEN);
+					DlibraUserModel userModel = (DlibraUserModel) getSession()
+							.getAttribute(Constants.SESSION_USER_MODEL);
+					MyExpImportService.startImport(model, accessToken,
+						userModel);
+					importStatus.add(updater);
+					target.add(importStatus);
+					
+					this.setEnabled(false);
+					target.add(this);
+				}
 			}
-		};
-
-		add(go, stop);
+		}).setOutputMarkupId(true);
 	}
 
 

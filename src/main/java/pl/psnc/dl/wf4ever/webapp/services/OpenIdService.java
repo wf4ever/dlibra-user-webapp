@@ -94,8 +94,6 @@ public class OpenIdService
 	public static DiscoveryInformation performDiscoveryOnUserSuppliedIdentifier(
 			String userSuppliedIdentifier)
 	{
-		DiscoveryInformation ret = null;
-		//
 		ConsumerManager consumerManager = getConsumerManager();
 		try {
 			// Perform discover on the User-Supplied Identifier
@@ -103,7 +101,7 @@ public class OpenIdService
 			List<DiscoveryInformation> discoveries = consumerManager
 					.discover(userSuppliedIdentifier);
 			// Pass the discoveries to the associate() method...
-			ret = consumerManager.associate(discoveries);
+			return consumerManager.associate(discoveries);
 
 		}
 		catch (DiscoveryException e) {
@@ -111,7 +109,6 @@ public class OpenIdService
 			log.error(message, e);
 			throw new RuntimeException(message, e);
 		}
-		return ret;
 	}
 
 

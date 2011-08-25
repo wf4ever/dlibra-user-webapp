@@ -3,6 +3,7 @@
  */
 package pl.psnc.dl.wf4ever.webapp.model;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.wicket.util.crypt.Base64;
@@ -24,6 +25,8 @@ public class MyExpFile
 	private String filename;
 
 	private String content;
+
+	private String contentType;
 
 
 	/**
@@ -65,6 +68,25 @@ public class MyExpFile
 	public String getContentDecoded()
 	{
 		return new String(Base64.decodeBase64(content));
+	}
+
+
+	/**
+	 * @return the contentType
+	 */
+	@XmlElement(name = "content-type")
+	public String getContentType()
+	{
+		return contentType;
+	}
+
+
+	/**
+	 * @param contentType the contentType to set
+	 */
+	public void setContentType(String contentType)
+	{
+		this.contentType = contentType;
 	}
 
 }

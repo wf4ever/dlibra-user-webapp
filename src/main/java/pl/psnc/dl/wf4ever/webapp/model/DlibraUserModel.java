@@ -15,6 +15,8 @@ public class DlibraUserModel
 
 	private static final long serialVersionUID = 3184540866229897863L;
 
+	private boolean authenticated = false;
+	
 	private String openId;
 
 	private String accessToken;
@@ -140,6 +142,24 @@ public class DlibraUserModel
 	public void setUsername(String username)
 	{
 		this.username = username;
+	}
+
+
+	/**
+	 * @return the authenticated
+	 */
+	public boolean isAuthenticated()
+	{
+		return authenticated;
+	}
+
+
+	/**
+	 * @param authenticated the authenticated to set
+	 */
+	public void setAuthenticated(boolean authenticated)
+	{
+		this.authenticated = authenticated;
 	}
 
 

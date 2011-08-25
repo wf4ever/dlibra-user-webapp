@@ -105,6 +105,8 @@ public class ImportModel
 	public void setMessage(String message)
 	{
 		this.message = message;
+		if (messages == null)
+			messages = new ArrayList<String>();
 		messages.add(message);
 	}
 

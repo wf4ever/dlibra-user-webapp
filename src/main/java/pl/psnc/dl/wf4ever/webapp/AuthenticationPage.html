@@ -6,11 +6,15 @@
 			<p>Please enter and confirm your OpenID below to register with
 				this site.</p>
 			<form id="OpenIdRegistrationForm" wicket:id="form">
-				<label>Your Open ID:</label> <input class="biginput" type="text"
-					wicket:id="openId" /> <input type="submit"
-					wicket:id="confirmOpenIdButton" value="Confirm OpenID" />
+				<p>
+					<label>Your Open ID:</label> <input class="biginput" type="text"
+						wicket:id="openId" /> <input type="submit"
+						wicket:id="confirmOpenIdButton" value="Confirm OpenID" />
+				</p>
+				<p>
+					<input type="submit" wicket:id="logInWithGoogle" value="Log in with Google" />
+				</p>
 			</form>
-			<p>For Google, type in "https://www.google.com/accounts/o8/id"</p>
 		</div>
 	</div>
 </wicket:extend>

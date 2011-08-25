@@ -21,6 +21,7 @@ import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportStatus;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpFile;
+import pl.psnc.dl.wf4ever.webapp.model.MyExpWorkflow;
 import pl.psnc.dl.wf4ever.webapp.model.NewResearchObjectModel;
 
 /**
@@ -64,29 +65,87 @@ public class MyExpImportService
 			Token token, DlibraUserModel dLibraUser)
 		throws Exception
 	{
-		model.setMessage(String.format(
-			"Creating a Research Object \"%s\"", ro.getName()));
-		if (!DlibraService.createResearchObjectAndVersion(ro.getName(),
-			dLibraUser, model.isMergeROs())) {
-			model.setMessage("Merged with an existing Research Object");
-		}
+		createRO(model, ro, dLibraUser);
+		importFiles(model, ro, token, dLibraUser);
+		importWorkflows(model, ro, token, dLibraUser);
+	}
+
+
+	/**
+	 * @param model
+	 * @param ro
+	 * @param token
+	 * @param dLibraUser
+	 * @throws JAXBException
+	 * @throws Exception
+	 */
+	private static void importFiles(ImportModel model,
+			NewResearchObjectModel ro, Token token, DlibraUserModel dLibraUser)
+		throws JAXBException, Exception
+	{
 		for (MyExpFile file : ro.getFiles()) {
 			OAuthRequest request = new OAuthRequest(Verb.GET, createUrl(file));
 			service.signRequest(token, request);
 			Response response = request.send();
-			MyExpFile fileWithContent = createMyExpFile(response.getBody());
+			MyExpFile f = createMyExpFile(response.getBody());
 			model.setMessage(String.format("Importing file \"%s\"",
-				fileWithContent.getFilename()));
+				f.getFilename()));
 
-			DlibraService.sendResource(fileWithContent.getFilename(),
-				ro.getName(), fileWithContent.getContentDecoded(), dLibraUser);
+			DlibraService.sendResource(f.getFilename(), ro.getName(),
+				f.getContentDecoded(), f.getContentType(), dLibraUser);
+		}
+	}
+
+
+	/**
+	 * @param model
+	 * @param ro
+	 * @param token
+	 * @param dLibraUser
+	 * @throws JAXBException
+	 * @throws Exception
+	 */
+	private static void importWorkflows(ImportModel model,
+			NewResearchObjectModel ro, Token token, DlibraUserModel dLibraUser)
+		throws JAXBException, Exception
+	{
+		for (MyExpWorkflow workflow : ro.getWorkflows()) {
+			OAuthRequest request = new OAuthRequest(Verb.GET,
+					createUrl(workflow));
+			service.signRequest(token, request);
+			Response response = request.send();
+			MyExpWorkflow w = createMyExpWorkflow(response.getBody());
+			model.setMessage(String.format("Importing workflow \"%s\"",
+				w.getFilename()));
+
+			DlibraService.sendResource(w.getFilename(), ro.getName(),
+				w.getContentDecoded(), w.getContentType(), dLibraUser);
+		}
+	}
+
+
+	/**
+	 * @param model
+	 * @param ro
+	 * @param dLibraUser
+	 * @throws Exception
+	 */
+	private static void createRO(ImportModel model, NewResearchObjectModel ro,
+			DlibraUserModel dLibraUser)
+		throws Exception
+	{
+		model.setMessage(String.format("Creating a Research Object \"%s\"",
+			ro.getName()));
+		if (!DlibraService.createResearchObjectAndVersion(ro.getName(),
+			dLibraUser, model.isMergeROs())) {
+			model.setMessage("Merged with an existing Research Object");
 		}
 	}
 
 
 	private static String createUrl(MyExpFile file)
 	{
-		return file.getUri() + "&elements=filename,content";
+		return file.getUri() + "&elements=filename,content,content-type";
 	}
 
 
@@ -99,6 +158,24 @@ public class MyExpImportService
 		StringBuffer xmlStr = new StringBuffer(xml);
 		return (MyExpFile) u.unmarshal(new StreamSource(new StringReader(xmlStr
 				.toString())));
+	}
+
+
+	private static String createUrl(MyExpWorkflow workflow)
+	{
+		return workflow.getUri() + "&elements=content,content-uri,content-type";
+	}
+
+
+	private static MyExpWorkflow createMyExpWorkflow(String xml)
+		throws JAXBException
+	{
+		JAXBContext jc = JAXBContext.newInstance(MyExpWorkflow.class);
+
+		Unmarshaller u = jc.createUnmarshaller();
+		StringBuffer xmlStr = new StringBuffer(xml);
+		return (MyExpWorkflow) u.unmarshal(new StreamSource(new StringReader(
+				xmlStr.toString())));
 	}
 
 }

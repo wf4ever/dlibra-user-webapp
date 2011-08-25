@@ -1,24 +1,20 @@
 package pl.psnc.dl.wf4ever.webapp;
 
-import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.openid4java.discovery.DiscoveryInformation;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
-import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
@@ -58,27 +54,9 @@ public class DlibraRegistrationPage
 	{
 		super(pageParameters);
 		DlibraUserModel model = getDlibraUserModel();
-		if (!pageParameters.isEmpty()) {
-			String isReturn = pageParameters.get("is_return").toString();
-			if ("true".equals(isReturn)) {
-				Session session = getSession();
-				DiscoveryInformation discoveryInformation = (DiscoveryInformation) session
-						.getAttribute(Constants.SESSION_DISCOVERY_INFORMATION);
-
-				OpenIdService.processReturn(model, discoveryInformation,
-					pageParameters, WicketUtils.getCompleteUrl(this,
-						DlibraRegistrationPage.class, true));
-				if (model.getOpenIdData() == null) {
-					error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider. You will have to enter all information by hand into the text fields provided.");
-				}
-				DlibraService.provisionAuthenticatedUserModel(model);
-				logIn(model);
-			}
-		}
 
 		add(new UserInfoDisplayForm("dLibraForm", model));
 		add(new MyExpImportForm("myExpImportForm", model));
-		add(new FeedbackPanel("feedback"));
 	}
 
 

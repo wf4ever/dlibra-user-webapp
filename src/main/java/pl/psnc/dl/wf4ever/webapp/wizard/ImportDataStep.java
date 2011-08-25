@@ -40,8 +40,8 @@ public class ImportDataStep
 	{
 		super(previousStep, "Import data", "", new Model<ImportModel>(model));
 		final TextArea<String> importStatus = new TextArea<String>(
-				"importStatus", new PropertyModel<String>(model,
-						"allImportStatuses"));
+				"messages", new PropertyModel<String>(model,
+						"messages"));
 		importStatus.setOutputMarkupId(true);
 		add(importStatus);
 

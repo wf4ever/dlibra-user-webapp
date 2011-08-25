@@ -1,6 +1,7 @@
 package pl.psnc.dl.wf4ever.webapp;
 
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -25,11 +26,11 @@ public abstract class TemplatePage
 	public TemplatePage(PageParameters pageParameters)
 	{
 		DlibraUserModel userModel = getDlibraUserModel();
-		if (userModel.getOpenId() == null
+		if (!userModel.isAuthenticated()
 				&& !(this instanceof AuthenticationPage)) {
 			goToAuthenticationPage(pageParameters);
 		}
-		if (userModel.getOpenId() == null) {
+		if (!userModel.isAuthenticated()) {
 			sidebarPanel = new LoggedOutPanel("sidebar");
 		}
 		else {
@@ -42,6 +43,7 @@ public abstract class TemplatePage
 			}
 		}
 		add(sidebarPanel);
+		add(new FeedbackPanel("feedback"));
 	}
 
 
@@ -61,6 +63,7 @@ public abstract class TemplatePage
 		try {
 			getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
 			sidebarPanel.replaceWith(new LoggedInPanel("sidebar", model));
+			model.setAuthenticated(true);
 			return true;
 		}
 		catch (Exception e) {
@@ -74,6 +77,7 @@ public abstract class TemplatePage
 	{
 		DlibraUserModel model = new DlibraUserModel();
 		getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
+		model.setAuthenticated(false);
 		reloadPage();
 	}
 

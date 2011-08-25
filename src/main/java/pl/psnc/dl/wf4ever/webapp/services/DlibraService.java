@@ -80,8 +80,8 @@ public class DlibraService
 		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
 		Response response = request.send();
 		if (response.getCode() != HttpStatus.SC_CREATED) {
-			log.error("Response: " + response.getCode() + " "
-					+ response.getBody());
+			log.error("Error when creating workspace, response: "
+					+ response.getCode() + " " + response.getBody());
 		}
 
 		try {
@@ -129,7 +129,8 @@ public class DlibraService
 			return false;
 		}
 		else {
-			throw new Exception("Response: " + response.getCode() + " "
+			throw new Exception("Error when creating RO " + name
+					+ ", response: " + response.getCode() + " "
 					+ response.getBody());
 		}
 	}
@@ -161,26 +162,28 @@ public class DlibraService
 			return false;
 		}
 		else {
-			throw new Exception("Response: " + response.getCode() + " "
-					+ response.getBody());
+			throw new Exception("Error when creating version, response: "
+					+ response.getCode() + " " + response.getBody());
 		}
 	}
 
 
 	public static void sendResource(String path, String roName, String content,
-			DlibraUserModel model)
+			String contentType, DlibraUserModel model)
 		throws Exception
 	{
 		String url = String.format(URI_RESOURCE, model.getUsername(), roName,
 			DEFAULT_VERSION, path);
 		OAuthRequest request = new OAuthRequest(Verb.PUT, url);
-		request.addHeader("Content-type", "text/plain");
+		request.addHeader("Content-Type", contentType != null ? contentType
+				: "text/plain");
 		request.addPayload(content);
 		dLibraService.signRequest(new Token(model.getAccessToken(), null),
 			request);
 		Response response = request.send();
 		if (response.getCode() != HttpStatus.SC_OK) {
-			log.error("Response: " + response.getCode() + " "
+			throw new Exception("Error when sending resource " + path
+					+ ", response: " + response.getCode() + " "
 					+ response.getBody());
 		}
 	}
@@ -207,8 +210,8 @@ public class DlibraService
 			request);
 		Response response = request.send();
 		if (response.getCode() != HttpStatus.SC_OK) {
-			log.error("Response: " + response.getCode() + " "
-					+ response.getBody());
+			log.error("Error when deleting workspace, response: "
+					+ response.getCode() + " " + response.getBody());
 		}
 
 		try {

@@ -1,10 +1,13 @@
 package pl.psnc.dl.wf4ever.webapp;
 
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
@@ -50,13 +53,106 @@ public class DlibraRegistrationPage
 	 * @param pageParameters The request parameters (which are the response
 	 *  parameters from the OP).
 	 */
+	@SuppressWarnings("serial")
 	public DlibraRegistrationPage(PageParameters pageParameters)
 	{
 		super(pageParameters);
+		setOutputMarkupId(true);
 		DlibraUserModel model = getDlibraUserModel();
 
-		add(new UserInfoDisplayForm("dLibraForm", model));
-		add(new MyExpImportForm("myExpImportForm", model));
+		Form<DlibraUserModel> form = new Form<DlibraUserModel>("form",
+				new CompoundPropertyModel<DlibraUserModel>(model));
+		form.setOutputMarkupId(true);
+		add(form);
+
+		final WebMarkupContainer message = createMessageFragment(model, this);
+		message.setOutputMarkupId(true);
+		form.add(message);
+
+		final WebMarkupContainer credentials = createCredentialsDiv(model);
+		form.add(credentials);
+
+		final Button importButton = new Button("myExpImportButton") {
+
+			@Override
+			public void onSubmit()
+			{
+				startMyExpImport();
+			}
+		};
+		importButton.setEnabled(model.isRegistered());
+		form.add(importButton).setOutputMarkupId(true);
+
+		form.add(
+			new AjaxButton("registerButtonText", new PropertyModel<String>(
+					model, "registerButtonText")) {
+
+				@Override
+				protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
+				{
+					DlibraUserModel model = (DlibraUserModel) getForm()
+							.getModelObject();
+					try {
+						if (model.isRegistered()) {
+							DlibraService.deleteWorkspace(model);
+						}
+						else {
+							DlibraService.createWorkspace(model);
+						}
+					}
+					catch (Exception e) {
+						error(e.getMessage() != null ? e.getMessage()
+								: "Unknown error");
+					}
+					target.add(message);
+					target.add(this);
+					importButton.setEnabled(model.isRegistered());
+					target.add(importButton);
+					WebMarkupContainer div = createCredentialsDiv(model);
+					getParent().replace(div);
+					Fragment f = createMessageFragment(model, DlibraRegistrationPage.this);
+					getParent().replace(f);
+					target.add(getParent());
+
+				}
+
+
+				@Override
+				protected void onError(AjaxRequestTarget arg0, Form< ? > arg1)
+				{
+				}
+			}).setOutputMarkupId(true);
+	}
+
+
+	private WebMarkupContainer createCredentialsDiv(DlibraUserModel model)
+	{
+		WebMarkupContainer div = new WebMarkupContainer("credentials");
+		if (model.isRegistered()) {
+			div.add(new Label("username", new PropertyModel<String>(model,
+					"username")));
+			div.add(new Label("password", new PropertyModel<String>(model,
+					"password")));
+		}
+		else {
+			div.setVisible(false);
+		}
+		return div;
+	}
+
+
+	private Fragment createMessageFragment(DlibraUserModel model,
+			MarkupContainer container)
+	{
+		Fragment f;
+		if (model.isRegistered()) {
+			f = new RegisteredFragment("message", "registered", container,
+					model);
+		}
+		else {
+			f = new Fragment("message", "notRegistered", container);
+		}
+		return f;
 	}
 
 
@@ -74,75 +170,19 @@ public class DlibraRegistrationPage
 			new RedirectRequestHandler(authorizationUrl));
 	}
 
-	private class UserInfoDisplayForm
-		extends Form<DlibraUserModel>
+	@SuppressWarnings("serial")
+	private class RegisteredFragment
+		extends Fragment
 	{
 
-		private static final long serialVersionUID = 8454343676077898053L;
-
-
-		@SuppressWarnings("serial")
-		public UserInfoDisplayForm(String id, final DlibraUserModel model)
+		public RegisteredFragment(String id, String markupId,
+				MarkupContainer markupProvider, DlibraUserModel model)
 		{
-			super(id, new CompoundPropertyModel<DlibraUserModel>(model));
-
-			final Label message = new Label("message");
-			message.setOutputMarkupId(true);
-			add(message);
-
-			Button actionButton = new AjaxButton("registerButton",
-					new PropertyModel<String>(model, "buttonText")) {
-
-				@Override
-				protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
-				{
-					if (model.isRegistered()) {
-						DlibraService.deleteWorkspace(model);
-					}
-					else {
-						DlibraService.createWorkspace(model);
-					}
-					target.add(message);
-					target.add(this);
-				}
-
-
-				@Override
-				protected void onError(AjaxRequestTarget arg0, Form< ? > arg1)
-				{
-					// TODO Auto-generated method stub
-
-				}
-			};
-			actionButton.setOutputMarkupId(true);
-			add(actionButton);
+			super(id, markupId, markupProvider);
+			add(new Label("accessTokenString", new PropertyModel<String>(model,
+					"accessTokenString")));
 		}
-	}
 
-	private class MyExpImportForm
-		extends Form<DlibraUserModel>
-	{
-
-		private static final long serialVersionUID = 8454343676077898053L;
-
-
-		public MyExpImportForm(String id, DlibraUserModel model)
-		{
-			super(id, new CompoundPropertyModel<DlibraUserModel>(model));
-
-			@SuppressWarnings("serial")
-			final Button importButton = new Button("myExpImportButton") {
-
-				@Override
-				public void onSubmit()
-				{
-					startMyExpImport();
-				}
-			};
-			importButton.setOutputMarkupId(true);
-			add(importButton);
-
-		}
 	}
 
 }

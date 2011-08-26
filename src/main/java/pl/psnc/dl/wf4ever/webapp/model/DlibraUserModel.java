@@ -5,6 +5,8 @@ package pl.psnc.dl.wf4ever.webapp.model;
 
 import java.io.Serializable;
 
+import org.scribe.model.Token;
+
 /**
  * @author Piotr Hołubowicz
  *
@@ -16,16 +18,18 @@ public class DlibraUserModel
 	private static final long serialVersionUID = 3184540866229897863L;
 
 	private boolean authenticated = false;
-	
+
 	private String openId;
 
-	private String accessToken;
+	private Token accessToken;
 
 	private String myExpId;
 
 	private OpenIdDataModel openIdData;
-	
+
 	private String username;
+
+	private String password;
 
 
 	public void setOpenId(String openId)
@@ -46,35 +50,28 @@ public class DlibraUserModel
 	/**
 	 * @return the accessToken
 	 */
-	public String getAccessToken()
+	public Token getAccessToken()
 	{
 		return accessToken;
 	}
 
 
 	/**
-	 * @param accessToken the accessToken to set
+	 * @param token the accessToken to set
 	 */
-	public void setAccessToken(String accessToken)
+	public void setAccessToken(Token token)
 	{
-		this.accessToken = accessToken;
+		this.accessToken = token;
 	}
 
 
-	public String getMessage()
+	public String getAccessTokenString()
 	{
-		if (isRegistered()) {
-			return "You are registered in dLibra. " + "Your access token is "
-					+ accessToken + ".";
-		}
-		else {
-			return "You are not registered in dLibra. By registering you will receive "
-					+ "an access token that will allow you to use dLibra.";
-		}
+		return accessToken != null ? accessToken.getToken() : null;
 	}
 
 
-	public String getButtonText()
+	public String getRegisterButtonText()
 	{
 		if (isRegistered()) {
 			return "Unregister from dLibra";
@@ -163,5 +160,21 @@ public class DlibraUserModel
 	}
 
 
+	/**
+	 * @return the password
+	 */
+	public String getPassword()
+	{
+		return password;
+	}
+
+
+	/**
+	 * @param password the password to set
+	 */
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
 
 }

@@ -3,7 +3,6 @@
  */
 package pl.psnc.dl.wf4ever.webapp.services;
 
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -48,8 +47,8 @@ public class DlibraService
 
 	private static final int USERNAME_LENGTH = 20;
 
-	private static final Token WFADMIN_ACCESS_TOKEN = new Token(
-			Base64.encodeBase64String("wfadmin:wfadmin!!!".getBytes()), null);
+	private static final Token WFADMIN_ACCESS_TOKEN = generateAccessToken(
+		"wfadmin", "wfadmin!!!");
 
 	private static final OAuthService dLibraService = DlibraApi
 			.getOAuthService();
@@ -66,6 +65,7 @@ public class DlibraService
 
 
 	public static void createWorkspace(DlibraUserModel model)
+		throws Exception
 	{
 		String username = generateUsername();
 		String password = generatePassword();
@@ -77,20 +77,17 @@ public class DlibraService
 
 		String url = String.format(URI_WORKSPACE);
 		OAuthRequest request = new OAuthRequest(Verb.POST, url);
+		request.addHeader("Content-Type", "text/plain");
+		request.addPayload(username + "\r\n" + password);
 		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
 		Response response = request.send();
 		if (response.getCode() != HttpStatus.SC_CREATED) {
-			log.error("Error when creating workspace, response: "
+			throw new Exception("Error when creating workspace, response: "
 					+ response.getCode() + " " + response.getBody());
 		}
 
-		try {
-			DerbyService.insertUser(model.getOpenId(), username, password);
-			provisionAuthenticatedUserModel(model);
-		}
-		catch (SQLException e1) {
-			log.error("Error when inserting username and password", e1);
-		}
+		DerbyService.insertUser(model.getOpenId(), username, password);
+		provisionAuthenticatedUserModel(model);
 	}
 
 
@@ -119,8 +116,7 @@ public class DlibraService
 		OAuthRequest request = new OAuthRequest(Verb.POST, url);
 		request.addHeader("Content-type", "text/plain");
 		request.addPayload(name);
-		dLibraService.signRequest(new Token(model.getAccessToken(), null),
-			request);
+		dLibraService.signRequest(model.getAccessToken(), request);
 		Response response = request.send();
 		if (response.getCode() == HttpStatus.SC_CREATED) {
 			return true;
@@ -152,8 +148,7 @@ public class DlibraService
 		OAuthRequest request = new OAuthRequest(Verb.POST, url);
 		request.addHeader("Content-type", "text/plain");
 		request.addPayload(DEFAULT_VERSION);
-		dLibraService.signRequest(new Token(model.getAccessToken(), null),
-			request);
+		dLibraService.signRequest(model.getAccessToken(), request);
 		Response response = request.send();
 		if (response.getCode() == HttpStatus.SC_CREATED) {
 			return true;
@@ -178,8 +173,7 @@ public class DlibraService
 		request.addHeader("Content-Type", contentType != null ? contentType
 				: "text/plain");
 		request.addPayload(content);
-		dLibraService.signRequest(new Token(model.getAccessToken(), null),
-			request);
+		dLibraService.signRequest(model.getAccessToken(), request);
 		Response response = request.send();
 		if (response.getCode() != HttpStatus.SC_OK) {
 			throw new Exception("Error when sending resource " + path
@@ -203,24 +197,19 @@ public class DlibraService
 
 
 	public static void deleteWorkspace(DlibraUserModel model)
+		throws Exception
 	{
+		model.setAccessToken(null);
 		String url = String.format(URI_WORKSPACE_ID, model.getUsername());
 		OAuthRequest request = new OAuthRequest(Verb.DELETE, url);
-		dLibraService.signRequest(new Token(model.getAccessToken(), null),
-			request);
+		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
 		Response response = request.send();
 		if (response.getCode() != HttpStatus.SC_OK) {
-			log.error("Error when deleting workspace, response: "
+			throw new Exception("Error when deleting workspace, response: "
 					+ response.getCode() + " " + response.getBody());
 		}
 
-		try {
-			DerbyService.deleteUser(model.getOpenId());
-		}
-		catch (SQLException e) {
-			log.error("Error when deleting username and password", e);
-		}
-		model.setAccessToken(null);
+		DerbyService.deleteUser(model.getOpenId());
 	}
 
 
@@ -229,7 +218,17 @@ public class DlibraService
 		if (DerbyService.userExists(model.getOpenId())) {
 			model.setAccessToken(DerbyService.getAccessToken(model.getOpenId()));
 			model.setUsername(DerbyService.getUsername(model.getOpenId()));
+			model.setPassword(DerbyService.getPassword(model.getOpenId()));
 		}
+	}
+
+
+	public static Token generateAccessToken(String username, String password)
+	{
+		String token = Base64.encodeBase64String((username + ":" + password)
+				.getBytes());
+		token = StringUtils.trim(token);
+		return new Token(token, null);
 	}
 
 }

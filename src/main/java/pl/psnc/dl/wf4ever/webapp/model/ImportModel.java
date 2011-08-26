@@ -121,6 +121,16 @@ public class ImportModel
 
 
 	/**
+	 * This method doesn't do anything.
+	 * @param messages
+	 */
+	public void setMessages(List<String> messages)
+	{
+		// do nothing
+	}
+
+
+	/**
 	 * @return the mergeROs
 	 */
 	public boolean isMergeROs()

@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.util.crypt.Base64;
+import org.scribe.model.Token;
 
 /**
  * @author Piotr Hołubowicz
@@ -37,6 +37,36 @@ public class DerbyService
 			conn = DriverManager.getConnection(protocol + dbName + ";");
 			PreparedStatement ps = conn
 					.prepareStatement("select username from users where openID = ?");
+			ps.setString(1, openID);
+			ResultSet rs = ps.executeQuery();
+			if (!rs.next()) {
+				throw new IllegalArgumentException("OpenID not found");
+			}
+			return rs.getString(1);
+		}
+		catch (SQLException e) {
+			log.error(e);
+		}
+		finally {
+			try {
+				if (conn != null)
+					conn.close();
+			}
+			catch (SQLException e) {
+				log.error(e);
+			}
+		}
+		return null;
+	}
+
+
+	public static String getPassword(String openID)
+	{
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(protocol + dbName + ";");
+			PreparedStatement ps = conn
+					.prepareStatement("select password from users where openID = ?");
 			ps.setString(1, openID);
 			ResultSet rs = ps.executeQuery();
 			if (!rs.next()) {
@@ -87,7 +117,7 @@ public class DerbyService
 	}
 
 
-	public static String getAccessToken(String openID)
+	public static Token getAccessToken(String openID)
 	{
 		Connection conn = null;
 		try {
@@ -100,8 +130,8 @@ public class DerbyService
 				return null;
 			}
 			else {
-				String tokenRaw = rs.getString(1) + ":" + rs.getString(2);
-				return Base64.encodeBase64String(tokenRaw.getBytes());
+				return DlibraService.generateAccessToken(rs.getString(1),
+					rs.getString(2));
 			}
 		}
 		catch (SQLException e) {

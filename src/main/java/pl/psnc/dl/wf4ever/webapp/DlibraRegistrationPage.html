@@ -3,21 +3,47 @@
 	<div class="post">
 		<h2 class="title">Welcome!</h2>
 		<div class="entry">
-			<form wicket:id="dLibraForm">
-				<p wicket:id="message">Hello!</p>
-				<input class="bigbutton" type="submit" wicket:id="registerButton"
-					value="Action" />
-			</form>
-			<form wicket:id="myExpImportForm">
+			<form wicket:id="form">
+				<div wicket:id="message"></div>
+				<div wicket:id="credentials">
+					<p>
+						In order to view your imported objects in <a
+							href="http://sandbox.wf4ever-project.org/dlibra-editor/editor.jnlp">dLibra
+							Editor Application</a> please use the username and password provided
+						below. As soon as other viewing options are available, username
+						and passwords will stop being revealed and only the access token
+						will be used.
+					</p>
+					<p>
+						dLibra username: <strong> <span wicket:id="username"></span>
+						</strong>
+					</p>
+					<p>
+						dLibra password: <strong> <span wicket:id="password"></span>
+						</strong>
+					</p>
+				</div>
+				<p>
+					<input type="submit" wicket:id="registerButtonText" value="Action" />
+				</p>
 				<p>You can import data from myExperiment to Wf4Ever. After
 					clicking the button below you will be redirected to myExperiment
 					page where you will be asked to give access to this service.</p>
 				<p>
-					<input class="bigbutton" type="submit"
-						wicket:id="myExpImportButton"
+					<input type="submit" wicket:id="myExpImportButton"
 						value="Import data from myExperiment" />
 				</p>
 			</form>
 		</div>
 	</div>
+	<wicket:fragment wicket:id="registered">
+		<p>
+			You are registered in dLibra. Your access token is <br /> <strong><span
+				wicket:id="accessTokenString"></span> </strong>
+		</p>
+	</wicket:fragment>
+	<wicket:fragment wicket:id="notRegistered">
+		<p>You are not registered in dLibra. By registering you will
+			receive an access token that will allow you to use dLibra.</p>
+	</wicket:fragment>
 </wicket:extend>

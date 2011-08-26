@@ -16,9 +16,9 @@ public class MyExpApi
 	extends DefaultApi10a
 {
 
-	private static final String CONSUMER_KEY = "kA9xe84b4sGDDcLfMCBrw";
+	private static final String CONSUMER_KEY = "W0Eog3P8R5AdWmL7R0dQ";
 
-	private static final String SHARED_SECRET = "IqywoxpYNsWgz8seUONNgxnhohziFvjdsqZHdsQE";
+	private static final String SHARED_SECRET = "78M8gdWyLrL5TswsN2nV0pd0fQzx1NG8IMVWoiDgmU";
 
 
 	public static OAuthService getOAuthService(String oauthCallbackURL)

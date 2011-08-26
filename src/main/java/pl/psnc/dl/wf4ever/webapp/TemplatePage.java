@@ -1,6 +1,7 @@
 package pl.psnc.dl.wf4ever.webapp;
 
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
@@ -23,6 +24,7 @@ public abstract class TemplatePage
 	protected Panel sidebarPanel;
 
 
+	@SuppressWarnings("serial")
 	public TemplatePage(PageParameters pageParameters)
 	{
 		DlibraUserModel userModel = getDlibraUserModel();
@@ -42,6 +44,25 @@ public abstract class TemplatePage
 				sidebarPanel = new LoggedOutPanel("sidebar");
 			}
 		}
+
+		add(new Link<Void>("home") {
+
+			@Override
+			public void onClick()
+			{
+				setResponsePage(getApplication().getHomePage());
+			}
+
+		});
+		add(new Link<Void>("about") {
+
+			@Override
+			public void onClick()
+			{
+				setResponsePage(new AboutPage());
+			}
+
+		});
 		add(sidebarPanel);
 		add(new FeedbackPanel("feedback"));
 	}

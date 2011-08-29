@@ -14,7 +14,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
-import pl.psnc.dl.wf4ever.webapp.model.NewResearchObjectModel;
+import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
 
 /**
  * @author Piotr Hołubowicz
@@ -35,12 +35,12 @@ public class ConfirmRONamesStep
 		Form< ? > form = new Form<Void>("form");
 		add(form);
 		@SuppressWarnings("serial")
-		ListView<NewResearchObjectModel> list = new ListView<NewResearchObjectModel>(
+		ListView<ResearchObject> list = new ListView<ResearchObject>(
 				"resourceListView", model.getResearchObjectsProcessed()) {
 
-			protected void populateItem(ListItem<NewResearchObjectModel> item)
+			protected void populateItem(ListItem<ResearchObject> item)
 			{
-				NewResearchObjectModel ro = (NewResearchObjectModel) item
+				ResearchObject ro = (ResearchObject) item
 						.getModelObject();
 				ro.setDefaultName();
 				item.add(new RequiredTextField<String>("name",

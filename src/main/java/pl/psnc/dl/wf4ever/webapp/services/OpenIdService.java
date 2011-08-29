@@ -28,8 +28,7 @@ import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
-import pl.psnc.dl.wf4ever.webapp.model.OpenIdDataModel;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
 
 /**
  * Most of this code modeled after ConsumerServlet, part of the openid4java 
@@ -201,10 +200,10 @@ public class OpenIdService
 	 * Processes the returned information from an authentication request
 	 * from the OP.
 	 */
-	public static void processReturn(DlibraUserModel model,
-			DiscoveryInformation discoveryInformation,
+	public static OpenIdData processReturn(DiscoveryInformation discoveryInformation,
 			PageParameters pageParameters, String returnToUrl)
 	{
+		OpenIdData data = null;
 		try {
 			// Verify the Information returned from the OP
 			/// This is required according to the spec
@@ -220,11 +219,11 @@ public class OpenIdService
 					MessageExtension extension = authSuccess
 							.getExtension(AxMessage.OPENID_NS_AX);
 					if (extension instanceof FetchResponse) {
-						if (model.getOpenIdData() == null) {
-							model.setOpenIdData(new OpenIdDataModel());
+						if (data == null) {
+							data = new OpenIdData();
 						}
 						provisionRegistrationModel(verifiedIdentifier,
-							(FetchResponse) extension, model.getOpenIdData());
+							(FetchResponse) extension, data);
 					}
 				}
 				else {
@@ -234,11 +233,11 @@ public class OpenIdService
 					MessageExtension extension = authSuccess
 							.getExtension(SRegMessage.OPENID_NS_SREG);
 					if (extension instanceof SRegResponse) {
-						if (model.getOpenIdData() == null) {
-							model.setOpenIdData(new OpenIdDataModel());
+						if (data == null) {
+							data = new OpenIdData();
 						}
 						provisionRegistrationModel(verifiedIdentifier,
-							(SRegResponse) extension, model.getOpenIdData());
+							(SRegResponse) extension, data);
 					}
 				}
 				else {
@@ -254,12 +253,13 @@ public class OpenIdService
 			log.error(message, e);
 			throw new RuntimeException(message, e);
 		}
+		return data;
 	}
 
 
 	private static void provisionRegistrationModel(
 			Identifier verifiedIdentifier, FetchResponse axResponse,
-			OpenIdDataModel ret)
+			OpenIdData ret)
 	{
 		ret.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;
@@ -304,7 +304,7 @@ public class OpenIdService
 
 
 	private static void provisionRegistrationModel(
-			Identifier verifiedIdentifier, SRegResponse res, OpenIdDataModel ret)
+			Identifier verifiedIdentifier, SRegResponse res, OpenIdData ret)
 	{
 		ret.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;

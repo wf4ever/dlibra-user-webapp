@@ -1,4 +1,4 @@
-package pl.psnc.dl.wf4ever.webapp;
+package pl.psnc.dl.wf4ever.webapp.pages;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -15,7 +15,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
@@ -57,15 +57,17 @@ public class DlibraRegistrationPage
 	public DlibraRegistrationPage(PageParameters pageParameters)
 	{
 		super(pageParameters);
-		setOutputMarkupId(true);
-		DlibraUserModel model = getDlibraUserModel();
+		if (willBeRedirected)
+			return;
+		
+		DlibraUser model = getDlibraUserModel();
 
-		Form<DlibraUserModel> form = new Form<DlibraUserModel>("form",
-				new CompoundPropertyModel<DlibraUserModel>(model));
+		Form<DlibraUser> form = new Form<DlibraUser>("form",
+				new CompoundPropertyModel<DlibraUser>(model));
 		form.setOutputMarkupId(true);
-		add(form);
+		content.add(form);
 
-		final WebMarkupContainer message = createMessageFragment(model, this);
+		final WebMarkupContainer message = createMessageFragment(model, content);
 		message.setOutputMarkupId(true);
 		form.add(message);
 
@@ -90,14 +92,15 @@ public class DlibraRegistrationPage
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
 				{
-					DlibraUserModel model = (DlibraUserModel) getForm()
-							.getModelObject();
+					DlibraUser model = (DlibraUser) getForm().getModelObject();
 					try {
 						if (model.isRegistered()) {
 							DlibraService.deleteWorkspace(model);
 						}
 						else {
-							DlibraService.createWorkspace(model);
+							if (!DlibraService.createWorkspace(model)) {
+								info("Registered an existing account");
+							}
 						}
 					}
 					catch (Exception e) {
@@ -110,7 +113,8 @@ public class DlibraRegistrationPage
 					target.add(importButton);
 					WebMarkupContainer div = createCredentialsDiv(model);
 					getParent().replace(div);
-					Fragment f = createMessageFragment(model, DlibraRegistrationPage.this);
+					Fragment f = createMessageFragment(model,
+						content);
 					getParent().replace(f);
 					target.add(getParent());
 
@@ -125,7 +129,7 @@ public class DlibraRegistrationPage
 	}
 
 
-	private WebMarkupContainer createCredentialsDiv(DlibraUserModel model)
+	private WebMarkupContainer createCredentialsDiv(DlibraUser model)
 	{
 		WebMarkupContainer div = new WebMarkupContainer("credentials");
 		if (model.isRegistered()) {
@@ -141,7 +145,7 @@ public class DlibraRegistrationPage
 	}
 
 
-	private Fragment createMessageFragment(DlibraUserModel model,
+	private Fragment createMessageFragment(DlibraUser model,
 			MarkupContainer container)
 	{
 		Fragment f;
@@ -176,11 +180,11 @@ public class DlibraRegistrationPage
 	{
 
 		public RegisteredFragment(String id, String markupId,
-				MarkupContainer markupProvider, DlibraUserModel model)
+				MarkupContainer markupProvider, DlibraUser model)
 		{
 			super(id, markupId, markupProvider);
-			add(new Label("accessTokenString", new PropertyModel<String>(model,
-					"accessTokenString")));
+			add(new Label("dLibraAccessTokenString", new PropertyModel<String>(model,
+					"dlibraAccessTokenString")));
 		}
 
 	}

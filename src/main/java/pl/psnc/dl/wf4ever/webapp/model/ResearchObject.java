@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Piotr Hołubowicz
  *
  */
-public class NewResearchObjectModel
+public class ResearchObject
 	implements Serializable
 {
 
@@ -36,24 +36,24 @@ public class NewResearchObjectModel
 	private String name;
 
 
-	public NewResearchObjectModel()
+	public ResearchObject()
 	{
 	}
 
 
-	public NewResearchObjectModel(MyExpFile file)
+	public ResearchObject(MyExpFile file)
 	{
 		files.add(file);
 	}
 
 
-	public NewResearchObjectModel(MyExpWorkflow workflow)
+	public ResearchObject(MyExpWorkflow workflow)
 	{
 		workflows.add(workflow);
 	}
 
 
-	public NewResearchObjectModel(MyExpPack pack)
+	public ResearchObject(MyExpPack pack)
 	{
 		packs.add(pack);
 	}

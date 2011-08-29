@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp;
+package pl.psnc.dl.wf4ever.webapp.pages;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -9,8 +9,8 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
-import pl.psnc.dl.wf4ever.webapp.model.OpenIdDataModel;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
 
 /**
  * @author Piotr Hołubowicz
@@ -20,21 +20,21 @@ public class LoggedInPanel
 	extends Panel
 {
 
-	Form<OpenIdDataModel> userDetails;
+	Form<OpenIdData> userDetails;
 
 
-	public LoggedInPanel(String id, DlibraUserModel model)
+	public LoggedInPanel(String id, DlibraUser model)
 		throws Exception
 	{
-		super(id, new CompoundPropertyModel<DlibraUserModel>(model));
+		super(id, new CompoundPropertyModel<DlibraUser>(model));
 		setOutputMarkupId(true);
 
 		if (model == null || model.getOpenId() == null) {
 			throw new Exception("User is not logged in");
 		}
 		
-		userDetails = new Form<OpenIdDataModel>("userDetails",
-				new CompoundPropertyModel<OpenIdDataModel>(
+		userDetails = new Form<OpenIdData>("userDetails",
+				new CompoundPropertyModel<OpenIdData>(
 						model.getOpenIdData()));
 		userDetails.add(new Label("fullName"));
 		//			userDetails.add(new Label("openId"));

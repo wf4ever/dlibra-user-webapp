@@ -15,7 +15,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.time.Duration;
 import org.scribe.model.Token;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportStatus;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpImportService;
@@ -73,7 +73,7 @@ public class ImportDataStep
 				if (model.getStatus() == ImportStatus.NOT_STARTED) {
 					Token accessToken = (Token) getSession().getAttribute(
 						Constants.SESSION_ACCESS_TOKEN);
-					DlibraUserModel userModel = (DlibraUserModel) getSession()
+					DlibraUser userModel = (DlibraUser) getSession()
 							.getAttribute(Constants.SESSION_USER_MODEL);
 					MyExpImportService.startImport(model, accessToken,
 						userModel);

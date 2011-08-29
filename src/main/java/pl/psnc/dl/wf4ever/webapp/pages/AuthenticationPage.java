@@ -1,4 +1,4 @@
-package pl.psnc.dl.wf4ever.webapp;
+package pl.psnc.dl.wf4ever.webapp.pages;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.form.Button;
@@ -13,7 +13,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
@@ -45,7 +46,6 @@ public class AuthenticationPage
 	public AuthenticationPage(PageParameters pageParameters)
 	{
 		super(pageParameters);
-		final DlibraUserModel model = getDlibraUserModel();
 
 		// FIXME replaceAll because "../" gets inserted, don't know why
 		returnToUrl = WicketUtils.getCompleteUrl(this,
@@ -62,32 +62,32 @@ public class AuthenticationPage
 				DiscoveryInformation discoveryInformation = (DiscoveryInformation) session
 						.getAttribute(Constants.SESSION_DISCOVERY_INFORMATION);
 
-				OpenIdService.processReturn(model, discoveryInformation,
-					pageParameters, returnToUrl);
-				if (model.getOpenIdData() == null) {
+				OpenIdData openIdData = OpenIdService.processReturn(
+					discoveryInformation, pageParameters, returnToUrl);
+				if (openIdData == null) {
 					error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider. You will have to enter all information by hand into the text fields provided.");
 				}
-				DlibraService.provisionAuthenticatedUserModel(model);
-				confirmAuthentication(model);
-				logIn(model);
+				DlibraUser user = DlibraService.loadOrCreateUser(openIdData
+						.getOpenId());
+				user.setOpenIdData(openIdData);
+				confirmAuthentication(user);
+				logIn(user);
 			}
 		}
 
-		if (!model.isAuthenticated() && model.getOpenId() == GOOGLE_URL) {
-			model.setOpenId(null);
-		}
+		final DlibraUser tempUser = new DlibraUser();
 
-		Form<DlibraUserModel> form = new Form<DlibraUserModel>("form",
-				new CompoundPropertyModel<DlibraUserModel>(model)) {
+		Form<DlibraUser> form = new Form<DlibraUser>("form",
+				new CompoundPropertyModel<DlibraUser>(tempUser)) {
 
 			@Override
 			protected void onSubmit()
 			{
 				super.onSubmit();
-				applyForAuthentication(model.getOpenId());
+				applyForAuthentication(tempUser.getOpenId());
 			}
 		};
-		add(form);
+		content.add(form);
 		TextField<String> openId = new RequiredTextField<String>("openId");
 		openId.setLabel(new Model<String>("Your Open ID"));
 		form.add(openId);
@@ -98,7 +98,7 @@ public class AuthenticationPage
 			public void onSubmit()
 			{
 				super.onSubmit();
-				model.setOpenId(GOOGLE_URL);
+				tempUser.setOpenId(GOOGLE_URL);
 				applyForAuthentication(GOOGLE_URL);
 			}
 		};
@@ -125,7 +125,7 @@ public class AuthenticationPage
 	}
 
 
-	public void confirmAuthentication(DlibraUserModel model)
+	public void confirmAuthentication(DlibraUser model)
 	{
 		String url = urlFor(DlibraRegistrationPage.class, null).toString();
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(

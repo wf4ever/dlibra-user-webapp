@@ -17,12 +17,12 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportStatus;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpFile;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpWorkflow;
-import pl.psnc.dl.wf4ever.webapp.model.NewResearchObjectModel;
+import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
 
 /**
  * @author Piotr Hołubowicz
@@ -38,10 +38,10 @@ public class MyExpImportService
 
 
 	public static void startImport(ImportModel model, Token myExpAccessToken,
-			DlibraUserModel dLibraUser)
+			DlibraUser dLibraUser)
 	{
 		model.setStatus(ImportStatus.RUNNING);
-		for (NewResearchObjectModel ro : model.getResearchObjects()) {
+		for (ResearchObject ro : model.getResearchObjects()) {
 			try {
 				importRO(model, ro, myExpAccessToken, dLibraUser);
 			}
@@ -61,8 +61,8 @@ public class MyExpImportService
 	 * @param ro
 	 * @throws Exception 
 	 */
-	private static void importRO(ImportModel model, NewResearchObjectModel ro,
-			Token token, DlibraUserModel dLibraUser)
+	private static void importRO(ImportModel model, ResearchObject ro,
+			Token token, DlibraUser dLibraUser)
 		throws Exception
 	{
 		createRO(model, ro, dLibraUser);
@@ -80,7 +80,7 @@ public class MyExpImportService
 	 * @throws Exception
 	 */
 	private static void importFiles(ImportModel model,
-			NewResearchObjectModel ro, Token token, DlibraUserModel dLibraUser)
+			ResearchObject ro, Token token, DlibraUser dLibraUser)
 		throws JAXBException, Exception
 	{
 		for (MyExpFile file : ro.getFiles()) {
@@ -106,7 +106,7 @@ public class MyExpImportService
 	 * @throws Exception
 	 */
 	private static void importWorkflows(ImportModel model,
-			NewResearchObjectModel ro, Token token, DlibraUserModel dLibraUser)
+			ResearchObject ro, Token token, DlibraUser dLibraUser)
 		throws JAXBException, Exception
 	{
 		for (MyExpWorkflow workflow : ro.getWorkflows()) {
@@ -130,8 +130,8 @@ public class MyExpImportService
 	 * @param dLibraUser
 	 * @throws Exception
 	 */
-	private static void createRO(ImportModel model, NewResearchObjectModel ro,
-			DlibraUserModel dLibraUser)
+	private static void createRO(ImportModel model, ResearchObject ro,
+			DlibraUser dLibraUser)
 		throws Exception
 	{
 		model.setMessage(String.format("Creating a Research Object \"%s\"",

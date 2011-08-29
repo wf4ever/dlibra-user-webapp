@@ -23,9 +23,9 @@ public class ImportModel
 
 	private static final long serialVersionUID = -6654329540413067819L;
 
-	private List<NewResearchObjectModel> researchObjects;
+	private List<ResearchObject> researchObjects;
 
-	private List<NewResearchObjectModel> researchObjectsProcessed;
+	private List<ResearchObject> researchObjectsProcessed;
 
 	private MyExpUser myExpUser;
 
@@ -42,14 +42,14 @@ public class ImportModel
 	{
 		super();
 		this.myExpUser = user;
-		this.researchObjects = new ArrayList<NewResearchObjectModel>();
+		this.researchObjects = new ArrayList<ResearchObject>();
 	}
 
 
 	/**
 	 * @return the researchObjects
 	 */
-	public List<NewResearchObjectModel> getResearchObjects()
+	public List<ResearchObject> getResearchObjects()
 	{
 		return researchObjects;
 	}
@@ -67,7 +67,7 @@ public class ImportModel
 	/**
 	 * @return the researchObjectsProcessed
 	 */
-	public List<NewResearchObjectModel> getResearchObjectsProcessed()
+	public List<ResearchObject> getResearchObjectsProcessed()
 	{
 		return researchObjectsProcessed;
 	}
@@ -77,7 +77,7 @@ public class ImportModel
 	 * @param researchObjectsProcessed the researchObjectsProcessed to set
 	 */
 	public void setResearchObjectsProcessed(
-			List<NewResearchObjectModel> researchObjectsProcessed)
+			List<ResearchObject> researchObjectsProcessed)
 	{
 		this.researchObjectsProcessed = researchObjectsProcessed;
 	}

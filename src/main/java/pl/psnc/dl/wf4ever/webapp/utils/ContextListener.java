@@ -6,7 +6,7 @@ package pl.psnc.dl.wf4ever.webapp.utils;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import pl.psnc.dl.wf4ever.webapp.services.DerbyService;
+import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 
 /**
  * @author Piotr Hołubowicz
@@ -19,15 +19,13 @@ public class ContextListener
 	@Override
 	public void contextInitialized(ServletContextEvent event)
 	{
-		DerbyService.loadDriver();
-		DerbyService.initDB(false);
+		HibernateService.getSessionFactory();
 	}
 
 
 	@Override
 	public void contextDestroyed(ServletContextEvent event)
 	{
-		DerbyService.shutdownDB();
 	}
 
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp;
+package pl.psnc.dl.wf4ever.webapp.pages;
 
 import java.io.StringReader;
 
@@ -12,7 +12,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.wicket.extensions.wizard.Wizard;
 import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardModel;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.scribe.model.OAuthRequest;
@@ -22,6 +21,7 @@ import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
@@ -49,38 +49,42 @@ public class MyExpImportPage
 	public MyExpImportPage(PageParameters pageParameters)
 	{
 		super(pageParameters);
+		if (willBeRedirected)
+			return;
 
-		WebMarkupContainer body = new WebMarkupContainer("body");
-		add(body);
+		DlibraUser user = getDlibraUserModel();
+		OAuthService service = MyExpApi.getOAuthService(WicketUtils
+			.getCompleteUrl(this, MyExpImportPage.class, true));
 
-		if (pageParameters.get(OAUTH_VERIFIER) == null) {
+		if (user.getMyExpAccessToken() == null && pageParameters.get(OAUTH_VERIFIER) != null) {
+				Verifier verifier = new Verifier(pageParameters.get(OAUTH_VERIFIER)
+					.toString());
+			Token requestToken = (Token) getSession().getAttribute(
+				Constants.SESSION_REQUEST_TOKEN);
+			user.setMyExpAccessToken(service.getAccessToken(requestToken, verifier));			
+		}
+
+		if (user.getMyExpAccessToken() == null) {
 			String home = urlFor(AuthenticationPage.class, null).toString();
 			getRequestCycle().scheduleRequestHandlerAfterCurrent(
 				new RedirectRequestHandler(home));
-			body.setVisible(false);
+			content.setVisible(false);
 			return;
 		}
 
-		Verifier verifier = new Verifier(pageParameters.get(OAUTH_VERIFIER)
-				.toString());
-		Token requestToken = (Token) getSession().getAttribute(
-			Constants.SESSION_REQUEST_TOKEN);
-
-		OAuthService service = MyExpApi.getOAuthService(WicketUtils
-				.getCompleteUrl(this, MyExpImportPage.class, true));
-		Token accessToken = service.getAccessToken(requestToken, verifier);
-		getSession().setAttribute(Constants.SESSION_ACCESS_TOKEN, accessToken);
+		getSession().setAttribute(Constants.SESSION_ACCESS_TOKEN, user.getMyExpAccessToken());
+		getDlibraUserModel().setMyExpAccessToken(user.getMyExpAccessToken());
 
 		MyExpUser myExpUser = null;
 		try {
 			OAuthRequest request = new OAuthRequest(Verb.GET, WHOAMI_URL);
-			service.signRequest(accessToken, request);
+			service.signRequest(user.getMyExpAccessToken(), request);
 			Response response = request.send();
 			myExpUser = createMyExpUserModel(response.getBody());
 
 			request = new OAuthRequest(Verb.GET, String.format(GET_USER_URL,
 				myExpUser.getId()));
-			service.signRequest(accessToken, request);
+			service.signRequest(user.getMyExpAccessToken(), request);
 			response = request.send();
 			myExpUser = createMyExpUserModel(response.getBody());
 		}
@@ -89,12 +93,12 @@ public class MyExpImportPage
 					+ "?message=" + e.getMessage();
 			getRequestCycle().scheduleRequestHandlerAfterCurrent(
 				new RedirectRequestHandler(page));
-			body.setVisible(false);
+			content.setVisible(false);
 			return;
 		}
 
 		ImportModel model = new ImportModel(myExpUser);
-		body.add(new ImportWizard("wizard", model));
+		content.add(new ImportWizard("wizard", model));
 
 	}
 

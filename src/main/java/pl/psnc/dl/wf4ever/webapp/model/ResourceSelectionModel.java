@@ -56,11 +56,11 @@ public class ResourceSelectionModel
 	}
 
 
-	public List<NewResearchObjectModel> createResearchObjects()
+	public List<ResearchObject> createResearchObjects()
 	{
-		List<NewResearchObjectModel> ros = new ArrayList<NewResearchObjectModel>();
+		List<ResearchObject> ros = new ArrayList<ResearchObject>();
 		if (importType == ImportType.ALL_AS_ONE) {
-			NewResearchObjectModel ro = new NewResearchObjectModel();
+			ResearchObject ro = new ResearchObject();
 			ro.setFiles(selectedFiles);
 			ro.setWorkflows(selectedWorkflows);
 			ro.setPacks(selectedPacks);
@@ -68,13 +68,13 @@ public class ResourceSelectionModel
 		}
 		else {
 			for (MyExpFile file : selectedFiles) {
-				ros.add(new NewResearchObjectModel(file));
+				ros.add(new ResearchObject(file));
 			}
 			for (MyExpWorkflow workflow : selectedWorkflows) {
-				ros.add(new NewResearchObjectModel(workflow));
+				ros.add(new ResearchObject(workflow));
 			}
 			for (MyExpPack pack : selectedPacks) {
-				ros.add(new NewResearchObjectModel(pack));
+				ros.add(new ResearchObject(pack));
 			}
 		}
 		return ros;

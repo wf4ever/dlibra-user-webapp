@@ -1,5 +1,6 @@
-package pl.psnc.dl.wf4ever.webapp;
+package pl.psnc.dl.wf4ever.webapp.pages;
 
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -7,7 +8,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUserModel;
+import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 
 /**
@@ -22,17 +23,23 @@ public abstract class TemplatePage
 	private static final long serialVersionUID = 4677896071331937974L;
 
 	protected Panel sidebarPanel;
+	
+	protected WebMarkupContainer content;
+	
+	protected boolean willBeRedirected = false;
 
 
 	@SuppressWarnings("serial")
 	public TemplatePage(PageParameters pageParameters)
 	{
-		DlibraUserModel userModel = getDlibraUserModel();
-		if (!userModel.isAuthenticated()
-				&& !(this instanceof AuthenticationPage)) {
+		DlibraUser userModel = getDlibraUserModel();
+		content = new WebMarkupContainer("content");
+		if (userModel == null && !(this instanceof AuthenticationPage)) {
+			content.setVisible(false);
+			willBeRedirected = true;
 			goToAuthenticationPage(pageParameters);
 		}
-		if (!userModel.isAuthenticated()) {
+		if (userModel == null) {
 			sidebarPanel = new LoggedOutPanel("sidebar");
 		}
 		else {
@@ -63,28 +70,24 @@ public abstract class TemplatePage
 			}
 
 		});
+		add(content);
 		add(sidebarPanel);
-		add(new FeedbackPanel("feedback"));
+		content.add(new FeedbackPanel("feedback"));
 	}
 
 
-	protected DlibraUserModel getDlibraUserModel()
+	protected DlibraUser getDlibraUserModel()
 	{
-		if (getSession().getAttribute(Constants.SESSION_USER_MODEL) == null) {
-			DlibraUserModel model = new DlibraUserModel();
-			getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
-		}
-		return (DlibraUserModel) getSession().getAttribute(
+		return (DlibraUser) getSession().getAttribute(
 			Constants.SESSION_USER_MODEL);
 	}
 
 
-	public boolean logIn(DlibraUserModel model)
+	public boolean logIn(DlibraUser model)
 	{
 		try {
 			getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
 			sidebarPanel.replaceWith(new LoggedInPanel("sidebar", model));
-			model.setAuthenticated(true);
 			return true;
 		}
 		catch (Exception e) {
@@ -96,9 +99,7 @@ public abstract class TemplatePage
 
 	public void logOut()
 	{
-		DlibraUserModel model = new DlibraUserModel();
-		getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
-		model.setAuthenticated(false);
+		getSession().setAttribute(Constants.SESSION_USER_MODEL, null);
 		reloadPage();
 	}
 

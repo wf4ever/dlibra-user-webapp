@@ -14,7 +14,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
-import pl.psnc.dl.wf4ever.webapp.model.NewResearchObjectModel;
+import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
 
 /**
  * @author Piotr Hołubowicz
@@ -35,12 +35,12 @@ public class RODefinedStep
 		super(previousStep, "Defined Research Objects", "",
 				new Model<ImportModel>(model));
 
-		add(new ListView<NewResearchObjectModel>("resourceListView",
+		add(new ListView<ResearchObject>("resourceListView",
 				model.getResearchObjects()) {
 
-			protected void populateItem(ListItem<NewResearchObjectModel> item)
+			protected void populateItem(ListItem<ResearchObject> item)
 			{
-				NewResearchObjectModel ro = (NewResearchObjectModel) item
+				ResearchObject ro = (ResearchObject) item
 						.getModelObject();
 				item.add(new Label("name", ro.getName()));
 

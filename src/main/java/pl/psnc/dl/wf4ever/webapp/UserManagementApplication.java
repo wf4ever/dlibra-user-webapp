@@ -3,6 +3,11 @@ package pl.psnc.dl.wf4ever.webapp;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 
+import pl.psnc.dl.wf4ever.webapp.pages.AuthenticationPage;
+import pl.psnc.dl.wf4ever.webapp.pages.DlibraRegistrationPage;
+import pl.psnc.dl.wf4ever.webapp.pages.ErrorPage;
+import pl.psnc.dl.wf4ever.webapp.pages.MyExpImportPage;
+
 /**
  * 
  * @author Piotr Hołubowicz

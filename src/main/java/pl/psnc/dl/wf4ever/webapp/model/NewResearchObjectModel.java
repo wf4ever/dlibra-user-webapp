@@ -218,13 +218,13 @@ public class NewResearchObjectModel
 		}
 		else {
 			if (!packs.isEmpty())
-				return StringUtils.left("Pack: " + packs.get(0).getTitle(),
+				return StringUtils.abbreviate("Pack: " + packs.get(0).getTitle(),
 					CONTENT_DESC_MAX_LEN);
 			if (!workflows.isEmpty())
-				return StringUtils.left("Workflow: " + workflows.get(0).getTitle(), 
+				return StringUtils.abbreviate("Workflow: " + workflows.get(0).getTitle(), 
 					CONTENT_DESC_MAX_LEN);
 			if (!files.isEmpty())
-				return StringUtils.left("File: " + files.get(0).getTitle(),
+				return StringUtils.abbreviate("File: " + files.get(0).getTitle(),
 					CONTENT_DESC_MAX_LEN);
 		}
 		return null;

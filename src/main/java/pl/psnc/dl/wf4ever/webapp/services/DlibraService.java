@@ -67,7 +67,7 @@ public class DlibraService
 	public static void createWorkspace(DlibraUserModel model)
 		throws Exception
 	{
-		String username = generateUsername();
+		String username = generateUsername(model);
 		String password = generatePassword();
 
 		if (userExistsInDlibra(username)) {
@@ -82,12 +82,35 @@ public class DlibraService
 		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
 		Response response = request.send();
 		if (response.getCode() != HttpStatus.SC_CREATED) {
-			throw new Exception("Error when creating workspace, response: "
-					+ response.getCode() + " " + response.getBody());
+			if (response.getCode() == HttpStatus.SC_CONFLICT) {
+				log.warn("Registering a user that already exists in dLibra");
+			}
+			else {
+				throw new Exception("Error when creating workspace, response: "
+						+ response.getCode() + " " + response.getBody());
+			}
 		}
 
 		DerbyService.insertUser(model.getOpenId(), username, password);
 		provisionAuthenticatedUserModel(model);
+	}
+
+
+	public static void deleteWorkspace(DlibraUserModel model)
+		throws Exception
+	{
+		String url = String.format(URI_WORKSPACE_ID, model.getUsername());
+		OAuthRequest request = new OAuthRequest(Verb.DELETE, url);
+		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
+		Response response = request.send();
+
+		model.setAccessToken(null);
+		DerbyService.deleteUser(model.getOpenId());
+
+		if (response.getCode() != HttpStatus.SC_NO_CONTENT) {
+			throw new Exception("Error when deleting workspace, response: "
+					+ response.getCode() + " " + response.getBody());
+		}
 	}
 
 
@@ -189,27 +212,17 @@ public class DlibraService
 	}
 
 
-	private static String generateUsername()
+	private static String generateUsername(DlibraUserModel model)
 	{
-		Date now = new Date();
-		return StringUtils.left("openID-" + now.getTime(), USERNAME_LENGTH);
-	}
-
-
-	public static void deleteWorkspace(DlibraUserModel model)
-		throws Exception
-	{
-		model.setAccessToken(null);
-		String url = String.format(URI_WORKSPACE_ID, model.getUsername());
-		OAuthRequest request = new OAuthRequest(Verb.DELETE, url);
-		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
-		Response response = request.send();
-		if (response.getCode() != HttpStatus.SC_OK) {
-			throw new Exception("Error when deleting workspace, response: "
-					+ response.getCode() + " " + response.getBody());
+		if (model.getOpenId().length() <= USERNAME_LENGTH) {
+			return model.getOpenId();
 		}
-
-		DerbyService.deleteUser(model.getOpenId());
+		if (model.getOpenIdData() != null
+				&& model.getOpenIdData().getEmailAddress() != null) {
+			return StringUtils.left(model.getOpenIdData().getEmailAddress(),
+				USERNAME_LENGTH).replace('@', '_');
+		}
+		return "OpenID-" + new Date().getTime();
 	}
 
 
@@ -219,6 +232,7 @@ public class DlibraService
 			model.setAccessToken(DerbyService.getAccessToken(model.getOpenId()));
 			model.setUsername(DerbyService.getUsername(model.getOpenId()));
 			model.setPassword(DerbyService.getPassword(model.getOpenId()));
+			model.setAuthenticated(true);
 		}
 	}
 
@@ -228,6 +242,8 @@ public class DlibraService
 		String token = Base64.encodeBase64String((username + ":" + password)
 				.getBytes());
 		token = StringUtils.trim(token);
+		log.debug(String.format("Username %s, password %s, access token %s",
+			username, password, token));
 		return new Token(token, null);
 	}
 

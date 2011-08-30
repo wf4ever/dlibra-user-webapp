@@ -21,6 +21,9 @@ import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportStatus;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpFile;
+import pl.psnc.dl.wf4ever.webapp.model.MyExpPack;
+import pl.psnc.dl.wf4ever.webapp.model.MyExpResource;
+import pl.psnc.dl.wf4ever.webapp.model.MyExpSimpleResource;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpWorkflow;
 import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
 
@@ -68,6 +71,7 @@ public class MyExpImportService
 		createRO(model, ro, dLibraUser);
 		importFiles(model, ro, token, dLibraUser);
 		importWorkflows(model, ro, token, dLibraUser);
+		importPacks(model, ro, token, dLibraUser);
 	}
 
 
@@ -79,20 +83,12 @@ public class MyExpImportService
 	 * @throws JAXBException
 	 * @throws Exception
 	 */
-	private static void importFiles(ImportModel model,
-			ResearchObject ro, Token token, DlibraUser dLibraUser)
+	private static void importFiles(ImportModel model, ResearchObject ro,
+			Token token, DlibraUser user)
 		throws JAXBException, Exception
 	{
 		for (MyExpFile file : ro.getFiles()) {
-			OAuthRequest request = new OAuthRequest(Verb.GET, createUrl(file));
-			service.signRequest(token, request);
-			Response response = request.send();
-			MyExpFile f = createMyExpFile(response.getBody());
-			model.setMessage(String.format("Importing file \"%s\"",
-				f.getFilename()));
-
-			DlibraService.sendResource(f.getFilename(), ro.getName(),
-				f.getContentDecoded(), f.getContentType(), dLibraUser);
+			importSimpleResource(model, file, ro.getName(), token, user);
 		}
 	}
 
@@ -105,22 +101,67 @@ public class MyExpImportService
 	 * @throws JAXBException
 	 * @throws Exception
 	 */
-	private static void importWorkflows(ImportModel model,
-			ResearchObject ro, Token token, DlibraUser dLibraUser)
+	private static void importWorkflows(ImportModel model, ResearchObject ro,
+			Token token, DlibraUser user)
 		throws JAXBException, Exception
 	{
 		for (MyExpWorkflow workflow : ro.getWorkflows()) {
-			OAuthRequest request = new OAuthRequest(Verb.GET,
-					createUrl(workflow));
+			importSimpleResource(model, workflow, ro.getName(), token, user);
+		}
+	}
+
+
+	/**
+	 * @param model
+	 * @param ro
+	 * @param token
+	 * @param dLibraUser
+	 * @throws JAXBException
+	 * @throws Exception
+	 */
+	private static void importPacks(ImportModel model, ResearchObject ro,
+			Token token, DlibraUser user)
+		throws JAXBException, Exception
+	{
+		for (MyExpPack pack : ro.getPacks()) {
+			OAuthRequest request = new OAuthRequest(Verb.GET, pack.getFullUrl());
 			service.signRequest(token, request);
 			Response response = request.send();
-			MyExpWorkflow w = createMyExpWorkflow(response.getBody());
-			model.setMessage(String.format("Importing workflow \"%s\"",
-				w.getFilename()));
+			MyExpPack p = (MyExpPack) createMyExpResource(response.getBody(),
+				MyExpPack.class);
+			model.setMessage(String.format("Importing pack \"%d\"", p.getId()));
 
-			DlibraService.sendResource(w.getFilename(), ro.getName(),
-				w.getContentDecoded(), w.getContentType(), dLibraUser);
+			for (MyExpSimpleResource r : p.getResources()) {
+				importSimpleResource(model, r, ro.getName(), token, user,
+					p.getId() + "/");
+			}
 		}
+	}
+
+
+	private static void importSimpleResource(ImportModel model,
+			MyExpSimpleResource res, String roName, Token token, DlibraUser user)
+		throws Exception
+	{
+		importSimpleResource(model, res, roName, token, user, "");
+	}
+
+
+	private static void importSimpleResource(ImportModel model,
+			MyExpSimpleResource res, String roName, Token token,
+			DlibraUser user, String path)
+		throws Exception
+	{
+		OAuthRequest request = new OAuthRequest(Verb.GET, res.getFullUrl());
+		service.signRequest(token, request);
+		Response response = request.send();
+		MyExpSimpleResource r = (MyExpSimpleResource) createMyExpResource(
+			response.getBody(), res.getClass());
+		model.setMessage(String.format("Importing \"%s\"", r.getFilename()));
+
+		DlibraService.sendResource(path + r.getFilename(), roName,
+			r.getContentDecoded(), r.getContentType(), user);
+
 	}
 
 
@@ -143,39 +184,15 @@ public class MyExpImportService
 	}
 
 
-	private static String createUrl(MyExpFile file)
-	{
-		return file.getUri() + "&elements=filename,content,content-type";
-	}
-
-
-	private static MyExpFile createMyExpFile(String xml)
+	private static Object createMyExpResource(String xml,
+			Class< ? extends MyExpResource> resourceClass)
 		throws JAXBException
 	{
-		JAXBContext jc = JAXBContext.newInstance(MyExpFile.class);
+		JAXBContext jc = JAXBContext.newInstance(resourceClass);
 
 		Unmarshaller u = jc.createUnmarshaller();
 		StringBuffer xmlStr = new StringBuffer(xml);
-		return (MyExpFile) u.unmarshal(new StreamSource(new StringReader(xmlStr
-				.toString())));
-	}
-
-
-	private static String createUrl(MyExpWorkflow workflow)
-	{
-		return workflow.getUri() + "&elements=content,content-uri,content-type";
-	}
-
-
-	private static MyExpWorkflow createMyExpWorkflow(String xml)
-		throws JAXBException
-	{
-		JAXBContext jc = JAXBContext.newInstance(MyExpWorkflow.class);
-
-		Unmarshaller u = jc.createUnmarshaller();
-		StringBuffer xmlStr = new StringBuffer(xml);
-		return (MyExpWorkflow) u.unmarshal(new StreamSource(new StringReader(
-				xmlStr.toString())));
+		return u.unmarshal(new StreamSource(new StringReader(xmlStr.toString())));
 	}
 
 }

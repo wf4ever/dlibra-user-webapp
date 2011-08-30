@@ -21,7 +21,7 @@ public abstract class MyExpResource
 	 * 
 	 */
 	private static final long serialVersionUID = -9038815722609845400L;
-
+	
 	private String uri;
 
 	private String resource;
@@ -90,5 +90,8 @@ public abstract class MyExpResource
 	{
 		this.title = title;
 	}
+
+
+	public abstract String getFullUrl();
 
 }

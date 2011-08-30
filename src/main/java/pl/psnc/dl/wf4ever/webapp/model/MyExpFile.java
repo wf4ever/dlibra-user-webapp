@@ -3,10 +3,7 @@
  */
 package pl.psnc.dl.wf4ever.webapp.model;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.wicket.util.crypt.Base64;
 
 /**
  * @author Piotr Hołubowicz
@@ -14,7 +11,7 @@ import org.apache.wicket.util.crypt.Base64;
  */
 @XmlRootElement(name = "file")
 public class MyExpFile
-	extends MyExpResource
+	extends MyExpSimpleResource
 {
 
 	/**
@@ -23,11 +20,6 @@ public class MyExpFile
 	private static final long serialVersionUID = 1547898914095065327L;
 
 	private String filename;
-
-	private String content;
-
-	private String contentType;
-
 
 	/**
 	 * @return the filename
@@ -47,46 +39,12 @@ public class MyExpFile
 	}
 
 
-	/**
-	 * @return the content base64-encoded
-	 */
-	public String getContent()
+	@Override
+	public String getFullUrl()
 	{
-		return content;
+		return getUri() + "&elements=filename,content,content-type,id";
 	}
 
 
-	/**
-	 * @param content the content to set, base64-encoded
-	 */
-	public void setContent(String content)
-	{
-		this.content = content;
-	}
-
-
-	public String getContentDecoded()
-	{
-		return new String(Base64.decodeBase64(content));
-	}
-
-
-	/**
-	 * @return the contentType
-	 */
-	@XmlElement(name = "content-type")
-	public String getContentType()
-	{
-		return contentType;
-	}
-
-
-	/**
-	 * @param contentType the contentType to set
-	 */
-	public void setContentType(String contentType)
-	{
-		this.contentType = contentType;
-	}
 
 }

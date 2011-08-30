@@ -28,11 +28,11 @@ public class ErrorPage
 		super(pageParameters);
 
 		if (pageParameters.get(MESSAGE) != null) {
-			add(new Label("message", new Model<String>(pageParameters.get(
+			content.add(new Label("message", new Model<String>(pageParameters.get(
 				MESSAGE).toString())));
 		}
 		else {
-			add(new Label("message"));
+			content.add(new Label("message"));
 		}
 	}
 }

@@ -21,7 +21,7 @@ public class ResourceSelectionModel
 		ALL_AS_ONE, EACH_SEPARATELY
 	}
 
-	private ImportType importType;
+	private ImportType importType = ImportType.ALL_AS_ONE;
 
 	private List<MyExpFile> selectedFiles;
 

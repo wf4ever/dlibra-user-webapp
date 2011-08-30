@@ -24,6 +24,7 @@ import org.scribe.oauth.OAuthService;
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
+import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
@@ -54,14 +55,17 @@ public class MyExpImportPage
 
 		DlibraUser user = getDlibraUserModel();
 		OAuthService service = MyExpApi.getOAuthService(WicketUtils
-			.getCompleteUrl(this, MyExpImportPage.class, true));
+				.getCompleteUrl(this, MyExpImportPage.class, true));
 
-		if (user.getMyExpAccessToken() == null && pageParameters.get(OAUTH_VERIFIER) != null) {
-				Verifier verifier = new Verifier(pageParameters.get(OAUTH_VERIFIER)
+		if (user.getMyExpAccessToken() == null
+				&& pageParameters.get(OAUTH_VERIFIER) != null) {
+			Verifier verifier = new Verifier(pageParameters.get(OAUTH_VERIFIER)
 					.toString());
 			Token requestToken = (Token) getSession().getAttribute(
 				Constants.SESSION_REQUEST_TOKEN);
-			user.setMyExpAccessToken(service.getAccessToken(requestToken, verifier));			
+			user.setMyExpAccessToken(service.getAccessToken(requestToken,
+				verifier));
+			HibernateService.storeUser(user);
 		}
 
 		if (user.getMyExpAccessToken() == null) {
@@ -71,9 +75,6 @@ public class MyExpImportPage
 			content.setVisible(false);
 			return;
 		}
-
-		getSession().setAttribute(Constants.SESSION_ACCESS_TOKEN, user.getMyExpAccessToken());
-		getDlibraUserModel().setMyExpAccessToken(user.getMyExpAccessToken());
 
 		MyExpUser myExpUser = null;
 		try {

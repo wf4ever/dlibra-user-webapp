@@ -64,16 +64,6 @@ public class DlibraService
 	}
 
 
-	public static DlibraUser loadOrCreateUser(String openId)
-	{
-		DlibraUser user = HibernateService.loadUser(openId);
-		if (user == null) {
-			user = new DlibraUser();
-			user.setOpenId(openId);
-		}
-		return user;
-	}
-
 	public static boolean createWorkspace(DlibraUser user)
 		throws Exception
 	{

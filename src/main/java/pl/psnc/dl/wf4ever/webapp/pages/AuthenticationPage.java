@@ -15,7 +15,7 @@ import org.openid4java.message.AuthRequest;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
-import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
+import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
@@ -67,8 +67,11 @@ public class AuthenticationPage
 				if (openIdData == null) {
 					error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider. You will have to enter all information by hand into the text fields provided.");
 				}
-				DlibraUser user = DlibraService.loadOrCreateUser(openIdData
-						.getOpenId());
+				DlibraUser user = HibernateService.loadUser(openIdData.getOpenId());
+				if (user == null) {
+					user = new DlibraUser();
+					user.setOpenId(openIdData.getOpenId());
+				}
 				user.setOpenIdData(openIdData);
 				confirmAuthentication(user);
 				logIn(user);

@@ -18,6 +18,7 @@ import org.scribe.model.Token;
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportStatus;
+import pl.psnc.dl.wf4ever.webapp.pages.TemplatePage;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpImportService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 
@@ -39,9 +40,8 @@ public class ImportDataStep
 			final ImportModel model)
 	{
 		super(previousStep, "Import data", "", new Model<ImportModel>(model));
-		final TextArea<String> importStatus = new TextArea<String>(
-				"messages", new PropertyModel<String>(model,
-						"messages"));
+		final TextArea<String> importStatus = new TextArea<String>("messages",
+				new PropertyModel<String>(model, "messages"));
 		importStatus.setOutputMarkupId(true);
 		add(importStatus);
 
@@ -71,15 +71,15 @@ public class ImportDataStep
 			protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
 			{
 				if (model.getStatus() == ImportStatus.NOT_STARTED) {
-					Token accessToken = (Token) getSession().getAttribute(
-						Constants.SESSION_ACCESS_TOKEN);
+					Token accessToken = ((TemplatePage) getPage())
+							.getDlibraUserModel().getMyExpAccessToken();
 					DlibraUser userModel = (DlibraUser) getSession()
 							.getAttribute(Constants.SESSION_USER_MODEL);
 					MyExpImportService.startImport(model, accessToken,
 						userModel);
 					importStatus.add(updater);
 					target.add(importStatus);
-					
+
 					this.setEnabled(false);
 					target.add(this);
 				}

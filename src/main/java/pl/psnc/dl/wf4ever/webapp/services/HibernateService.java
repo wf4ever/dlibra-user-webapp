@@ -54,7 +54,7 @@ public class HibernateService
 		Session session = getSessionFactory().getCurrentSession();
 		session.beginTransaction();
 
-		session.save(user);
+		session.saveOrUpdate(user);
 
 		session.getTransaction().commit();
 	}

@@ -76,7 +76,7 @@ public abstract class TemplatePage
 	}
 
 
-	protected DlibraUser getDlibraUserModel()
+	public DlibraUser getDlibraUserModel()
 	{
 		return (DlibraUser) getSession().getAttribute(
 			Constants.SESSION_USER_MODEL);

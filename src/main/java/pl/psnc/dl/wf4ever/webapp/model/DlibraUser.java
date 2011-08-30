@@ -33,9 +33,11 @@ public class DlibraUser
 
 	private Token dLibraAccessToken;
 
-	private Token myExpAccessToken;
-
 	private OpenIdData openIdData;
+
+	private String myExpToken;
+
+	private String myExpSecret;
 
 
 	public void setOpenId(String openId)
@@ -172,19 +174,63 @@ public class DlibraUser
 	/**
 	 * @return the myExpAccessToken
 	 */
-	@Basic
+	@Transient
 	public Token getMyExpAccessToken()
 	{
-		return myExpAccessToken;
+		if (myExpToken == null || myExpSecret == null)
+			return null;
+		else
+			return new Token(myExpToken, myExpSecret);
 	}
 
 
 	/**
 	 * @param myExpAccessToken the myExpAccessToken to set
 	 */
-	public void setMyExpAccessToken(Token myExpAccessToken)
+	public void setMyExpAccessToken(Token token)
 	{
-		this.myExpAccessToken = myExpAccessToken;
+		if (token != null) {
+			myExpToken = token.getToken();
+			myExpSecret = token.getSecret();
+		}
+	}
+
+
+	/**
+	 * @return the myExpToken
+	 */
+	@Basic
+	public String getMyExpToken()
+	{
+		return myExpToken;
+	}
+
+
+	/**
+	 * @param myExpToken the myExpToken to set
+	 */
+	public void setMyExpToken(String myExpToken)
+	{
+		this.myExpToken = myExpToken;
+	}
+
+
+	/**
+	 * @return the myExpSecret
+	 */
+	@Basic
+	public String getMyExpSecret()
+	{
+		return myExpSecret;
+	}
+
+
+	/**
+	 * @param myExpSecret the myExpSecret to set
+	 */
+	public void setMyExpSecret(String myExpSecret)
+	{
+		this.myExpSecret = myExpSecret;
 	}
 
 }

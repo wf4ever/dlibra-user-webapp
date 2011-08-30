@@ -59,19 +59,19 @@ public class DlibraRegistrationPage
 		super(pageParameters);
 		if (willBeRedirected)
 			return;
-		
-		DlibraUser model = getDlibraUserModel();
+
+		final DlibraUser user = getDlibraUserModel();
 
 		Form<DlibraUser> form = new Form<DlibraUser>("form",
-				new CompoundPropertyModel<DlibraUser>(model));
+				new CompoundPropertyModel<DlibraUser>(user));
 		form.setOutputMarkupId(true);
 		content.add(form);
 
-		final WebMarkupContainer message = createMessageFragment(model, content);
+		final WebMarkupContainer message = createMessageFragment(user, content);
 		message.setOutputMarkupId(true);
 		form.add(message);
 
-		final WebMarkupContainer credentials = createCredentialsDiv(model);
+		final WebMarkupContainer credentials = createCredentialsDiv(user);
 		form.add(credentials);
 
 		final Button importButton = new Button("myExpImportButton") {
@@ -79,26 +79,31 @@ public class DlibraRegistrationPage
 			@Override
 			public void onSubmit()
 			{
-				startMyExpImport();
+				if (user.getMyExpAccessToken() != null) {
+					startMyExpImport();
+				}
+				else {
+					startMyExpAuthorization();
+				}
 			}
 		};
-		importButton.setEnabled(model.isRegistered());
+		importButton.setEnabled(user.isRegistered());
 		form.add(importButton).setOutputMarkupId(true);
 
 		form.add(
 			new AjaxButton("registerButtonText", new PropertyModel<String>(
-					model, "registerButtonText")) {
+					user, "registerButtonText")) {
 
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
 				{
-					DlibraUser model = (DlibraUser) getForm().getModelObject();
+					DlibraUser user = (DlibraUser) getForm().getModelObject();
 					try {
-						if (model.isRegistered()) {
-							DlibraService.deleteWorkspace(model);
+						if (user.isRegistered()) {
+							DlibraService.deleteWorkspace(user);
 						}
 						else {
-							if (!DlibraService.createWorkspace(model)) {
+							if (!DlibraService.createWorkspace(user)) {
 								info("Registered an existing account");
 							}
 						}
@@ -109,12 +114,11 @@ public class DlibraRegistrationPage
 					}
 					target.add(message);
 					target.add(this);
-					importButton.setEnabled(model.isRegistered());
+					importButton.setEnabled(user.isRegistered());
 					target.add(importButton);
-					WebMarkupContainer div = createCredentialsDiv(model);
+					WebMarkupContainer div = createCredentialsDiv(user);
 					getParent().replace(div);
-					Fragment f = createMessageFragment(model,
-						content);
+					Fragment f = createMessageFragment(user, content);
 					getParent().replace(f);
 					target.add(getParent());
 
@@ -162,6 +166,14 @@ public class DlibraRegistrationPage
 
 	private void startMyExpImport()
 	{
+		getRequestCycle().scheduleRequestHandlerAfterCurrent(
+			new RedirectRequestHandler(urlFor(MyExpImportPage.class,
+				new PageParameters()).toString()));
+	}
+
+
+	private void startMyExpAuthorization()
+	{
 		String oauthCallbackURL = WicketUtils.getCompleteUrl(this,
 			MyExpImportPage.class, false);
 
@@ -183,8 +195,8 @@ public class DlibraRegistrationPage
 				MarkupContainer markupProvider, DlibraUser model)
 		{
 			super(id, markupId, markupProvider);
-			add(new Label("dLibraAccessTokenString", new PropertyModel<String>(model,
-					"dlibraAccessTokenString")));
+			add(new Label("dLibraAccessTokenString", new PropertyModel<String>(
+					model, "dlibraAccessTokenString")));
 		}
 
 	}

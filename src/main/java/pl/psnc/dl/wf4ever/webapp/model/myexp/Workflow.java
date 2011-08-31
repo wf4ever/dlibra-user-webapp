@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp.model;
+package pl.psnc.dl.wf4ever.webapp.model.myexp;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -11,8 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlRootElement(name = "workflow")
-public class MyExpWorkflow
-	extends MyExpSimpleResource
+public class Workflow
+	extends SimpleResource
 {
 
 	/**
@@ -26,6 +26,7 @@ public class MyExpWorkflow
 	/**
 	 * @return the filename
 	 */
+	@XmlElement
 	public String getFilename()
 	{
 		return contentUri.substring(contentUri.lastIndexOf('/') + 1);
@@ -50,10 +51,4 @@ public class MyExpWorkflow
 		this.contentUri = contentUri;
 	}
 
-
-	@Override
-	public String getFullUrl()
-	{
-		return getUri() + "&elements=content,content-uri,content-type,id";
-	}
 }

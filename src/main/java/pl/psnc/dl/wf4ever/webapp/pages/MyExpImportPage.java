@@ -23,7 +23,7 @@ import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
-import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
 import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
@@ -76,7 +76,7 @@ public class MyExpImportPage
 			return;
 		}
 
-		MyExpUser myExpUser = null;
+		User myExpUser = null;
 		try {
 			OAuthRequest request = new OAuthRequest(Verb.GET, WHOAMI_URL);
 			service.signRequest(user.getMyExpAccessToken(), request);
@@ -104,14 +104,14 @@ public class MyExpImportPage
 	}
 
 
-	private MyExpUser createMyExpUserModel(String xml)
+	private User createMyExpUserModel(String xml)
 		throws JAXBException
 	{
-		JAXBContext jc = JAXBContext.newInstance(MyExpUser.class);
+		JAXBContext jc = JAXBContext.newInstance(User.class);
 
 		Unmarshaller u = jc.createUnmarshaller();
 		StringBuffer xmlStr = new StringBuffer(xml);
-		return (MyExpUser) u.unmarshal(new StreamSource(new StringReader(xmlStr
+		return (User) u.unmarshal(new StreamSource(new StringReader(xmlStr
 				.toString())));
 	}
 

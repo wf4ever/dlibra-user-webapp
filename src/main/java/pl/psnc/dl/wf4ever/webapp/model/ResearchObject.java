@@ -9,6 +9,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import pl.psnc.dl.wf4ever.webapp.model.myexp.FileHeader;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.PackHeader;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.ResourceHeader;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.WorkflowHeader;
+
 /**
  * @author Piotr Hołubowicz
  *
@@ -25,13 +30,13 @@ public class ResearchObject
 
 	private boolean existing;
 
-	private List< ? extends MyExpResource> resources;
+	private List< ? extends ResourceHeader> resources;
 
-	private List<MyExpFile> files = new ArrayList<MyExpFile>();
+	private List<FileHeader> files = new ArrayList<FileHeader>();
 
-	private List<MyExpWorkflow> workflows = new ArrayList<MyExpWorkflow>();
+	private List<WorkflowHeader> workflows = new ArrayList<WorkflowHeader>();
 
-	private List<MyExpPack> packs = new ArrayList<MyExpPack>();
+	private List<PackHeader> packs = new ArrayList<PackHeader>();
 
 	private String name;
 
@@ -41,19 +46,19 @@ public class ResearchObject
 	}
 
 
-	public ResearchObject(MyExpFile file)
+	public ResearchObject(FileHeader file)
 	{
 		files.add(file);
 	}
 
 
-	public ResearchObject(MyExpWorkflow workflow)
+	public ResearchObject(WorkflowHeader workflow)
 	{
 		workflows.add(workflow);
 	}
 
 
-	public ResearchObject(MyExpPack pack)
+	public ResearchObject(PackHeader pack)
 	{
 		packs.add(pack);
 	}
@@ -80,7 +85,7 @@ public class ResearchObject
 	/**
 	 * @return the resources
 	 */
-	public List< ? extends MyExpResource> getResources()
+	public List< ? extends ResourceHeader> getResources()
 	{
 		return resources;
 	}
@@ -89,7 +94,7 @@ public class ResearchObject
 	/**
 	 * @param resources the resources to set
 	 */
-	public void setResources(List< ? extends MyExpResource> resources)
+	public void setResources(List< ? extends ResourceHeader> resources)
 	{
 		this.resources = resources;
 	}
@@ -116,7 +121,7 @@ public class ResearchObject
 	/**
 	 * @return the files
 	 */
-	public List<MyExpFile> getFiles()
+	public List<FileHeader> getFiles()
 	{
 		return files;
 	}
@@ -125,7 +130,7 @@ public class ResearchObject
 	/**
 	 * @param files the files to set
 	 */
-	public void setFiles(List<MyExpFile> files)
+	public void setFiles(List<FileHeader> files)
 	{
 		this.files = files;
 	}
@@ -134,7 +139,7 @@ public class ResearchObject
 	/**
 	 * @return the workflows
 	 */
-	public List<MyExpWorkflow> getWorkflows()
+	public List<WorkflowHeader> getWorkflows()
 	{
 		return workflows;
 	}
@@ -143,7 +148,7 @@ public class ResearchObject
 	/**
 	 * @param workflows the workflows to set
 	 */
-	public void setWorkflows(List<MyExpWorkflow> workflows)
+	public void setWorkflows(List<WorkflowHeader> workflows)
 	{
 		this.workflows = workflows;
 	}
@@ -152,7 +157,7 @@ public class ResearchObject
 	/**
 	 * @return the packs
 	 */
-	public List<MyExpPack> getPacks()
+	public List<PackHeader> getPacks()
 	{
 		return packs;
 	}
@@ -161,13 +166,13 @@ public class ResearchObject
 	/**
 	 * @param packs the packs to set
 	 */
-	public void setPacks(List<MyExpPack> packs)
+	public void setPacks(List<PackHeader> packs)
 	{
 		this.packs = packs;
 	}
 
 
-	public MyExpResource getFirstResource()
+	public ResourceHeader getFirstResource()
 	{
 		if (!packs.isEmpty()) {
 			return packs.get(0);
@@ -190,7 +195,7 @@ public class ResearchObject
 
 	public void setDefaultName()
 	{
-		MyExpResource resource = getFirstResource();
+		ResourceHeader resource = getFirstResource();
 		if (resource == null) {
 			name = "";
 		}
@@ -218,14 +223,14 @@ public class ResearchObject
 		}
 		else {
 			if (!packs.isEmpty())
-				return StringUtils.abbreviate("Pack: " + packs.get(0).getTitle(),
-					CONTENT_DESC_MAX_LEN);
+				return StringUtils.abbreviate("Pack: "
+						+ packs.get(0).getTitle(), CONTENT_DESC_MAX_LEN);
 			if (!workflows.isEmpty())
-				return StringUtils.abbreviate("Workflow: " + workflows.get(0).getTitle(), 
-					CONTENT_DESC_MAX_LEN);
+				return StringUtils.abbreviate("Workflow: "
+						+ workflows.get(0).getTitle(), CONTENT_DESC_MAX_LEN);
 			if (!files.isEmpty())
-				return StringUtils.abbreviate("File: " + files.get(0).getTitle(),
-					CONTENT_DESC_MAX_LEN);
+				return StringUtils.abbreviate("File: "
+						+ files.get(0).getTitle(), CONTENT_DESC_MAX_LEN);
 		}
 		return null;
 	}

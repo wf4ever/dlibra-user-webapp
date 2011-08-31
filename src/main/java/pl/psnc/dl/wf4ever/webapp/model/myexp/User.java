@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp.model;
+package pl.psnc.dl.wf4ever.webapp.model.myexp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlRootElement(name = "user")
-public class MyExpUser
+public class User
 	implements Serializable
 {
 
@@ -42,14 +42,14 @@ public class MyExpUser
 
 	private String website;
 
-	private List<MyExpPack> packs = new ArrayList<MyExpPack>();
+	private List<PackHeader> packs = new ArrayList<PackHeader>();
 
-	private List<MyExpWorkflow> workflows = new ArrayList<MyExpWorkflow>();
+	private List<WorkflowHeader> workflows = new ArrayList<WorkflowHeader>();
 
-	private List<MyExpFile> files = new ArrayList<MyExpFile>();
+	private List<FileHeader> files = new ArrayList<FileHeader>();
 
 
-	public MyExpUser()
+	public User()
 	{
 
 	}
@@ -170,7 +170,7 @@ public class MyExpUser
 	 */
 	@XmlElementWrapper(name = "workflows")
 	@XmlElement(name = "workflow")
-	public List<MyExpWorkflow> getWorkflows()
+	public List<WorkflowHeader> getWorkflows()
 	{
 		return workflows;
 	}
@@ -179,7 +179,7 @@ public class MyExpUser
 	/**
 	 * @param workflows the workflows to set
 	 */
-	public void setWorkflows(List<MyExpWorkflow> workflows)
+	public void setWorkflows(List<WorkflowHeader> workflows)
 	{
 		this.workflows = workflows;
 	}
@@ -190,7 +190,7 @@ public class MyExpUser
 	 */
 	@XmlElementWrapper(name = "packs")
 	@XmlElement(name = "pack")
-	public List<MyExpPack> getPacks()
+	public List<PackHeader> getPacks()
 	{
 		return packs;
 	}
@@ -199,7 +199,7 @@ public class MyExpUser
 	/**
 	 * @param packs the packs to set
 	 */
-	public void setPacks(List<MyExpPack> packs)
+	public void setPacks(List<PackHeader> packs)
 	{
 		this.packs = packs;
 	}
@@ -210,7 +210,7 @@ public class MyExpUser
 	 */
 	@XmlElementWrapper(name = "files")
 	@XmlElement(name = "file")
-	public List<MyExpFile> getFiles()
+	public List<FileHeader> getFiles()
 	{
 		return files;
 	}
@@ -219,7 +219,7 @@ public class MyExpUser
 	/**
 	 * @param files the files to set
 	 */
-	public void setFiles(List<MyExpFile> files)
+	public void setFiles(List<FileHeader> files)
 	{
 		this.files = files;
 	}

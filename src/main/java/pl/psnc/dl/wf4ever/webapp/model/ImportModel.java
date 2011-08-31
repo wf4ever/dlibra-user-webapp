@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
+
 /**
  * @author Piotr Hołubowicz
  *
@@ -27,7 +29,7 @@ public class ImportModel
 
 	private List<ResearchObject> researchObjectsProcessed;
 
-	private MyExpUser myExpUser;
+	private User myExpUser;
 
 	private String message = "Import has not started";
 
@@ -38,7 +40,7 @@ public class ImportModel
 	private boolean mergeROs = true;
 
 
-	public ImportModel(MyExpUser user)
+	public ImportModel(User user)
 	{
 		super();
 		this.myExpUser = user;
@@ -58,7 +60,7 @@ public class ImportModel
 	/**
 	 * @return the myExpUser
 	 */
-	public MyExpUser getMyExpUser()
+	public User getMyExpUser()
 	{
 		return myExpUser;
 	}

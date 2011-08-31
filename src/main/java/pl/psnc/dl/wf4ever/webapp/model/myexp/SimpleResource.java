@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp.model;
+package pl.psnc.dl.wf4ever.webapp.model.myexp;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -11,8 +11,8 @@ import org.apache.wicket.util.crypt.Base64;
  * @author Piotr Hołubowicz
  *
  */
-public abstract class MyExpSimpleResource
-	extends MyExpResource
+public abstract class SimpleResource
+	extends Resource
 {
 
 	/**

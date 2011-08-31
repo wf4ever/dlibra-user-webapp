@@ -1,8 +1,9 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp.model;
+package pl.psnc.dl.wf4ever.webapp.model.myexp;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -10,8 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlRootElement(name = "file")
-public class MyExpFile
-	extends MyExpSimpleResource
+public class File
+	extends SimpleResource
 {
 
 	/**
@@ -24,6 +25,7 @@ public class MyExpFile
 	/**
 	 * @return the filename
 	 */
+	@XmlElement
 	public String getFilename()
 	{
 		return filename;
@@ -36,13 +38,6 @@ public class MyExpFile
 	public void setFilename(String filename)
 	{
 		this.filename = filename;
-	}
-
-
-	@Override
-	public String getFullUrl()
-	{
-		return getUri() + "&elements=filename,content,content-type,id";
 	}
 
 

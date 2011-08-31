@@ -21,7 +21,7 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.PropertyModel;
 
-import pl.psnc.dl.wf4ever.webapp.model.MyExpResource;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.ResourceHeader;
 
 /**
  * @author Piotr Hołubowicz
@@ -38,8 +38,8 @@ public class ResourceListPanel
 
 	@SuppressWarnings({ "serial", "deprecation"})
 	public ResourceListPanel(String id, String name,
-			List< ? extends MyExpResource> resources,
-			List< ? extends MyExpResource> selectedResources)
+			List< ? extends ResourceHeader> resources,
+			List< ? extends ResourceHeader> selectedResources)
 	{
 		super(id);
 		this.resourceName = name;
@@ -59,18 +59,21 @@ public class ResourceListPanel
 		Form< ? > form = new Form<Void>("form");
 		resourceList.add(form);
 		@SuppressWarnings("unchecked")
-		CheckGroup<MyExpResource> group = new CheckGroup<MyExpResource>(
-				"group", (List<MyExpResource>) selectedResources);
+		CheckGroup<ResourceHeader> group = new CheckGroup<ResourceHeader>(
+				"group", (List<ResourceHeader>) selectedResources);
 		form.add(group);
 		group.add(new CheckGroupSelector("groupselector"));
-		ListView<MyExpResource> list = new ListView<MyExpResource>("resourceListView", resources) {
+		ListView<ResourceHeader> list = new ListView<ResourceHeader>(
+				"resourceListView", resources) {
 
-			protected void populateItem(ListItem<MyExpResource> item)
+			protected void populateItem(ListItem<ResourceHeader> item)
 			{
-				MyExpResource resource = (MyExpResource) item.getModelObject();
-				item.add(new Check<MyExpResource>("checkbox", item.getModel()));
-				ExternalLink link = new ExternalLink("link", resource
-						.getResource());
+				ResourceHeader resource = (ResourceHeader) item
+						.getModelObject();
+				item.add(new Check<ResourceHeader>("checkbox", item
+						.getModel()));
+				ExternalLink link = new ExternalLink("link",
+						resource.getResource());
 				link.add(new Label("title", resource.getTitle()));
 				item.add(link);
 			}

@@ -7,6 +7,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.psnc.dl.wf4ever.webapp.model.myexp.FileHeader;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.PackHeader;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.WorkflowHeader;
+
 /**
  * @author Piotr Hołubowicz
  *
@@ -23,34 +27,34 @@ public class ResourceSelectionModel
 
 	private ImportType importType = ImportType.ALL_AS_ONE;
 
-	private List<MyExpFile> selectedFiles;
+	private List<FileHeader> selectedFiles;
 
-	private List<MyExpWorkflow> selectedWorkflows;
+	private List<WorkflowHeader> selectedWorkflows;
 
-	private List<MyExpPack> selectedPacks;
+	private List<PackHeader> selectedPacks;
 
 
 	public ResourceSelectionModel()
 	{
-		this.selectedFiles = new ArrayList<MyExpFile>();
-		this.selectedWorkflows = new ArrayList<MyExpWorkflow>();
-		this.selectedPacks = new ArrayList<MyExpPack>();
+		this.selectedFiles = new ArrayList<FileHeader>();
+		this.selectedWorkflows = new ArrayList<WorkflowHeader>();
+		this.selectedPacks = new ArrayList<PackHeader>();
 	}
 
 
-	public List<MyExpFile> getSelectedFiles()
+	public List<FileHeader> getSelectedFiles()
 	{
 		return selectedFiles;
 	}
 
 
-	public List<MyExpWorkflow> getSelectedWorkflows()
+	public List<WorkflowHeader> getSelectedWorkflows()
 	{
 		return selectedWorkflows;
 	}
 
 
-	public List<MyExpPack> getSelectedPacks()
+	public List<PackHeader> getSelectedPacks()
 	{
 		return selectedPacks;
 	}
@@ -67,13 +71,13 @@ public class ResourceSelectionModel
 			ros.add(ro);
 		}
 		else {
-			for (MyExpFile file : selectedFiles) {
+			for (FileHeader file : selectedFiles) {
 				ros.add(new ResearchObject(file));
 			}
-			for (MyExpWorkflow workflow : selectedWorkflows) {
+			for (WorkflowHeader workflow : selectedWorkflows) {
 				ros.add(new ResearchObject(workflow));
 			}
-			for (MyExpPack pack : selectedPacks) {
+			for (PackHeader pack : selectedPacks) {
 				ros.add(new ResearchObject(pack));
 			}
 		}

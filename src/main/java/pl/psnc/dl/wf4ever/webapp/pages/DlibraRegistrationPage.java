@@ -1,5 +1,9 @@
 package pl.psnc.dl.wf4ever.webapp.pages;
 
+import java.io.IOException;
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -35,6 +39,7 @@ public class DlibraRegistrationPage
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private static final Logger log = Logger.getLogger(DlibraRegistrationPage.class);
 
 	/**
 	 * Default Constructor
@@ -79,6 +84,7 @@ public class DlibraRegistrationPage
 			@Override
 			public void onSubmit()
 			{
+				tryLoadTestToken(user);
 				if (user.getMyExpAccessToken() != null) {
 					startMyExpImport();
 				}
@@ -130,6 +136,24 @@ public class DlibraRegistrationPage
 				{
 				}
 			}).setOutputMarkupId(true);
+	}
+
+
+	protected void tryLoadTestToken(DlibraUser user)
+	{
+			Properties props = new Properties();
+			try {
+				props.load(getClass().getClassLoader().getResourceAsStream(
+					"testToken.properties"));
+				String token = props.getProperty("token");
+				String secret = props.getProperty("secret");
+				if (token != null && secret != null) {
+					user.setMyExpAccessToken(new Token(token, secret));
+				}
+			}
+			catch (IOException e) {
+				log.debug("Failed to load properties: " + e.getMessage());
+			}
 	}
 
 

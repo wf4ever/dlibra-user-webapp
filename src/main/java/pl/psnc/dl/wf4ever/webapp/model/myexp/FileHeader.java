@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "file")
 public class FileHeader
-	extends ResourceHeader
+	extends SimpleResourceHeader
 {
 
 	/**
@@ -24,6 +24,13 @@ public class FileHeader
 	public String getResourceUrl()
 	{
 		return getUri() + "&elements=filename,content,content-type,id,title";
+	}
+
+
+	@Override
+	public Class<File> getResourceClass()
+	{
+		return File.class;
 	}
 
 }

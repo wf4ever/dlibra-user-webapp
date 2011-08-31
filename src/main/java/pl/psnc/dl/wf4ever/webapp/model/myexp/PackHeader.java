@@ -26,4 +26,11 @@ public class PackHeader
 		return getUri() + "&elements=internal-pack-items,id,title";
 	}
 
+
+	@Override
+	public Class<Pack> getResourceClass()
+	{
+		return Pack.class;
+	}
+
 }

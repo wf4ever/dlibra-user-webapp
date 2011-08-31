@@ -25,16 +25,16 @@ public class Pack
 	 */
 	private static final long serialVersionUID = 3146768347985843474L;
 
-	private List<SimpleResource> resources = new ArrayList<SimpleResource>();
+	private List<InternalPackItemHeader> resources = new ArrayList<InternalPackItemHeader>();
 
 
 	/**
 	 * @return the resources
 	 */
 	@XmlElementWrapper(name = "internal-pack-items")
-	@XmlElements({ @XmlElement(name = "file", type = File.class),
-			@XmlElement(name = "workflow", type = Workflow.class)})
-	public List<SimpleResource> getResources()
+	@XmlElements({ @XmlElement(name = "file", type = InternalPackItemHeader.class),
+			@XmlElement(name = "workflow", type = InternalPackItemHeader.class)})
+	public List<InternalPackItemHeader> getResources()
 	{
 		return resources;
 	}
@@ -43,7 +43,7 @@ public class Pack
 	/**
 	 * @param resources the resources to set
 	 */
-	public void setResources(List<SimpleResource> resources)
+	public void setResources(List<InternalPackItemHeader> resources)
 	{
 		this.resources = resources;
 	}

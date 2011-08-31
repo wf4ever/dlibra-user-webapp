@@ -4,6 +4,7 @@
 package pl.psnc.dl.wf4ever.webapp.services;
 
 import java.io.StringReader;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -20,16 +21,15 @@ import org.scribe.oauth.OAuthService;
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel.ImportStatus;
-import pl.psnc.dl.wf4ever.webapp.model.myexp.File;
-import pl.psnc.dl.wf4ever.webapp.model.myexp.FileHeader;
+import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.InternalPackItem;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.InternalPackItemHeader;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.Pack;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.PackHeader;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.Resource;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.ResourceHeader;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.SimpleResource;
-import pl.psnc.dl.wf4ever.webapp.model.myexp.Workflow;
-import pl.psnc.dl.wf4ever.webapp.model.myexp.WorkflowHeader;
-import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.SimpleResourceHeader;
 
 /**
  * @author Piotr Hołubowicz
@@ -73,8 +73,10 @@ public class MyExpImportService
 		throws Exception
 	{
 		createRO(model, ro, dLibraUser);
-		importFiles(model, ro, token, dLibraUser);
-		importWorkflows(model, ro, token, dLibraUser);
+		importSimpleResources(model, ro.getFiles(), ro.getName(), token,
+			dLibraUser);
+		importSimpleResources(model, ro.getWorkflows(), ro.getName(), token,
+			dLibraUser);
 		importPacks(model, ro, token, dLibraUser);
 	}
 
@@ -87,32 +89,14 @@ public class MyExpImportService
 	 * @throws JAXBException
 	 * @throws Exception
 	 */
-	private static void importFiles(ImportModel model, ResearchObject ro,
-			Token token, DlibraUser user)
+	private static void importSimpleResources(ImportModel model,
+			List< ? extends SimpleResourceHeader> resourceHeaders,
+			String roName, Token token, DlibraUser user)
 		throws JAXBException, Exception
 	{
-		for (FileHeader file : ro.getFiles()) {
-			importSimpleResource(model, file, ro.getName(), token, user,
-				File.class);
-		}
-	}
-
-
-	/**
-	 * @param model
-	 * @param ro
-	 * @param token
-	 * @param dLibraUser
-	 * @throws JAXBException
-	 * @throws Exception
-	 */
-	private static void importWorkflows(ImportModel model, ResearchObject ro,
-			Token token, DlibraUser user)
-		throws JAXBException, Exception
-	{
-		for (WorkflowHeader workflow : ro.getWorkflows()) {
-			importSimpleResource(model, workflow, ro.getName(), token, user,
-				Workflow.class);
+		for (SimpleResourceHeader header : resourceHeaders) {
+			importSimpleResource(model, header, roName, token, user, "",
+				header.getResourceClass());
 		}
 	}
 
@@ -129,36 +113,54 @@ public class MyExpImportService
 			Token token, DlibraUser user)
 		throws JAXBException, Exception
 	{
-		for (PackHeader pack : ro.getPacks()) {
+		for (PackHeader packHeader : ro.getPacks()) {
 			OAuthRequest request = new OAuthRequest(Verb.GET,
-					pack.getResourceUrl());
+					packHeader.getResourceUrl());
 			service.signRequest(token, request);
 			Response response = request.send();
-			Pack p = (Pack) createMyExpResource(response.getBody(),
+			Pack pack = (Pack) createMyExpResource(response.getBody(),
 				Pack.class);
-			model.setMessage(String.format("Importing pack \"%d\"", p.getId()));
+			model.setMessage(String.format("Importing pack \"%d\"",
+				pack.getId()));
 
-			for (SimpleResource r : p.getResources()) {
-				//				importSimpleResource(model, r, ro.getName(), token, user,
-				//					p.getId() + "/");
+			for (InternalPackItemHeader packItemHeader : pack.getResources()) {
+				importInternalPackItem(model, ro, token, user, pack,
+					packItemHeader);
 			}
 		}
 	}
 
 
-	private static void importSimpleResource(ImportModel model,
-			ResourceHeader res, String roName, Token token,
-			DlibraUser user, Class< ? extends SimpleResource> resourceClass)
-		throws Exception
+	/**
+	 * @param model
+	 * @param ro
+	 * @param token
+	 * @param user
+	 * @param pack
+	 * @param r
+	 * @throws JAXBException
+	 * @throws Exception
+	 */
+	private static void importInternalPackItem(ImportModel model,
+			ResearchObject ro, Token token, DlibraUser user, Pack pack,
+			InternalPackItemHeader packItemHeader)
+		throws JAXBException, Exception
 	{
-		importSimpleResource(model, res, roName, token, user, "", resourceClass);
+		OAuthRequest request = new OAuthRequest(Verb.GET,
+				packItemHeader.getResourceUrl());
+		service.signRequest(token, request);
+		Response response = request.send();
+		InternalPackItem internalItem = (InternalPackItem) createMyExpResource(
+			response.getBody(), InternalPackItem.class);
+		SimpleResourceHeader resourceHeader = internalItem.getItem();
+		importSimpleResource(model, resourceHeader, ro.getName(), token, user,
+			pack.getId() + "/", resourceHeader.getResourceClass());
 	}
 
 
 	private static void importSimpleResource(ImportModel model,
-			ResourceHeader res, String roName, Token token,
-			DlibraUser user, String path,
-			Class< ? extends SimpleResource> resourceClass)
+			ResourceHeader res, String roName, Token token, DlibraUser user,
+			String path, Class< ? extends SimpleResource> resourceClass)
 		throws Exception
 	{
 		OAuthRequest request = new OAuthRequest(Verb.GET, res.getResourceUrl());

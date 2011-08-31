@@ -93,5 +93,7 @@ public abstract class ResourceHeader
 
 
 	public abstract String getResourceUrl();
+	
+	public abstract Class<? extends Resource> getResourceClass();
 
 }

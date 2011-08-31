@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "workflow")
 public class WorkflowHeader
-	extends ResourceHeader
+	extends SimpleResourceHeader
 {
 
 	/**
@@ -24,5 +24,12 @@ public class WorkflowHeader
 	public String getResourceUrl()
 	{
 		return getUri() + "&elements=content,content-uri,content-type,id,title";
+	}
+
+
+	@Override
+	public Class<Workflow> getResourceClass()
+	{
+		return Workflow.class;
 	}
 }

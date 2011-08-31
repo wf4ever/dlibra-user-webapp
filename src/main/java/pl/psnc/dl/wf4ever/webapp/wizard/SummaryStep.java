@@ -3,9 +3,7 @@
  */
 package pl.psnc.dl.wf4ever.webapp.wizard;
 
-import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardStep;
 import org.apache.wicket.extensions.wizard.dynamic.IDynamicWizardStep;
-import org.apache.wicket.model.Model;
 
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 
@@ -15,7 +13,7 @@ import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
  *
  */
 public class SummaryStep
-	extends DynamicWizardStep
+	extends AbstractStep
 {
 
 	private static final long serialVersionUID = -4003286657493791544L;
@@ -24,7 +22,7 @@ public class SummaryStep
 	public SummaryStep(IDynamicWizardStep previousStep,
 			ImportModel model)
 	{
-		super(previousStep, "Summary", "", new Model<ImportModel>(model));
+		super(previousStep, "Summary", model);
 	}
 
 

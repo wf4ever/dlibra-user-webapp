@@ -1,10 +1,8 @@
-
 /*
 Design by Free CSS Templates
 http://www.freecsstemplates.org
 Released for free under a Creative Commons Attribution 2.5 License
 */
-
 body {
 	margin: 0;
 	padding: 0;
@@ -14,7 +12,7 @@ body {
 	color: #7F7F81;
 }
 
-h1, h2, h3 {
+h1,h2,h3 {
 	margin: 0;
 	padding: 0;
 	font-weight: normal;
@@ -33,12 +31,13 @@ h3 {
 	font-size: 1.6em;
 }
 
-p, ul, ol {
+p,ul,ol {
 	margin-top: 0;
 	line-height: 180%;
 }
 
-ul, ol {
+ul,ol {
+	
 }
 
 a {
@@ -73,7 +72,6 @@ img.aligncenter {
 }
 
 /* Header */
-
 #header {
 	width: 1000px;
 	height: 120px;
@@ -82,7 +80,6 @@ img.aligncenter {
 }
 
 /* Logo */
-
 #logo {
 	float: left;
 	height: 100px;
@@ -91,7 +88,7 @@ img.aligncenter {
 	color: #FFFFFF;
 }
 
-#logo h1, #logo p {
+#logo h1,#logo p {
 	margin: 0;
 	padding: 0;
 }
@@ -122,7 +119,6 @@ img.aligncenter {
 }
 
 /* Search */
-
 #search {
 	float: right;
 	width: 280px;
@@ -157,7 +153,6 @@ img.aligncenter {
 }
 
 /* Menu */
-
 #menu {
 	width: 1000px;
 	height: 49px;
@@ -193,6 +188,7 @@ img.aligncenter {
 }
 
 #menu .current_page_item a {
+	
 }
 
 #menu a:hover {
@@ -207,7 +203,6 @@ img.aligncenter {
 }
 
 /* Page */
-
 #page {
 	width: 1000px;
 	margin: 0 auto;
@@ -216,6 +211,7 @@ img.aligncenter {
 }
 
 #page-bgtop {
+	
 }
 
 #page-bgbtm {
@@ -224,7 +220,6 @@ img.aligncenter {
 }
 
 /* Content */
-
 #content {
 	float: right;
 	width: 540px;
@@ -255,6 +250,7 @@ img.aligncenter {
 }
 
 .post .meta a {
+	
 }
 
 .post .entry {
@@ -275,7 +271,6 @@ img.aligncenter {
 }
 
 /* Sidebar */
-
 #sidebar {
 	float: left;
 	width: 330px;
@@ -340,8 +335,8 @@ img.aligncenter {
 }
 
 /* Calendar */
-
 #calendar {
+	
 }
 
 #calendar_wrap {
@@ -361,7 +356,6 @@ img.aligncenter {
 }
 
 /* Footer */
-
 #footer {
 	width: 1000px;
 	height: 55px;
@@ -382,4 +376,22 @@ img.aligncenter {
 
 #footer a {
 	color: #FFFFFF;
+}
+
+.wicketExtensionsWizard table,.wicketExtensionsWizard tbody,.wicketExtensionsWizard tr,.wicketExtensionsWizard td
+	{
+	marign: 0;
+	padding: 0;
+}
+
+table.resourceList {
+	width: 500px;
+}
+
+tr.even {
+	background-color: #eaeaea;
+}
+
+tr.odd {
+	background-color: #f6f6f6;
 }

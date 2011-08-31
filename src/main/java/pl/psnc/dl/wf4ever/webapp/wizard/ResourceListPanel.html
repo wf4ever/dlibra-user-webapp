@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <wicket:panel xmlns:wicket="http://wicket.apache.org">
 	<p>
-		<span wicket:id="resourceName">[Resources]</span> <a
+		<span wicket:id="resourceName">[Resources]</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
 			wicket:id="resourceListLink">[<span
-			wicket:id="resourceListLinkLabel">[Hide/show]</span>]</a>
-	</p>
+			wicket:id="resourceListLinkLabel">[Hide/show]</span>]
+		</a>&nbsp; <a wicket:id="selectAll">[Select all]</a>&nbsp; <a
+			wicket:id="deselectAll">[Deselect all]</a>
 	<div wicket:id="resourceList">
 		<form wicket:id="form">
-			<span wicket:id="group"> 
-				<input type="checkbox"
-					wicket:id="groupselector">check/uncheck all</input>
-				<table>
+			<span wicket:id="group">
+				<table class="resourceList">
 					<tr wicket:id="resourceListView">
-						<td><input type="checkbox" wicket:id="checkbox" /></td>
-						<td><a wicket:id="link"><span wicket:id="title"></span></a></td>
+						<td><input type="checkbox" wicket:id="checkbox" />&nbsp; <label
+							wicket:id="title"></label>&nbsp;&nbsp;<a wicket:id="link"><small>link</small></a></td>
 					</tr>
-				</table> 
+				</table>
 			</span>
 		</form>
 	</div>
+	</p>
 </wicket:panel>

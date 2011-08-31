@@ -3,7 +3,6 @@
  */
 package pl.psnc.dl.wf4ever.webapp.wizard;
 
-import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardStep;
 import org.apache.wicket.extensions.wizard.dynamic.IDynamicWizardStep;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
@@ -15,7 +14,7 @@ import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
  *
  */
 public class StartImportStep
-	extends DynamicWizardStep
+	extends AbstractStep
 {
 
 	private static final long serialVersionUID = 4637256013660809942L;
@@ -23,7 +22,7 @@ public class StartImportStep
 
 	public StartImportStep(ImportModel model)
 	{
-		super(null, "Start", "", new Model<ImportModel>(model));
+		super(null, "Start", model);
 
 		add(new Label("userName", new Model<String>(model.getMyExpUser()
 				.getName())));

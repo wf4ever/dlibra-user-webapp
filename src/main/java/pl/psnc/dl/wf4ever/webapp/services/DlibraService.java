@@ -223,7 +223,7 @@ public class DlibraService
 		if (model.getOpenIdData() != null
 				&& model.getOpenIdData().getEmailAddress() != null) {
 			return StringUtils.left(model.getOpenIdData().getEmailAddress(),
-				USERNAME_LENGTH).replace('@', '_');
+				USERNAME_LENGTH).replaceAll("\\s", "_").replaceAll("\\W", "");
 		}
 		return "OpenID-" + new Date().getTime();
 	}

@@ -5,12 +5,10 @@ package pl.psnc.dl.wf4ever.webapp.wizard;
 
 import java.util.Arrays;
 
-import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardStep;
 import org.apache.wicket.extensions.wizard.dynamic.IDynamicWizardStep;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.RadioChoice;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
@@ -22,7 +20,7 @@ import pl.psnc.dl.wf4ever.webapp.model.ResourceSelectionModel.ImportType;
  *
  */
 public class SelectResourcesStep
-	extends DynamicWizardStep
+	extends AbstractStep
 {
 
 	private static final long serialVersionUID = -7984392838783804920L;
@@ -33,7 +31,7 @@ public class SelectResourcesStep
 	public SelectResourcesStep(IDynamicWizardStep previousStep,
 			ImportModel model)
 	{
-		super(previousStep, "Select resources", "", new Model<ImportModel>(model));
+		super(previousStep, "Select resources", model);
 
 		selectionModel = new ResourceSelectionModel();
 
@@ -90,7 +88,8 @@ public class SelectResourcesStep
 	@Override
 	public IDynamicWizardStep next()
 	{
-		return new ConfirmRONamesStep(this, (ImportModel) this.getDefaultModelObject());
+		return new ConfirmRONamesStep(this,
+				(ImportModel) this.getDefaultModelObject());
 	}
 
 
@@ -106,7 +105,8 @@ public class SelectResourcesStep
 	{
 		super.applyState();
 		ImportModel model = (ImportModel) this.getDefaultModelObject();
-		model.setResearchObjectsProcessed(selectionModel.createResearchObjects());
+		model.setResearchObjectsProcessed(selectionModel
+				.createResearchObjects());
 	}
 
 	private class ImportTypeChoiceRenderer

@@ -3,7 +3,6 @@
  */
 package pl.psnc.dl.wf4ever.webapp.wizard;
 
-import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardStep;
 import org.apache.wicket.extensions.wizard.dynamic.IDynamicWizardStep;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -11,7 +10,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.model.Model;
 
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
@@ -21,7 +19,7 @@ import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
  *
  */
 public class RODefinedStep
-	extends DynamicWizardStep
+	extends AbstractStep
 {
 
 	private static final long serialVersionUID = 4637256013660809942L;
@@ -32,16 +30,14 @@ public class RODefinedStep
 	@SuppressWarnings("serial")
 	public RODefinedStep(IDynamicWizardStep previousStep, ImportModel model)
 	{
-		super(previousStep, "Defined Research Objects", "",
-				new Model<ImportModel>(model));
+		super(previousStep, "Defined Research Objects", model);
 
 		add(new ListView<ResearchObject>("resourceListView",
 				model.getResearchObjects()) {
 
 			protected void populateItem(ListItem<ResearchObject> item)
 			{
-				ResearchObject ro = (ResearchObject) item
-						.getModelObject();
+				ResearchObject ro = (ResearchObject) item.getModelObject();
 				item.add(new Label("name", ro.getName()));
 
 			}
@@ -70,7 +66,7 @@ public class RODefinedStep
 		}
 		else {
 			return new ImportDataStep(this,
-				(ImportModel) this.getDefaultModelObject());
+					(ImportModel) this.getDefaultModelObject());
 		}
 	}
 

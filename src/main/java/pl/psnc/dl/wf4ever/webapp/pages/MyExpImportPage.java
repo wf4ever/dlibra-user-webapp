@@ -124,11 +124,7 @@ public class MyExpImportPage
 
 		public ImportWizard(String id, ImportModel model)
 		{
-			super(id);
-
-			DynamicWizardModel wizardModel = new DynamicWizardModel(
-					new StartImportStep(model));
-			init(wizardModel);
+			super(id, new DynamicWizardModel(new StartImportStep(model)), false);
 		}
 
 	}

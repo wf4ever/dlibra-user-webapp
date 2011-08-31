@@ -3,14 +3,12 @@
  */
 package pl.psnc.dl.wf4ever.webapp.wizard;
 
-import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardStep;
 import org.apache.wicket.extensions.wizard.dynamic.IDynamicWizardStep;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
@@ -21,7 +19,7 @@ import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
  *
  */
 public class ConfirmRONamesStep
-	extends DynamicWizardStep
+	extends AbstractStep
 {
 
 	private static final long serialVersionUID = -3238571883021517707L;
@@ -29,8 +27,7 @@ public class ConfirmRONamesStep
 
 	public ConfirmRONamesStep(IDynamicWizardStep previousStep, ImportModel model)
 	{
-		super(previousStep, "Confirm Research Object names", "",
-				new Model<ImportModel>(model));
+		super(previousStep, "Confirm Research Object names", model);
 
 		Form< ? > form = new Form<Void>("form");
 		add(form);
@@ -40,13 +37,12 @@ public class ConfirmRONamesStep
 
 			protected void populateItem(ListItem<ResearchObject> item)
 			{
-				ResearchObject ro = (ResearchObject) item
-						.getModelObject();
+				ResearchObject ro = (ResearchObject) item.getModelObject();
 				ro.setDefaultName();
 				item.add(new RequiredTextField<String>("name",
 						new PropertyModel<String>(ro, "name"), String.class));
 				item.add(new Label("content", ro.getContentDesc()));
-				
+
 			}
 		};
 		list.setReuseItems(true);
@@ -61,6 +57,7 @@ public class ConfirmRONamesStep
 		ImportModel model = (ImportModel) this.getDefaultModelObject();
 		model.finishProcessingResearchObjects();
 	}
+
 
 	/* (non-Javadoc)
 	 * @see org.apache.wicket.extensions.wizard.dynamic.IDynamicWizardStep#isLastStep()
@@ -78,7 +75,8 @@ public class ConfirmRONamesStep
 	@Override
 	public IDynamicWizardStep next()
 	{
-		return new RODefinedStep(this, (ImportModel) this.getDefaultModelObject());
+		return new RODefinedStep(this,
+				(ImportModel) this.getDefaultModelObject());
 	}
 
 }

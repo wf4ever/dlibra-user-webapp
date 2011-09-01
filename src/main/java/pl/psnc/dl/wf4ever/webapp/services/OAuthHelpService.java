@@ -3,7 +3,8 @@
  */
 package pl.psnc.dl.wf4ever.webapp.services;
 
-import org.apache.http.HttpStatus;
+import java.net.HttpURLConnection;
+
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
@@ -61,22 +62,22 @@ public class OAuthHelpService
 	{
 		switch (verb) {
 			case GET:
-				if (response.getCode() != HttpStatus.SC_OK) {
+				if (response.getCode() != HttpURLConnection.HTTP_OK) {
 					throw prepareException(response);
 				}
 				break;
 			case PUT:
-				if (response.getCode() != HttpStatus.SC_OK) {
+				if (response.getCode() != HttpURLConnection.HTTP_OK) {
 					throw prepareException(response);
 				}
 				break;
 			case POST:
-				if (response.getCode() != HttpStatus.SC_CREATED) {
+				if (response.getCode() != HttpURLConnection.HTTP_CREATED) {
 					throw prepareException(response);
 				}
 				break;
 			case DELETE:
-				if (response.getCode() != HttpStatus.SC_NO_CONTENT) {
+				if (response.getCode() != HttpURLConnection.HTTP_NO_CONTENT) {
 					throw prepareException(response);
 				}
 				break;
@@ -86,7 +87,7 @@ public class OAuthHelpService
 
 	private static OAuthException prepareException(Response response)
 	{
-		if (response.getCode() == HttpStatus.SC_UNAUTHORIZED) {
+		if (response.getCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
 			return new OAuthException(response,
 					"the access token has been rejected");
 		}

@@ -37,11 +37,14 @@ public class ResourceListPanel
 
 	private String resourceName;
 
+	private Form< ? > form;
+
 
 	@SuppressWarnings("serial")
 	public ResourceListPanel(String id, String name,
 			final List< ? extends ResourceHeader> resources,
-			final List< ? extends ResourceHeader> selectedResources)
+			final List< ? extends ResourceHeader> selectedResources,
+			final List< ? extends ResourceHeader> importedResources)
 	{
 		super(id);
 		this.resourceName = name;
@@ -57,7 +60,7 @@ public class ResourceListPanel
 						visModel, "resourceListDisplayStyle")));
 		add(resourceList);
 
-		Form< ? > form = new Form<Void>("form");
+		form = new Form<Void>("form");
 		resourceList.add(form);
 		@SuppressWarnings("unchecked")
 		CheckGroup<ResourceHeader> group = new CheckGroup<ResourceHeader>(
@@ -81,9 +84,12 @@ public class ResourceListPanel
 				Check<ResourceHeader> check = new Check<ResourceHeader>(
 						"checkbox", item.getModel());
 				item.add(check);
-				Label label = new Label("title", resource.getTitle());
+				String msg = importedResources.contains(resource) ? " <i>(already selected for import)</i>"
+						: "";
+				Label label = new Label("title", resource.getTitle() + msg);
 				label.add(new AttributeModifier("for", new Model<String>(check
 						.getMarkupId())));
+				label.setEscapeModelStrings(false);
 				item.add(label);
 				item.add(new ExternalLink("link", resource.getResource()));
 			}
@@ -127,6 +133,12 @@ public class ResourceListPanel
 				target.add(resourceList);
 			}
 		});
+	}
+
+
+	public void commit()
+	{
+		form.process(null);
 	}
 
 	class VisibilityModel

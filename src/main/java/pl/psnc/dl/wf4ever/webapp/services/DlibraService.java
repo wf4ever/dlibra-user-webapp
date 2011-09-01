@@ -3,11 +3,11 @@
  */
 package pl.psnc.dl.wf4ever.webapp.services;
 
+import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.apache.wicket.util.crypt.Base64;
 import org.scribe.model.OAuthRequest;
@@ -60,7 +60,7 @@ public class DlibraService
 		OAuthRequest request = new OAuthRequest(Verb.GET, url);
 		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
 		Response response = request.send();
-		return response.getCode() == HttpStatus.SC_OK;
+		return response.getCode() == HttpURLConnection.HTTP_OK;
 	}
 
 
@@ -79,8 +79,8 @@ public class DlibraService
 		request.addPayload(username + "\r\n" + password);
 		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
 		Response response = request.send();
-		if (response.getCode() != HttpStatus.SC_CREATED) {
-			if (response.getCode() == HttpStatus.SC_CONFLICT) {
+		if (response.getCode() != HttpURLConnection.HTTP_CREATED) {
+			if (response.getCode() == HttpURLConnection.HTTP_CONFLICT) {
 				log.warn("Registering a user that already exists in dLibra");
 				created = false;
 			}
@@ -110,7 +110,7 @@ public class DlibraService
 		user.setDlibraAccessToken(null);
 		HibernateService.deleteUser(user);
 
-		if (response.getCode() != HttpStatus.SC_NO_CONTENT) {
+		if (response.getCode() != HttpURLConnection.HTTP_CONFLICT) {
 			throw new Exception("Error when deleting workspace, response: "
 					+ response.getCode() + " " + response.getBody());
 		}
@@ -144,10 +144,10 @@ public class DlibraService
 		request.addPayload(name);
 		dLibraService.signRequest(model.getDlibraAccessToken(), request);
 		Response response = request.send();
-		if (response.getCode() == HttpStatus.SC_CREATED) {
+		if (response.getCode() == HttpURLConnection.HTTP_CREATED) {
 			return true;
 		}
-		else if (response.getCode() == HttpStatus.SC_CONFLICT && ignoreIfExists) {
+		else if (response.getCode() == HttpURLConnection.HTTP_CONFLICT && ignoreIfExists) {
 			return false;
 		}
 		else {
@@ -176,10 +176,10 @@ public class DlibraService
 		request.addPayload(DEFAULT_VERSION);
 		dLibraService.signRequest(model.getDlibraAccessToken(), request);
 		Response response = request.send();
-		if (response.getCode() == HttpStatus.SC_CREATED) {
+		if (response.getCode() == HttpURLConnection.HTTP_CREATED) {
 			return true;
 		}
-		else if (response.getCode() == HttpStatus.SC_CONFLICT && ignoreIfExists) {
+		else if (response.getCode() == HttpURLConnection.HTTP_CONFLICT && ignoreIfExists) {
 			return false;
 		}
 		else {
@@ -201,7 +201,7 @@ public class DlibraService
 		request.addPayload(content);
 		dLibraService.signRequest(model.getDlibraAccessToken(), request);
 		Response response = request.send();
-		if (response.getCode() != HttpStatus.SC_OK) {
+		if (response.getCode() != HttpURLConnection.HTTP_OK) {
 			throw new Exception("Error when sending resource " + path
 					+ ", response: " + response.getCode() + " "
 					+ response.getBody());

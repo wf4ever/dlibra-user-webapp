@@ -9,7 +9,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import pl.psnc.dl.wf4ever.webapp.model.myexp.FileHeader;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.PackHeader;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.WorkflowHeader;
 
 /**
  * @author Piotr Hołubowicz
@@ -29,6 +32,12 @@ public class ImportModel
 
 	private List<ResearchObject> researchObjectsProcessed;
 
+	private List<FileHeader> selectedFiles;
+
+	private List<WorkflowHeader> selectedWorkflows;
+
+	private List<PackHeader> selectedPacks;
+
 	private User myExpUser;
 
 	private String message = "Import has not started";
@@ -36,7 +45,7 @@ public class ImportModel
 	private List<String> messages = new ArrayList<String>();
 
 	private ImportStatus status = ImportStatus.NOT_STARTED;
-	
+
 	private boolean mergeROs = true;
 
 
@@ -45,6 +54,9 @@ public class ImportModel
 		super();
 		this.myExpUser = user;
 		this.researchObjects = new ArrayList<ResearchObject>();
+		this.selectedFiles = new ArrayList<FileHeader>();
+		this.selectedWorkflows = new ArrayList<WorkflowHeader>();
+		this.selectedPacks = new ArrayList<PackHeader>();
 	}
 
 
@@ -87,6 +99,11 @@ public class ImportModel
 
 	public void finishProcessingResearchObjects()
 	{
+		for(ResearchObject ro : researchObjectsProcessed) {
+			selectedFiles.addAll(ro.getFiles());
+			selectedWorkflows.addAll(ro.getWorkflows());
+			selectedPacks.addAll(ro.getPacks());
+		}
 		this.researchObjects.addAll(researchObjectsProcessed);
 		this.researchObjectsProcessed.clear();
 	}
@@ -165,6 +182,24 @@ public class ImportModel
 	public void setStatus(ImportStatus status)
 	{
 		this.status = status;
+	}
+
+
+	public List<FileHeader> getImportedFiles()
+	{
+		return selectedFiles;
+	}
+
+
+	public List<WorkflowHeader> getImportedWorkflows()
+	{
+		return selectedWorkflows;
+	}
+
+
+	public List<PackHeader> getImportedPacks()
+	{
+		return selectedPacks;
 	}
 
 }

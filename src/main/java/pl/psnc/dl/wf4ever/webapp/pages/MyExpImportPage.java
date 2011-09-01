@@ -10,8 +10,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.wicket.extensions.wizard.Wizard;
-import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardModel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.scribe.model.Response;
@@ -28,7 +26,7 @@ import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OAuthHelpService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
-import pl.psnc.dl.wf4ever.webapp.wizard.StartImportStep;
+import pl.psnc.dl.wf4ever.webapp.wizard.ImportWizard;
 
 /**
  * @author Piotr Hołubowicz
@@ -52,6 +50,9 @@ public class MyExpImportPage
 		super(pageParameters);
 		if (willBeRedirected)
 			return;
+
+		info("You have successfully authorized Wf4Ever User Management Service to\n"
+				+ " import your data from myExperiment.");
 
 		DlibraUser user = getDlibraUserModel();
 		OAuthService service = MyExpApi.getOAuthService(WicketUtils
@@ -111,20 +112,6 @@ public class MyExpImportPage
 		StringBuffer xmlStr = new StringBuffer(xml);
 		return (User) u.unmarshal(new StreamSource(new StringReader(xmlStr
 				.toString())));
-	}
-
-	class ImportWizard
-		extends Wizard
-	{
-
-		private static final long serialVersionUID = -8520850154339581229L;
-
-
-		public ImportWizard(String id, ImportModel model)
-		{
-			super(id, new DynamicWizardModel(new StartImportStep(model)), false);
-		}
-
 	}
 
 }

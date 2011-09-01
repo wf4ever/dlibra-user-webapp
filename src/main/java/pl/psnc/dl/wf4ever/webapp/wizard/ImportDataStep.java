@@ -38,6 +38,7 @@ public class ImportDataStep
 			final ImportModel model)
 	{
 		super(previousStep, "Import data", model);
+		setOutputMarkupId(true);
 		final TextArea<String> importStatus = new TextArea<String>("messages",
 				new PropertyModel<String>(model, "messages"));
 		importStatus.setOutputMarkupId(true);
@@ -53,7 +54,8 @@ public class ImportDataStep
 				if (model.getStatus() == ImportStatus.FINISHED) {
 					stop();
 					importStatus.remove(this);
-					target.add(importStatus);
+					getSession().info("Import complete.");
+					getRequestCycle().setResponsePage(getPage());
 				}
 			}
 		};
@@ -80,9 +82,11 @@ public class ImportDataStep
 
 					this.setEnabled(false);
 					target.add(this);
+					getRequestCycle().setResponsePage(getPage());
 				}
 			}
-		}).setOutputMarkupId(true);
+		}).setEnabled(model.getStatus() == ImportStatus.NOT_STARTED)
+				.setOutputMarkupId(true);
 	}
 
 
@@ -103,6 +107,20 @@ public class ImportDataStep
 	public IDynamicWizardStep next()
 	{
 		return new SummaryStep(this, (ImportModel) this.getDefaultModelObject());
+	}
+	
+	@Override
+	public boolean isPreviousAvailable()
+	{
+		ImportModel model = (ImportModel) getDefaultModelObject();
+		return model.getStatus() == ImportStatus.NOT_STARTED;
+	}
+
+	@Override
+	public boolean isNextAvailable()
+	{
+		ImportModel model = (ImportModel) getDefaultModelObject();
+		return model.getStatus() == ImportStatus.FINISHED;
 	}
 
 }

@@ -3,8 +3,10 @@
 	<div class="entry">
 		<p>Please check the default Research Object names provided below.
 		</p>
+		<p>Note: if 2 or more Research Objects have the same name, they
+			will be merged into one during import.</p>
 		<form wicket:id="form">
-			<table>
+			<table class="resourceList">
 				<tr>
 					<th>RO name</th>
 					<th>RO content</th>
@@ -15,5 +17,13 @@
 				</tr>
 			</table>
 		</form>
+		<p>&nbsp;</p>
+		<form wicket:id="formAddMore">
+			<p>
+				<input type="checkbox" id="addMoreROs" wicket:id="addMoreROs" /><label
+					for="addMoreROs">Define more Research Objects?</label>
+			</p>
+		</form>
+
 	</div>
 </wicket:panel>

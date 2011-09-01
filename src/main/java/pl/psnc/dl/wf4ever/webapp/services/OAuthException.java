@@ -3,7 +3,6 @@
  */
 package pl.psnc.dl.wf4ever.webapp.services;
 
-import org.mortbay.jetty.HttpStatus;
 import org.scribe.model.Response;
 
 /**
@@ -21,15 +20,14 @@ public class OAuthException
 
 	public OAuthException(Response response, String explanation)
 	{
-		super(String.format("%s (%s)",
-			HttpStatus.getResponseLine(response.getCode()), explanation));
+		super(String.format("Error %d: %s", response.getCode(), explanation));
 		this.response = response;
 	}
 
 
 	public OAuthException(Response response)
 	{
-		super(HttpStatus.getResponseLine(response.getCode()).toString());
+		super(String.format("Error %d", response.getCode()));
 		this.response = response;
 	}
 

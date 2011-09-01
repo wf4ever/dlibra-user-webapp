@@ -381,7 +381,7 @@ img.aligncenter {
 /* Wicket-specific */
 .wicketExtensionsWizard table,.wicketExtensionsWizard tbody,.wicketExtensionsWizard tr,.wicketExtensionsWizard td
 	{
-	marign: 0;
+	margin: 0;
 	padding: 0;
 }
 
@@ -421,4 +421,8 @@ li.feedbackPanelWARN, li.feedbackPanelDEBUG {
 
 li.feedbackPanelERROR {
 	background-image: url(images/feedback_error.png);
+}
+
+td.wicketExtensionsWizardFeedback {
+	visibility: hidden;
 }

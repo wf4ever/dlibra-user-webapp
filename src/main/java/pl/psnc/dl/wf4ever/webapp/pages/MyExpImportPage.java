@@ -14,7 +14,6 @@ import org.apache.wicket.extensions.wizard.Wizard;
 import org.apache.wicket.extensions.wizard.dynamic.DynamicWizardModel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
@@ -26,6 +25,7 @@ import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
 import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
+import pl.psnc.dl.wf4ever.webapp.services.OAuthHelpService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 import pl.psnc.dl.wf4ever.webapp.wizard.StartImportStep;
@@ -78,18 +78,16 @@ public class MyExpImportPage
 
 		User myExpUser = null;
 		try {
-			OAuthRequest request = new OAuthRequest(Verb.GET, WHOAMI_URL);
-			service.signRequest(user.getMyExpAccessToken(), request);
-			Response response = request.send();
+			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
+				WHOAMI_URL, user.getMyExpAccessToken());
 			myExpUser = createMyExpUserModel(response.getBody());
 
-			request = new OAuthRequest(Verb.GET, String.format(GET_USER_URL,
-				myExpUser.getId()));
-			service.signRequest(user.getMyExpAccessToken(), request);
-			response = request.send();
+			response = OAuthHelpService.sendRequest(service, Verb.GET,
+				String.format(GET_USER_URL, myExpUser.getId()),
+				user.getMyExpAccessToken());
 			myExpUser = createMyExpUserModel(response.getBody());
 		}
-		catch (JAXBException e) {
+		catch (Exception e) {
 			String page = urlFor(ErrorPage.class, null).toString()
 					+ "?message=" + e.getMessage();
 			getRequestCycle().scheduleRequestHandlerAfterCurrent(

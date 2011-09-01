@@ -12,7 +12,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
@@ -114,10 +113,8 @@ public class MyExpImportService
 		throws JAXBException, Exception
 	{
 		for (PackHeader packHeader : ro.getPacks()) {
-			OAuthRequest request = new OAuthRequest(Verb.GET,
-					packHeader.getResourceUrl());
-			service.signRequest(token, request);
-			Response response = request.send();
+			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
+				packHeader.getResourceUrl(), token);
 			Pack pack = (Pack) createMyExpResource(response.getBody(),
 				Pack.class);
 			model.setMessage(String.format("Importing pack \"%d\"",
@@ -146,10 +143,8 @@ public class MyExpImportService
 			InternalPackItemHeader packItemHeader)
 		throws JAXBException, Exception
 	{
-		OAuthRequest request = new OAuthRequest(Verb.GET,
-				packItemHeader.getResourceUrl());
-		service.signRequest(token, request);
-		Response response = request.send();
+		Response response = OAuthHelpService.sendRequest(service, Verb.GET,
+			packItemHeader.getResourceUrl(), token);
 		InternalPackItem internalItem = (InternalPackItem) createMyExpResource(
 			response.getBody(), InternalPackItem.class);
 		SimpleResourceHeader resourceHeader = internalItem.getItem();
@@ -163,9 +158,8 @@ public class MyExpImportService
 			String path, Class< ? extends SimpleResource> resourceClass)
 		throws Exception
 	{
-		OAuthRequest request = new OAuthRequest(Verb.GET, res.getResourceUrl());
-		service.signRequest(token, request);
-		Response response = request.send();
+		Response response = OAuthHelpService.sendRequest(service, Verb.GET,
+			res.getResourceUrl(), token);
 		SimpleResource r = (SimpleResource) createMyExpResource(
 			response.getBody(), resourceClass);
 		model.setMessage(String.format("Importing \"%s\"", r.getFilename()));

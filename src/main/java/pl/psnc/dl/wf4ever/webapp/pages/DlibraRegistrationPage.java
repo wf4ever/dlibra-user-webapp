@@ -1,6 +1,5 @@
 package pl.psnc.dl.wf4ever.webapp.pages;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -39,7 +38,9 @@ public class DlibraRegistrationPage
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger.getLogger(DlibraRegistrationPage.class);
+	private static final Logger log = Logger
+			.getLogger(DlibraRegistrationPage.class);
+
 
 	/**
 	 * Default Constructor
@@ -105,14 +106,22 @@ public class DlibraRegistrationPage
 				{
 					DlibraUser user = (DlibraUser) getForm().getModelObject();
 					try {
+						String infoMessage;
 						if (user.isRegistered()) {
 							DlibraService.deleteWorkspace(user);
+							infoMessage = "Account has been deleted.";
 						}
 						else {
 							if (!DlibraService.createWorkspace(user)) {
-								info("Registered an existing account");
+								infoMessage = "An account for this username already existed "
+										+ "in dLibra, you have been registered with it.";
+							}
+							else {
+								infoMessage = "New account has been created.";
 							}
 						}
+						getSession().info(infoMessage);
+						setResponsePage(getPage());
 					}
 					catch (Exception e) {
 						error(e.getMessage() != null ? e.getMessage()
@@ -141,19 +150,19 @@ public class DlibraRegistrationPage
 
 	protected void tryLoadTestToken(DlibraUser user)
 	{
-			Properties props = new Properties();
-			try {
-				props.load(getClass().getClassLoader().getResourceAsStream(
-					"testToken.properties"));
-				String token = props.getProperty("token");
-				String secret = props.getProperty("secret");
-				if (token != null && secret != null) {
-					user.setMyExpAccessToken(new Token(token, secret));
-				}
+		Properties props = new Properties();
+		try {
+			props.load(getClass().getClassLoader().getResourceAsStream(
+				"testToken.properties"));
+			String token = props.getProperty("token");
+			String secret = props.getProperty("secret");
+			if (token != null && secret != null) {
+				user.setMyExpAccessToken(new Token(token, secret));
 			}
-			catch (IOException e) {
-				log.debug("Failed to load properties: " + e.getMessage());
-			}
+		}
+		catch (Exception e) {
+			log.debug("Failed to load properties: " + e.getMessage());
+		}
 	}
 
 

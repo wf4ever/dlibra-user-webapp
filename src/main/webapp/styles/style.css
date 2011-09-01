@@ -378,6 +378,7 @@ img.aligncenter {
 	color: #FFFFFF;
 }
 
+/* Wicket-specific */
 .wicketExtensionsWizard table,.wicketExtensionsWizard tbody,.wicketExtensionsWizard tr,.wicketExtensionsWizard td
 	{
 	marign: 0;
@@ -394,4 +395,30 @@ tr.even {
 
 tr.odd {
 	background-color: #f6f6f6;
+}
+
+ul.feedbackPanel {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+ul.feedbackPanel li {
+	padding-left: 34px;
+	line-height: 35px;
+	border-bottom: 1px solid #EFF4F5;
+	background-repeat: no-repeat;
+	background-position: left 6px;
+} 
+
+li.feedbackPanelINFO {
+	background-image: url(images/feedback_info.png);
+}
+
+li.feedbackPanelWARN, li.feedbackPanelDEBUG {
+	background-image: url(images/feedback_warning.png);
+}
+
+li.feedbackPanelERROR {
+	background-image: url(images/feedback_error.png);
 }

@@ -51,4 +51,11 @@ public class Workflow
 		this.contentUri = contentUri;
 	}
 
+
+	@Override
+	public String toString()
+	{
+		return String.format("workflow \"%s\"", getFilename());
+	}
+
 }

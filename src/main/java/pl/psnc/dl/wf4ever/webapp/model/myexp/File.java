@@ -22,6 +22,7 @@ public class File
 
 	private String filename;
 
+
 	/**
 	 * @return the filename
 	 */
@@ -41,5 +42,10 @@ public class File
 	}
 
 
+	@Override
+	public String toString()
+	{
+		return String.format("file \"%s\"", filename);
+	}
 
 }

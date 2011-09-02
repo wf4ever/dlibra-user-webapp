@@ -115,8 +115,9 @@ public class MyExpImportService
 			throws JAXBException, Exception
 		{
 			for (SimpleResourceHeader header : resourceHeaders) {
-				importSimpleResource(header, roName, "",
+				SimpleResource r = importSimpleResource(header, roName, "",
 					header.getResourceClass());
+				importResourceMetadata(r, r.getFilename() + ".rdf", roName, "");
 			}
 		}
 
@@ -133,12 +134,9 @@ public class MyExpImportService
 			throws JAXBException, Exception
 		{
 			for (PackHeader packHeader : ro.getPacks()) {
-				Response response = OAuthHelpService.sendRequest(service,
-					Verb.GET, packHeader.getResourceUrl(), token);
-				Pack pack = (Pack) createMyExpResource(response.getBody(),
-					Pack.class);
-				model.setMessage(String.format("Importing pack \"%d\"",
-					pack.getId()));
+				Pack pack = (Pack) getResource(packHeader, Pack.class);
+				importResourceMetadata(pack, pack.getId() + ".rdf",
+					ro.getName(), "");
 
 				for (InternalPackItemHeader packItemHeader : pack
 						.getResources()) {
@@ -172,19 +170,53 @@ public class MyExpImportService
 		}
 
 
-		private void importSimpleResource(ResourceHeader res, String roName,
-				String path, Class< ? extends SimpleResource> resourceClass)
+		private SimpleResource importSimpleResource(SimpleResourceHeader res,
+				String roName, String path,
+				Class< ? extends SimpleResource> resourceClass)
 			throws Exception
 		{
-			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
-				res.getResourceUrl(), token);
-			SimpleResource r = (SimpleResource) createMyExpResource(
-				response.getBody(), resourceClass);
-			model.setMessage(String.format("Importing \"%s\"", r.getFilename()));
+			SimpleResource r = (SimpleResource) getResource(res, resourceClass);
 
 			DlibraService.sendResource(path + r.getFilename(), roName,
 				r.getContentDecoded(), r.getContentType(), user);
 
+			return r;
+		}
+
+
+		/**
+		 * @param res
+		 * @param path
+		 * @param resourceClass
+		 * @return
+		 * @throws OAuthException
+		 * @throws JAXBException
+		 */
+		private Resource getResource(ResourceHeader res,
+				Class< ? extends Resource> resourceClass)
+			throws OAuthException, JAXBException
+		{
+			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
+				res.getResourceUrl(), token);
+			Resource r = (Resource) createMyExpResource(response.getBody(),
+				resourceClass);
+			model.setMessage(String.format("Importing %s", r.toString()));
+			return r;
+		}
+
+
+		private void importResourceMetadata(Resource res, String filename,
+				String roName, String path)
+			throws Exception
+		{
+			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
+				res.getResource(), token, "application/rdf+xml");
+			// in the future, the RDF could be parsed (and somewhat validated) and the filename can be extracted from it
+			String rdf = response.getBody();
+			model.setMessage(String.format("Importing metadata file \"%s\"", filename));
+
+			DlibraService.sendResource(filename, roName, rdf,
+				"application/rdf+xml", user);
 		}
 
 

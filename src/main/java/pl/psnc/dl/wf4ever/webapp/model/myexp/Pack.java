@@ -48,4 +48,10 @@ public class Pack
 		this.resources = resources;
 	}
 
+	@Override
+	public String toString()
+	{
+		return String.format("pack \"%s\"", getId());
+	}
+
 }

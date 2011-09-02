@@ -3,18 +3,30 @@
 	<div class="post">
 		<h2 class="title">Authentication</h2>
 		<div class="entry">
-			<p>Please enter and confirm your OpenID below to register with
-				this site.</p>
-			<form id="OpenIdRegistrationForm" wicket:id="form">
+			<p>
+				Please enter and confirm your OpenID below to register with this
+				site or click an icon below. If you don't know if you have an OpenID
+				you may check it at <a href="http://openid.net/get-an-openid/">OpenID
+					website</a>.
+			</p>
+			<form wicket:id="openIdForm">
 				<p>
 					<label>Your Open ID:</label> <input class="biginput" type="text"
 						wicket:id="openId" /> <input type="submit"
 						wicket:id="confirmOpenIdButton" value="Confirm OpenID" />
 				</p>
-				<p>
-					<input type="submit" wicket:id="logInWithGoogle" value="Log in with Google" />
-				</p>
 			</form>
+			<form wicket:id="form">
+				<p>
+					<input type="submit" wicket:id="logInWithGoogle"
+						value="Log in with Google" />
+				</p>
+<!-- 				<p>
+					If you registered in myExperiment with an openID you may let this
+					site retrieve it for you.<br /> <input type="submit"
+						wicket:id="logInWithMyExp" value="Get my OpenID from myExperiment" />
+				</p>
+ -->			</form>
 		</div>
 	</div>
 </wicket:extend>

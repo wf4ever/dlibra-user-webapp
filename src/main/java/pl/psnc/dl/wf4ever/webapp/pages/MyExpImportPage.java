@@ -36,13 +36,7 @@ public class MyExpImportPage
 	extends TemplatePage
 {
 
-	private static final String WHOAMI_URL = "http://www.myexperiment.org/whoami.xml";
-
-	private static final String GET_USER_URL = "http://www.myexperiment.org/user.xml?id=%d&elements=id,name,email,city,country,website,packs,workflows,files";
-
 	private static final long serialVersionUID = 4637256013660809942L;
-
-	private static final String OAUTH_VERIFIER = "oauth_token";
 
 
 	public MyExpImportPage(PageParameters pageParameters)
@@ -59,8 +53,8 @@ public class MyExpImportPage
 				.getCompleteUrl(this, MyExpImportPage.class, true));
 
 		if (user.getMyExpAccessToken() == null
-				&& pageParameters.get(OAUTH_VERIFIER) != null) {
-			Verifier verifier = new Verifier(pageParameters.get(OAUTH_VERIFIER)
+				&& !pageParameters.get(MyExpApi.OAUTH_VERIFIER).isEmpty()) {
+			Verifier verifier = new Verifier(pageParameters.get(MyExpApi.OAUTH_VERIFIER)
 					.toString());
 			Token requestToken = (Token) getSession().getAttribute(
 				Constants.SESSION_REQUEST_TOKEN);
@@ -70,9 +64,7 @@ public class MyExpImportPage
 		}
 
 		if (user.getMyExpAccessToken() == null) {
-			String home = urlFor(AuthenticationPage.class, null).toString();
-			getRequestCycle().scheduleRequestHandlerAfterCurrent(
-				new RedirectRequestHandler(home));
+			goToPage(DlibraRegistrationPage.class, pageParameters);
 			content.setVisible(false);
 			return;
 		}
@@ -80,11 +72,11 @@ public class MyExpImportPage
 		User myExpUser = null;
 		try {
 			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
-				WHOAMI_URL, user.getMyExpAccessToken());
+				MyExpApi.WHOAMI_URL, user.getMyExpAccessToken());
 			myExpUser = createMyExpUserModel(response.getBody());
 
 			response = OAuthHelpService.sendRequest(service, Verb.GET,
-				String.format(GET_USER_URL, myExpUser.getId()),
+				String.format(MyExpApi.GET_USER_URL, myExpUser.getId()),
 				user.getMyExpAccessToken());
 			myExpUser = createMyExpUserModel(response.getBody());
 		}

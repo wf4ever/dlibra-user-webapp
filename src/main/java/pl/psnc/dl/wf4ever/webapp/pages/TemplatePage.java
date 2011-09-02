@@ -7,9 +7,13 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.scribe.model.Token;
+import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
+import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
+import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
 /**
  * 
@@ -23,9 +27,9 @@ public abstract class TemplatePage
 	private static final long serialVersionUID = 4677896071331937974L;
 
 	protected Panel sidebarPanel;
-	
+
 	protected WebMarkupContainer content;
-	
+
 	protected boolean willBeRedirected = false;
 
 
@@ -37,7 +41,7 @@ public abstract class TemplatePage
 		if (userModel == null && !(this instanceof AuthenticationPage)) {
 			content.setVisible(false);
 			willBeRedirected = true;
-			goToAuthenticationPage(pageParameters);
+			goToPage(AuthenticationPage.class, pageParameters);
 		}
 		if (userModel == null) {
 			sidebarPanel = new LoggedOutPanel("sidebar");
@@ -104,12 +108,12 @@ public abstract class TemplatePage
 	}
 
 
-	protected void goToAuthenticationPage(PageParameters pageParameters)
+	protected void goToPage(Class< ? extends TemplatePage> pageClass,
+			PageParameters pageParameters)
 	{
-		String home = urlFor(AuthenticationPage.class, pageParameters)
-				.toString();
+		String url = urlFor(pageClass, pageParameters).toString();
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
-			new RedirectRequestHandler(home));
+			new RedirectRequestHandler(url));
 	}
 
 
@@ -118,6 +122,21 @@ public abstract class TemplatePage
 		String url = urlFor(this.getClass(), null).toString();
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
 			new RedirectRequestHandler(url));
+	}
+
+
+	protected void startMyExpAuthorization()
+	{
+		String oauthCallbackURL = WicketUtils.getCompleteUrl(this,
+			MyExpImportPage.class, false);
+
+		OAuthService service = MyExpApi.getOAuthService(oauthCallbackURL);
+		Token requestToken = service.getRequestToken();
+		getSession()
+				.setAttribute(Constants.SESSION_REQUEST_TOKEN, requestToken);
+		String authorizationUrl = service.getAuthorizationUrl(requestToken);
+		getRequestCycle().scheduleRequestHandlerAfterCurrent(
+			new RedirectRequestHandler(authorizationUrl));
 	}
 
 }

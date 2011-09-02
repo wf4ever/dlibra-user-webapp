@@ -20,6 +20,12 @@ public class MyExpApi
 
 	private static final String SHARED_SECRET = "78M8gdWyLrL5TswsN2nV0pd0fQzx1NG8IMVWoiDgmU";
 
+	public static final String OAUTH_VERIFIER = "oauth_token";
+
+	public static final String WHOAMI_URL = "http://www.myexperiment.org/whoami.xml";
+
+	public static final String GET_USER_URL = "http://www.myexperiment.org/user.xml?id=%d&elements=id,name,email,city,country,website,packs,workflows,files";
+
 
 	public static OAuthService getOAuthService(String oauthCallbackURL)
 	{

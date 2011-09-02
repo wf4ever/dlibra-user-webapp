@@ -224,4 +224,14 @@ public class User
 		this.files = files;
 	}
 
+
+	/**
+	 * For future use.
+	 * @return
+	 */
+	public String getOpenID()
+	{
+		return null;
+	}
+
 }

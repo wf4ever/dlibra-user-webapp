@@ -13,16 +13,11 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.scribe.model.Token;
-import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
-import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
-import pl.psnc.dl.wf4ever.webapp.utils.Constants;
-import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
 /**
  * 
@@ -87,7 +82,7 @@ public class DlibraRegistrationPage
 			{
 				tryLoadTestToken(user);
 				if (user.getMyExpAccessToken() != null) {
-					startMyExpImport();
+					goToPage(MyExpImportPage.class, null);
 				}
 				else {
 					startMyExpAuthorization();
@@ -194,29 +189,6 @@ public class DlibraRegistrationPage
 			f = new Fragment("message", "notRegistered", container);
 		}
 		return f;
-	}
-
-
-	private void startMyExpImport()
-	{
-		getRequestCycle().scheduleRequestHandlerAfterCurrent(
-			new RedirectRequestHandler(urlFor(MyExpImportPage.class,
-				new PageParameters()).toString()));
-	}
-
-
-	private void startMyExpAuthorization()
-	{
-		String oauthCallbackURL = WicketUtils.getCompleteUrl(this,
-			MyExpImportPage.class, false);
-
-		OAuthService service = MyExpApi.getOAuthService(oauthCallbackURL);
-		Token requestToken = service.getRequestToken();
-		getSession()
-				.setAttribute(Constants.SESSION_REQUEST_TOKEN, requestToken);
-		String authorizationUrl = service.getAuthorizationUrl(requestToken);
-		getRequestCycle().scheduleRequestHandlerAfterCurrent(
-			new RedirectRequestHandler(authorizationUrl));
 	}
 
 	@SuppressWarnings("serial")

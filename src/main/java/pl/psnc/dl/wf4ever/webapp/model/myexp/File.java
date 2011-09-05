@@ -29,7 +29,7 @@ public class File
 	@XmlElement
 	public String getFilename()
 	{
-		return filename;
+		return filename.trim();
 	}
 
 

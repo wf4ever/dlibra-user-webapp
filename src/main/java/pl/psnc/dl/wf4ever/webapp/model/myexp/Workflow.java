@@ -29,7 +29,7 @@ public class Workflow
 	@XmlElement
 	public String getFilename()
 	{
-		return contentUri.substring(contentUri.lastIndexOf('/') + 1);
+		return contentUri.substring(contentUri.lastIndexOf('/') + 1).trim();
 	}
 
 

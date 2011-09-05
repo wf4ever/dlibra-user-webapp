@@ -160,10 +160,8 @@ public class MyExpImportService
 				InternalPackItemHeader packItemHeader)
 			throws JAXBException, Exception
 		{
-			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
-				packItemHeader.getResourceUrl(), token);
-			InternalPackItem internalItem = (InternalPackItem) createMyExpResource(
-				response.getBody(), InternalPackItem.class);
+			InternalPackItem internalItem = (InternalPackItem) getResource(
+				packItemHeader, InternalPackItem.class);
 			SimpleResourceHeader resourceHeader = internalItem.getItem();
 			importSimpleResource(resourceHeader, ro.getName(), pack.getId()
 					+ "/", resourceHeader.getResourceClass());
@@ -177,8 +175,10 @@ public class MyExpImportService
 		{
 			SimpleResource r = (SimpleResource) getResource(res, resourceClass);
 
-			DlibraService.sendResource(path + r.getFilename(), roName,
-				r.getContentDecoded(), r.getContentType(), user);
+			String filename = path + r.getFilename();
+			model.setMessage(String.format("Uploading %s", filename));
+			DlibraService.sendResource(filename, roName, r.getContentDecoded(),
+				r.getContentType(), user);
 
 			return r;
 		}
@@ -196,11 +196,12 @@ public class MyExpImportService
 				Class< ? extends Resource> resourceClass)
 			throws OAuthException, JAXBException
 		{
+			model.setMessage(String.format("Downloading %s",
+				res.getResourceUrl()));
 			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
 				res.getResourceUrl(), token);
 			Resource r = (Resource) createMyExpResource(response.getBody(),
 				resourceClass);
-			model.setMessage(String.format("Importing %s", r.toString()));
 			return r;
 		}
 
@@ -209,12 +210,15 @@ public class MyExpImportService
 				String roName, String path)
 			throws Exception
 		{
+			model.setMessage(String.format("Downloading metadata file %s",
+				res.getResource()));
 			Response response = OAuthHelpService.sendRequest(service, Verb.GET,
 				res.getResource(), token, "application/rdf+xml");
 			// in the future, the RDF could be parsed (and somewhat validated) and the filename can be extracted from it
 			String rdf = response.getBody();
-			model.setMessage(String.format("Importing metadata file \"%s\"", filename));
 
+			model.setMessage(String.format("Uploading metadata file %s",
+				filename));
 			DlibraService.sendResource(filename, roName, rdf,
 				"application/rdf+xml", user);
 		}

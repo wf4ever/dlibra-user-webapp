@@ -2,7 +2,7 @@ package pl.psnc.dl.wf4ever.webapp.pages;
 
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
@@ -33,7 +33,6 @@ public abstract class TemplatePage
 	protected boolean willBeRedirected = false;
 
 
-	@SuppressWarnings("serial")
 	public TemplatePage(PageParameters pageParameters)
 	{
 		DlibraUser userModel = getDlibraUserModel();
@@ -56,24 +55,10 @@ public abstract class TemplatePage
 			}
 		}
 
-		add(new Link<Void>("home") {
+		add(new BookmarkablePageLink<Void>("home", getApplication()
+				.getHomePage()));
+		add(new BookmarkablePageLink<Void>("about", AboutPage.class));
 
-			@Override
-			public void onClick()
-			{
-				setResponsePage(getApplication().getHomePage());
-			}
-
-		});
-		add(new Link<Void>("about") {
-
-			@Override
-			public void onClick()
-			{
-				setResponsePage(new AboutPage());
-			}
-
-		});
 		add(content);
 		add(sidebarPanel);
 		content.add(new FeedbackPanel("feedback"));

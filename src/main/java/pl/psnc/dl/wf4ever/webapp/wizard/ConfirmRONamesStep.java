@@ -3,17 +3,21 @@
  */
 package pl.psnc.dl.wf4ever.webapp.wizard;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.wicket.extensions.wizard.dynamic.IDynamicWizardStep;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.list.OddEvenListItem;
 import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.PatternValidator;
 
 import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
@@ -32,13 +36,15 @@ public class ConfirmRONamesStep
 	private boolean addMoreROs = true;
 
 
+	@SuppressWarnings("serial")
 	public ConfirmRONamesStep(IDynamicWizardStep previousStep, ImportModel model)
 	{
 		super(previousStep, "Confirm names", model);
 
-		Form< ? > form = new Form<Void>("form");
+		final List<FormComponent<String>> fields = new ArrayList<FormComponent<String>>();
+		final Form< ? > form = new Form<Void>("form");
+		form.add(new RONamesValidator(fields));
 		add(form);
-		@SuppressWarnings("serial")
 		ListView<ResearchObject> list = new ListView<ResearchObject>(
 				"resourceListView", model.getResearchObjectsProcessed()) {
 
@@ -54,10 +60,12 @@ public class ConfirmRONamesStep
 			{
 				ResearchObject ro = (ResearchObject) item.getModelObject();
 				ro.setDefaultName();
-				item.add(new RequiredTextField<String>("name",
-						new PropertyModel<String>(ro, "name"), String.class).add(new PatternValidator("[\\w]+")));
+				FormComponent<String> field = new RequiredTextField<String>(
+						"name", new PropertyModel<String>(ro, "name"),
+						String.class).add(new PatternValidator("[\\w]+"));
+				fields.add(field);
+				item.add(field);
 				item.add(new Label("content", ro.getContentDesc()));
-
 			}
 		};
 		list.setReuseItems(true);

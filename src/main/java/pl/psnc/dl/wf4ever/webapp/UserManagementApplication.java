@@ -1,5 +1,7 @@
 package pl.psnc.dl.wf4ever.webapp;
 
+import java.util.Locale;
+
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 
@@ -31,6 +33,8 @@ public class UserManagementApplication
 		mountPage("/register", DlibraRegistrationPage.class);
 		mountPage("/import", MyExpImportPage.class);
 		mountPage("/error", ErrorPage.class);
+		
+		Locale.setDefault(Locale.ENGLISH);
 	}
 
 

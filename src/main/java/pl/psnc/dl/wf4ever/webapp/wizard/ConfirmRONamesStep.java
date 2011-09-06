@@ -43,7 +43,6 @@ public class ConfirmRONamesStep
 
 		final List<FormComponent<String>> fields = new ArrayList<FormComponent<String>>();
 		final Form< ? > form = new Form<Void>("form");
-		form.add(new RONamesValidator(fields));
 		add(form);
 		ListView<ResearchObject> list = new ListView<ResearchObject>(
 				"resourceListView", model.getResearchObjectsProcessed()) {
@@ -70,6 +69,7 @@ public class ConfirmRONamesStep
 		};
 		list.setReuseItems(true);
 		form.add(list);
+		form.add(new RONamesValidator(fields));
 
 		Form<ConfirmRONamesStep> formAddMore = new Form<ConfirmRONamesStep>(
 				"formAddMore", new CompoundPropertyModel<ConfirmRONamesStep>(

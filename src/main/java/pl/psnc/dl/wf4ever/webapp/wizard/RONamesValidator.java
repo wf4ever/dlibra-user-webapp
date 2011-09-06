@@ -4,9 +4,12 @@
 package pl.psnc.dl.wf4ever.webapp.wizard;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
@@ -27,6 +30,8 @@ public class RONamesValidator
 	private List<FormComponent<String>> components;
 
 	private Map<String, Integer> names = new HashMap<String, Integer>();
+
+	private Set<String> repeated = new HashSet<String>();
 
 
 	public RONamesValidator(List<FormComponent<String>> components)
@@ -52,18 +57,25 @@ public class RONamesValidator
 	public void validate(Form< ? > form)
 	{
 		names.clear();
+		repeated.clear();
+		FormComponent<String> first = null;
 		for (FormComponent<String> component : components) {
 			String input = component.getInput();
-			int cnt = names.containsKey(input) ? names.get(input) : 0;
+			int cnt = names.containsKey(input) ? names.get(input) + 1 : 1;
 			names.put(input, cnt);
+			if (first == null && cnt > 1)
+				first = component;
+
 		}
 		for (Map.Entry<String, Integer> entry : names.entrySet()) {
 			if (entry.getValue() > 1) {
-				form.getPage().warn(
-					String.format("Value '%s' is used %d times",
-						entry.getKey(), entry.getValue()));
+				repeated.add(entry.getKey());
 			}
 		}
+		if (!repeated.isEmpty()) {
+			Map<String, Object> variables = new HashMap<String, Object>();
+			variables.put("names", StringUtils.join(repeated, ", "));
+			error(first, variables);
+		}
 	}
-
 }

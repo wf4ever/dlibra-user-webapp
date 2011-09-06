@@ -1,12 +1,5 @@
 package pl.psnc.dl.wf4ever.webapp.pages;
 
-import java.io.StringReader;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
@@ -19,10 +12,7 @@ import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
-import org.scribe.model.Response;
 import org.scribe.model.Token;
-import org.scribe.model.Verb;
-import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
@@ -30,7 +20,6 @@ import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
 import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
-import pl.psnc.dl.wf4ever.webapp.services.OAuthHelpService;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
@@ -62,37 +51,32 @@ public class AuthenticationPage
 	{
 		super(pageParameters);
 
+		// FIXME replaceAll because "../" gets inserted, don't know why
+		returnToUrl = WicketUtils.getCompleteUrl(this,
+			AuthenticationPage.class, true).replaceAll("\\.\\./", "");
+
 		if (!pageParameters.get(MyExpApi.OAUTH_VERIFIER).isEmpty()) {
 			OAuthService service = MyExpApi.getOAuthService(WicketUtils
 					.getCompleteUrl(this, MyExpImportPage.class, true));
 
-			Verifier verifier = new Verifier(pageParameters.get(
-				MyExpApi.OAUTH_VERIFIER).toString());
-			Token requestToken = (Token) getSession().getAttribute(
-				Constants.SESSION_REQUEST_TOKEN);
-			Token accessToken = service.getAccessToken(requestToken, verifier);
-			getSession().setAttribute(Constants.SESSION_TEMPORARY_ACCESS_TOKEN, accessToken);
+			Token accessToken = retrieveAccessToken(pageParameters, service);
+			getSession().setAttribute(Constants.SESSION_TEMPORARY_ACCESS_TOKEN,
+				accessToken);
 
 			try {
-				Response response = OAuthHelpService.sendRequest(service, Verb.GET,
-					MyExpApi.WHOAMI_URL, accessToken);
-				User user = createMyExpUserModel(response.getBody());
-				String openID = user.getOpenID();
-				//TODO: get the openID out of the user
-				
-				if (openID == null) {
-					throw new Exception("Your myExperiment profile does not contain any openID.");
+				User user = retrieveMyExpUser(accessToken, service);
+
+				if (user.getOpenId() == null) {
+					throw new Exception(
+							"Your myExperiment profile does not contain any openID.");
 				}
-				applyForAuthentication(openID);
+				applyForAuthentication(user.getOpenId());
+				getSession().info("You have been logged in using OpenID: " + user.getOpenId());
 			}
 			catch (Exception e) {
 				error(e.getMessage());
 			}
 		}
-
-		// FIXME replaceAll because "../" gets inserted, don't know why
-		returnToUrl = WicketUtils.getCompleteUrl(this,
-			AuthenticationPage.class, true).replaceAll("\\.\\./", "");
 
 		if ("true".equals(pageParameters.get("is_return").toString())) {
 			processOpenIdResponse(pageParameters);
@@ -115,8 +99,8 @@ public class AuthenticationPage
 		openId.setLabel(new Model<String>("Your Open ID"));
 		form.add(openId);
 		form.add(new Button("confirmOpenIdButton"));
-		
-		Form<?> form2 = new Form<Void>("form");
+
+		Form< ? > form2 = new Form<Void>("form");
 		content.add(form2);
 		form2.add(new Button("logInWithGoogle") {
 
@@ -128,15 +112,15 @@ public class AuthenticationPage
 			}
 		});
 
-//		form2.add(new Button("logInWithMyExp") {
-//
-//			@Override
-//			public void onSubmit()
-//			{
-//				super.onSubmit();
-//				startMyExpAuthorization();
-//			}
-//		});
+		form2.add(new Button("logInWithMyExp") {
+
+			@Override
+			public void onSubmit()
+			{
+				super.onSubmit();
+				startMyExpAuthorization();
+			}
+		});
 	}
 
 
@@ -186,18 +170,6 @@ public class AuthenticationPage
 		IRequestHandler reqHandler = new RedirectRequestHandler(
 				authRequest.getDestinationUrl(true));
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(reqHandler);
-	}
-
-
-	private User createMyExpUserModel(String xml)
-		throws JAXBException
-	{
-		JAXBContext jc = JAXBContext.newInstance(User.class);
-
-		Unmarshaller u = jc.createUnmarshaller();
-		StringBuffer xmlStr = new StringBuffer(xml);
-		return (User) u.unmarshal(new StreamSource(new StringReader(xmlStr
-				.toString())));
 	}
 
 }

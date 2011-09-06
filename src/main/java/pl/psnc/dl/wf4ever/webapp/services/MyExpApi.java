@@ -24,7 +24,7 @@ public class MyExpApi
 
 	public static final String WHOAMI_URL = "http://www.myexperiment.org/whoami.xml";
 
-	public static final String GET_USER_URL = "http://www.myexperiment.org/user.xml?id=%d&elements=id,name,email,city,country,website,packs,workflows,files";
+	public static final String GET_USER_URL = "http://www.myexperiment.org/user.xml?id=%d&elements=id,openid-url,name,email,city,country,website,packs,workflows,files";
 
 
 	public static OAuthService getOAuthService(String oauthCallbackURL)

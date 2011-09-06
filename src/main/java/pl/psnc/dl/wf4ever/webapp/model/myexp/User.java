@@ -32,6 +32,8 @@ public class User
 
 	private int id;
 
+	private String openId;
+
 	private String name;
 
 	private String email;
@@ -64,6 +66,25 @@ public class User
 	public void setId(int id)
 	{
 		this.id = id;
+	}
+
+
+	/**
+	 * @return the openId
+	 */
+	@XmlElement(name = "openid-url")
+	public String getOpenId()
+	{
+		return openId;
+	}
+
+
+	/**
+	 * @param openId the openId to set
+	 */
+	public void setOpenId(String openId)
+	{
+		this.openId = openId;
 	}
 
 
@@ -222,16 +243,6 @@ public class User
 	public void setFiles(List<FileHeader> files)
 	{
 		this.files = files;
-	}
-
-
-	/**
-	 * For future use.
-	 * @return
-	 */
-	public String getOpenID()
-	{
-		return null;
 	}
 
 }

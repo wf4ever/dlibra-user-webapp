@@ -14,6 +14,9 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 
+import pl.psnc.dl.wf4ever.webapp.model.ImportModel;
+import pl.psnc.dl.wf4ever.webapp.model.ResearchObject;
+
 /**
  * @author Piotr Hołubowicz
  *
@@ -33,10 +36,14 @@ public class RONamesValidator
 
 	private Set<String> repeated = new HashSet<String>();
 
+	private ImportModel importModel;
 
-	public RONamesValidator(List<FormComponent<String>> components)
+
+	public RONamesValidator(List<FormComponent<String>> components,
+			ImportModel model)
 	{
 		this.components = components;
+		this.importModel = model;
 	}
 
 
@@ -59,6 +66,9 @@ public class RONamesValidator
 		names.clear();
 		repeated.clear();
 		FormComponent<String> first = null;
+		for (ResearchObject ro : importModel.getResearchObjects()) {
+			names.put(ro.getName(), 1);
+		}
 		for (FormComponent<String> component : components) {
 			String input = component.getInput();
 			int cnt = names.containsKey(input) ? names.get(input) + 1 : 1;

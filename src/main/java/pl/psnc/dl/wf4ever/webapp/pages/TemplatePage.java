@@ -1,5 +1,12 @@
 package pl.psnc.dl.wf4ever.webapp.pages;
 
+import java.io.StringReader;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -7,11 +14,17 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.scribe.model.Response;
 import org.scribe.model.Token;
+import org.scribe.model.Verb;
+import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
+import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
+import pl.psnc.dl.wf4ever.webapp.services.OAuthException;
+import pl.psnc.dl.wf4ever.webapp.services.OAuthHelpService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 
@@ -122,6 +135,61 @@ public abstract class TemplatePage
 		String authorizationUrl = service.getAuthorizationUrl(requestToken);
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
 			new RedirectRequestHandler(authorizationUrl));
+	}
+
+
+	/**
+	 * @param pageParameters
+	 * @param service
+	 * @return
+	 */
+	protected Token retrieveAccessToken(PageParameters pageParameters,
+			OAuthService service)
+	{
+		Token accessToken = null;
+		if (!pageParameters.get(MyExpApi.OAUTH_VERIFIER).isEmpty()) {
+			Verifier verifier = new Verifier(pageParameters.get(
+				MyExpApi.OAUTH_VERIFIER).toString());
+			Token requestToken = (Token) getSession().getAttribute(
+				Constants.SESSION_REQUEST_TOKEN);
+			accessToken = service.getAccessToken(requestToken, verifier);
+		}
+		return accessToken;
+	}
+
+
+	/**
+	 * @param user
+	 * @param service
+	 * @return
+	 * @throws OAuthException
+	 * @throws JAXBException
+	 */
+	protected User retrieveMyExpUser(Token accessToken, OAuthService service)
+		throws OAuthException, JAXBException
+	{
+		User myExpUser;
+		Response response = OAuthHelpService.sendRequest(service, Verb.GET,
+			MyExpApi.WHOAMI_URL, accessToken);
+		myExpUser = createMyExpUserModel(response.getBody());
+
+		response = OAuthHelpService.sendRequest(service, Verb.GET,
+			String.format(MyExpApi.GET_USER_URL, myExpUser.getId()),
+			accessToken);
+		myExpUser = createMyExpUserModel(response.getBody());
+		return myExpUser;
+	}
+
+
+	private User createMyExpUserModel(String xml)
+		throws JAXBException
+	{
+		JAXBContext jc = JAXBContext.newInstance(User.class);
+
+		Unmarshaller u = jc.createUnmarshaller();
+		StringBuffer xmlStr = new StringBuffer(xml);
+		return (User) u.unmarshal(new StreamSource(new StringReader(xmlStr
+				.toString())));
 	}
 
 }

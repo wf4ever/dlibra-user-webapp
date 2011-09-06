@@ -30,14 +30,6 @@ public class ImportModel
 
 	private List<ResearchObject> researchObjects;
 
-	private List<ResearchObject> researchObjectsProcessed;
-
-	private List<FileHeader> selectedFiles;
-
-	private List<WorkflowHeader> selectedWorkflows;
-
-	private List<PackHeader> selectedPacks;
-
 	private User myExpUser;
 
 	private String message = "Import has not started";
@@ -54,9 +46,6 @@ public class ImportModel
 		super();
 		this.myExpUser = user;
 		this.researchObjects = new ArrayList<ResearchObject>();
-		this.selectedFiles = new ArrayList<FileHeader>();
-		this.selectedWorkflows = new ArrayList<WorkflowHeader>();
-		this.selectedPacks = new ArrayList<PackHeader>();
 	}
 
 
@@ -75,37 +64,6 @@ public class ImportModel
 	public User getMyExpUser()
 	{
 		return myExpUser;
-	}
-
-
-	/**
-	 * @return the researchObjectsProcessed
-	 */
-	public List<ResearchObject> getResearchObjectsProcessed()
-	{
-		return researchObjectsProcessed;
-	}
-
-
-	/**
-	 * @param researchObjectsProcessed the researchObjectsProcessed to set
-	 */
-	public void setResearchObjectsProcessed(
-			List<ResearchObject> researchObjectsProcessed)
-	{
-		this.researchObjectsProcessed = researchObjectsProcessed;
-	}
-
-
-	public void finishProcessingResearchObjects()
-	{
-		for(ResearchObject ro : researchObjectsProcessed) {
-			selectedFiles.addAll(ro.getFiles());
-			selectedWorkflows.addAll(ro.getWorkflows());
-			selectedPacks.addAll(ro.getPacks());
-		}
-		this.researchObjects.addAll(researchObjectsProcessed);
-		this.researchObjectsProcessed.clear();
 	}
 
 
@@ -187,19 +145,31 @@ public class ImportModel
 
 	public List<FileHeader> getImportedFiles()
 	{
-		return selectedFiles;
+		List<FileHeader> list = new ArrayList<FileHeader>();
+		for (ResearchObject ro : researchObjects) {
+			list.addAll(ro.getFiles());
+		}
+		return list;
 	}
 
 
 	public List<WorkflowHeader> getImportedWorkflows()
 	{
-		return selectedWorkflows;
+		List<WorkflowHeader> list = new ArrayList<WorkflowHeader>();
+		for (ResearchObject ro : researchObjects) {
+			list.addAll(ro.getWorkflows());
+		}
+		return list;
 	}
 
 
 	public List<PackHeader> getImportedPacks()
 	{
-		return selectedPacks;
+		List<PackHeader> list = new ArrayList<PackHeader>();
+		for (ResearchObject ro : researchObjects) {
+			list.addAll(ro.getPacks());
+		}
+		return list;
 	}
 
 }

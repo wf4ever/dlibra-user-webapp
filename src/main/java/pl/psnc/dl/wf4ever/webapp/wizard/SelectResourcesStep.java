@@ -129,7 +129,7 @@ public class SelectResourcesStep
 	public IDynamicWizardStep next()
 	{
 		return new ConfirmRONamesStep(this,
-				(ImportModel) this.getDefaultModelObject());
+				(ImportModel) this.getDefaultModelObject(), selectionModel.createResearchObjects());
 	}
 
 
@@ -137,16 +137,6 @@ public class SelectResourcesStep
 	public boolean isComplete()
 	{
 		return selectionModel.isValid();
-	}
-
-
-	@Override
-	public void applyState()
-	{
-		super.applyState();
-		ImportModel model = (ImportModel) this.getDefaultModelObject();
-		model.setResearchObjectsProcessed(selectionModel
-				.createResearchObjects());
 	}
 
 	private class ImportTypeChoiceRenderer

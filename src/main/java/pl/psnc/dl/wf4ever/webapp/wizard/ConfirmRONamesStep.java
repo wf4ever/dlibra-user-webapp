@@ -35,17 +35,22 @@ public class ConfirmRONamesStep
 
 	private boolean addMoreROs = true;
 
+	private List<ResearchObject> researchObjectsEdited;
+
 
 	@SuppressWarnings("serial")
-	public ConfirmRONamesStep(IDynamicWizardStep previousStep, ImportModel model)
+	public ConfirmRONamesStep(IDynamicWizardStep previousStep,
+			ImportModel model, List<ResearchObject> researchObjectsEdited)
 	{
 		super(previousStep, "Confirm names", model);
+
+		this.researchObjectsEdited = researchObjectsEdited;
 
 		final List<FormComponent<String>> fields = new ArrayList<FormComponent<String>>();
 		final Form< ? > form = new Form<Void>("form");
 		add(form);
 		ListView<ResearchObject> list = new ListView<ResearchObject>(
-				"resourceListView", model.getResearchObjectsProcessed()) {
+				"resourceListView", researchObjectsEdited) {
 
 			@Override
 			protected ListItem<ResearchObject> newItem(int index,
@@ -69,13 +74,21 @@ public class ConfirmRONamesStep
 		};
 		list.setReuseItems(true);
 		form.add(list);
-		form.add(new RONamesValidator(fields));
+		form.add(new RONamesValidator(fields, model));
 
 		Form<ConfirmRONamesStep> formAddMore = new Form<ConfirmRONamesStep>(
 				"formAddMore", new CompoundPropertyModel<ConfirmRONamesStep>(
 						this));
 		formAddMore.add(new CheckBox("addMoreROs"));
 		add(formAddMore);
+	}
+	
+	@Override
+	protected void onBeforeRender()
+	{
+		super.onBeforeRender();
+		ImportModel model = (ImportModel) this.getDefaultModelObject();
+		model.getResearchObjects().removeAll(researchObjectsEdited);
 	}
 
 
@@ -84,7 +97,7 @@ public class ConfirmRONamesStep
 	{
 		super.applyState();
 		ImportModel model = (ImportModel) this.getDefaultModelObject();
-		model.finishProcessingResearchObjects();
+		model.getResearchObjects().addAll(researchObjectsEdited);
 	}
 
 

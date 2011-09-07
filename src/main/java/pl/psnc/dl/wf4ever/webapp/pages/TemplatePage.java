@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -36,6 +37,8 @@ import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 public abstract class TemplatePage
 	extends WebPage
 {
+
+	private static final Logger log = Logger.getLogger(TemplatePage.class);
 
 	private static final long serialVersionUID = 4677896071331937974L;
 
@@ -110,6 +113,7 @@ public abstract class TemplatePage
 			PageParameters pageParameters)
 	{
 		String url = urlFor(pageClass, pageParameters).toString();
+		log.debug("Will redirect to: " + url);
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
 			new RedirectRequestHandler(url));
 	}
@@ -133,6 +137,8 @@ public abstract class TemplatePage
 		getSession()
 				.setAttribute(Constants.SESSION_REQUEST_TOKEN, requestToken);
 		String authorizationUrl = service.getAuthorizationUrl(requestToken);
+		log.debug("Request token: " + requestToken.toString() + " service: "
+				+ service.getAuthorizationUrl(requestToken));
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
 			new RedirectRequestHandler(authorizationUrl));
 	}
@@ -152,6 +158,9 @@ public abstract class TemplatePage
 				MyExpApi.OAUTH_VERIFIER).toString());
 			Token requestToken = (Token) getSession().getAttribute(
 				Constants.SESSION_REQUEST_TOKEN);
+			log.debug("Request token: " + requestToken.toString()
+					+ " verifier: " + verifier.getValue() + " service: "
+					+ service.getAuthorizationUrl(requestToken));
 			accessToken = service.getAccessToken(requestToken, verifier);
 		}
 		return accessToken;

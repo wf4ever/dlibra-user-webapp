@@ -193,6 +193,10 @@ public class DlibraUser
 			myExpToken = token.getToken();
 			myExpSecret = token.getSecret();
 		}
+		else {
+			myExpToken = null;
+			myExpSecret = null;
+		}
 	}
 
 

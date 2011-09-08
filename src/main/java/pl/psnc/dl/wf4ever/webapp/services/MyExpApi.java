@@ -17,8 +17,10 @@ public class MyExpApi
 {
 
 	private static final String CONSUMER_KEY = "W0Eog3P8R5AdWmL7R0dQ";
+//	private static final String CONSUMER_KEY = "jG3lEoLBI1mD97yP6Kpg";
 
 	private static final String SHARED_SECRET = "78M8gdWyLrL5TswsN2nV0pd0fQzx1NG8IMVWoiDgmU";
+//	private static final String SHARED_SECRET = "kmDf9FMpMEqwtLRYvhXej70HWMTzIEu71stLPjaHI";
 
 	public static final String OAUTH_VERIFIER = "oauth_token";
 

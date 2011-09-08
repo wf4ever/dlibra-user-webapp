@@ -23,6 +23,7 @@ import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
+import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OAuthException;
 import pl.psnc.dl.wf4ever.webapp.services.OAuthHelpService;
@@ -53,7 +54,8 @@ public abstract class TemplatePage
 	{
 		DlibraUser userModel = getDlibraUserModel();
 		content = new WebMarkupContainer("content");
-		if (userModel == null && !(this instanceof AuthenticationPage)) {
+		if (userModel == null
+				&& !(this instanceof AuthenticationPage || this instanceof AboutPage)) {
 			content.setVisible(false);
 			willBeRedirected = true;
 			goToPage(AuthenticationPage.class, pageParameters);
@@ -88,17 +90,40 @@ public abstract class TemplatePage
 	}
 
 
-	public boolean logIn(DlibraUser model)
+	public boolean logIn(DlibraUser user)
 	{
 		try {
-			getSession().setAttribute(Constants.SESSION_USER_MODEL, model);
-			sidebarPanel.replaceWith(new LoggedInPanel("sidebar", model));
+			getSession().setAttribute(Constants.SESSION_USER_MODEL, user);
+			sidebarPanel.replaceWith(new LoggedInPanel("sidebar", user));
+			register(user);
 			return true;
 		}
 		catch (Exception e) {
 			error(e.getMessage());
 			return false;
 		}
+	}
+
+
+	private void register(DlibraUser user)
+	{
+		if (!user.isRegistered()) {
+			try {
+				String message;
+				if (!DlibraService.createWorkspace(user)) {
+					message = "An account for this username already existed "
+							+ "in dLibra, you have been registered with it.";
+				}
+				else {
+					message = "New account has been created.";
+				}
+				getSession().info(message);
+			}
+			catch (Exception e) {
+				getSession().error(e.getMessage() != null ? e.getMessage() : "Unknown error");
+			}
+		}
+
 	}
 
 

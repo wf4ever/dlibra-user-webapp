@@ -141,7 +141,8 @@ public class AuthenticationPage
 			OpenIdData openIdData = OpenIdService.processReturn(
 				discoveryInformation, pageParameters, returnToUrl);
 			if (openIdData == null) {
-				error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider. You will have to enter all information by hand into the text fields provided.");
+				error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider.");
+				return;
 			}
 			DlibraUser user = HibernateService.loadUser(openIdData.getOpenId());
 			if (user == null) {

@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
@@ -49,13 +50,16 @@ public abstract class TemplatePage
 
 	protected boolean willBeRedirected = false;
 
+	private static final Class< ? >[] publicPages = { AuthenticationPage.class,
+			AboutPage.class, HelpPage.class};
+
 
 	public TemplatePage(PageParameters pageParameters)
 	{
 		DlibraUser userModel = getDlibraUserModel();
 		content = new WebMarkupContainer("content");
 		if (userModel == null
-				&& !(this instanceof AuthenticationPage || this instanceof AboutPage)) {
+				&& !ArrayUtils.contains(publicPages, this.getClass())) {
 			content.setVisible(false);
 			willBeRedirected = true;
 			goToPage(AuthenticationPage.class, pageParameters);
@@ -76,6 +80,7 @@ public abstract class TemplatePage
 		add(new BookmarkablePageLink<Void>("home", getApplication()
 				.getHomePage()));
 		add(new BookmarkablePageLink<Void>("about", AboutPage.class));
+		add(new BookmarkablePageLink<Void>("help", HelpPage.class));
 
 		add(content);
 		add(sidebarPanel);
@@ -120,7 +125,8 @@ public abstract class TemplatePage
 				getSession().info(message);
 			}
 			catch (Exception e) {
-				getSession().error(e.getMessage() != null ? e.getMessage() : "Unknown error");
+				getSession().error(
+					e.getMessage() != null ? e.getMessage() : "Unknown error");
 			}
 		}
 

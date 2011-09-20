@@ -1,5 +1,6 @@
 package pl.psnc.dl.wf4ever.webapp.pages;
 
+import org.apache.log4j.Logger;
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
@@ -34,6 +35,8 @@ public class AuthenticationPage
 {
 
 	private static final long serialVersionUID = -8975579933617712699L;
+
+	private static final Logger log = Logger.getLogger(AuthenticationPage.class);
 
 	private static final String GOOGLE_URL = "https://www.google.com/accounts/o8/id";
 
@@ -71,7 +74,10 @@ public class AuthenticationPage
 							"Your myExperiment profile does not contain any openID.");
 				}
 				applyForAuthentication(user.getOpenId());
-				getSession().info("You have been logged in using OpenID: " + user.getOpenId());
+				getSession()
+						.info(
+							"You have been logged in using OpenID: "
+									+ user.getOpenId());
 			}
 			catch (Exception e) {
 				error(e.getMessage());
@@ -151,7 +157,17 @@ public class AuthenticationPage
 			}
 			user.setOpenIdData(openIdData);
 			logIn(user);
-			goToPage(DlibraRegistrationPage.class, null);
+			if (getSession().getAttribute(Constants.SESSION_REDIRECT_URI) == null) {
+				goToPage(DlibraRegistrationPage.class, null);
+			}
+			else {
+				getRequestCycle().scheduleRequestHandlerAfterCurrent(
+					new RedirectRequestHandler((String) getSession()
+							.getAttribute(Constants.SESSION_REDIRECT_URI)));
+				log.debug("Redirecting to: " + (String) getSession()
+							.getAttribute(Constants.SESSION_REDIRECT_URI));
+				getSession().setAttribute(Constants.SESSION_REDIRECT_URI, null);
+			}
 		}
 	}
 

@@ -14,6 +14,8 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.Url;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.scribe.model.Response;
@@ -62,6 +64,14 @@ public abstract class TemplatePage
 				&& !ArrayUtils.contains(publicPages, this.getClass())) {
 			content.setVisible(false);
 			willBeRedirected = true;
+			getSession().setAttribute(
+				Constants.SESSION_REDIRECT_URI,
+				RequestCycle
+						.get()
+						.getUrlRenderer()
+						.renderFullUrl(
+							Url.parse(urlFor(this.getClass(), pageParameters)
+									.toString())));
 			goToPage(AuthenticationPage.class, pageParameters);
 		}
 		if (userModel == null) {

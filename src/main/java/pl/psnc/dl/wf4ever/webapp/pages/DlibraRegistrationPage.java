@@ -1,20 +1,16 @@
 package pl.psnc.dl.wf4ever.webapp.pages;
 
-import java.util.Properties;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.scribe.model.Token;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
@@ -33,6 +29,7 @@ public class DlibraRegistrationPage
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(DlibraRegistrationPage.class);
 
@@ -75,23 +72,6 @@ public class DlibraRegistrationPage
 		final WebMarkupContainer credentials = createCredentialsDiv(user);
 		form.add(credentials);
 
-		final Button importButton = new Button("myExpImportButton") {
-
-			@Override
-			public void onSubmit()
-			{
-				tryLoadTestToken(user);
-				if (user.getMyExpAccessToken() != null) {
-					goToPage(MyExpImportPage.class, null);
-				}
-				else {
-					startMyExpAuthorization();
-				}
-			}
-		};
-		importButton.setEnabled(user.isRegistered());
-		form.add(importButton).setOutputMarkupId(true);
-
 		form.add(
 			new AjaxButton("registerButtonText", new PropertyModel<String>(
 					user, "registerButtonText")) {
@@ -103,11 +83,11 @@ public class DlibraRegistrationPage
 					try {
 						String infoMessage;
 						if (user.isRegistered()) {
-							DlibraService.deleteWorkspace(user);
+							DlibraService.deleteUser(user);
 							infoMessage = "Account has been deleted.";
 						}
 						else {
-							if (!DlibraService.createWorkspace(user)) {
+							if (!DlibraService.createUser(user)) {
 								infoMessage = "An account for this username already existed "
 										+ "in dLibra, you have been registered with it.";
 							}
@@ -124,8 +104,6 @@ public class DlibraRegistrationPage
 					}
 					target.add(message);
 					target.add(this);
-					importButton.setEnabled(user.isRegistered());
-					target.add(importButton);
 					WebMarkupContainer div = createCredentialsDiv(user);
 					getParent().replace(div);
 					Fragment f = createMessageFragment(user, content);
@@ -143,32 +121,12 @@ public class DlibraRegistrationPage
 	}
 
 
-	protected void tryLoadTestToken(DlibraUser user)
-	{
-		Properties props = new Properties();
-		try {
-			props.load(getClass().getClassLoader().getResourceAsStream(
-				"testToken.properties"));
-			String token = props.getProperty("token");
-			String secret = props.getProperty("secret");
-			if (token != null && secret != null) {
-				user.setMyExpAccessToken(new Token(token, secret));
-			}
-		}
-		catch (Exception e) {
-			log.debug("Failed to load properties: " + e.getMessage());
-		}
-	}
-
-
 	private WebMarkupContainer createCredentialsDiv(DlibraUser model)
 	{
 		WebMarkupContainer div = new WebMarkupContainer("credentials");
 		if (model.isRegistered()) {
 			div.add(new Label("username", new PropertyModel<String>(model,
 					"username")));
-			div.add(new Label("password", new PropertyModel<String>(model,
-					"password")));
 		}
 		else {
 			div.setVisible(false);
@@ -182,28 +140,12 @@ public class DlibraRegistrationPage
 	{
 		Fragment f;
 		if (model.isRegistered()) {
-			f = new RegisteredFragment("message", "registered", container,
-					model);
+			f = new Fragment("message", "registered", container);
 		}
 		else {
 			f = new Fragment("message", "notRegistered", container);
 		}
 		return f;
-	}
-
-	@SuppressWarnings("serial")
-	private class RegisteredFragment
-		extends Fragment
-	{
-
-		public RegisteredFragment(String id, String markupId,
-				MarkupContainer markupProvider, DlibraUser model)
-		{
-			super(id, markupId, markupProvider);
-			add(new Label("dLibraAccessTokenString", new PropertyModel<String>(
-					model, "dlibraAccessTokenString")));
-		}
-
 	}
 
 }

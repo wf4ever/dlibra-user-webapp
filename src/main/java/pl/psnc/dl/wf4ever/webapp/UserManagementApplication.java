@@ -9,7 +9,7 @@ import pl.psnc.dl.wf4ever.webapp.pages.AuthenticationPage;
 import pl.psnc.dl.wf4ever.webapp.pages.DlibraRegistrationPage;
 import pl.psnc.dl.wf4ever.webapp.pages.ErrorPage;
 import pl.psnc.dl.wf4ever.webapp.pages.HelpPage;
-import pl.psnc.dl.wf4ever.webapp.pages.MyExpImportPage;
+import pl.psnc.dl.wf4ever.webapp.pages.OAuthAuthorizationEndpointPage;
 
 /**
  * 
@@ -32,10 +32,10 @@ public class UserManagementApplication
 		super.init();
 		mountPage("/authenticate", AuthenticationPage.class);
 		mountPage("/register", DlibraRegistrationPage.class);
-		mountPage("/import", MyExpImportPage.class);
+		mountPage("/authorize", OAuthAuthorizationEndpointPage.class);
 		mountPage("/error", ErrorPage.class);
 		mountPage("/help", HelpPage.class);
-		
+
 		Locale.setDefault(Locale.ENGLISH);
 	}
 

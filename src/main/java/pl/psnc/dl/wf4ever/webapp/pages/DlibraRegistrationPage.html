@@ -21,29 +21,15 @@
 						dLibra username: <strong> <span wicket:id="username"></span>
 						</strong>
 					</p>
-					<p>
-						dLibra password: <strong> <span wicket:id="password"></span>
-						</strong>
-					</p>
 				</div>
 				<p>
 					<input type="submit" wicket:id="registerButtonText" value="Action" />
-				</p>
-				<p>You can import your data from myExperiment to Wf4Ever. When
-					you click the button below a wizard will guide you through the
-					import process. You need to be registered in dLibra to start the import.</p>
-				<p>
-					<input type="submit" wicket:id="myExpImportButton"
-						value="Import data from myExperiment" />
 				</p>
 			</form>
 		</div>
 	</div>
 	<wicket:fragment wicket:id="registered">
-		<p>
-			You are registered in dLibra. Your access token is <br /> <strong><span
-				wicket:id="dLibraAccessTokenString"></span> </strong>
-		</p>
+		<p>You are registered in dLibra.</p>
 	</wicket:fragment>
 	<wicket:fragment wicket:id="notRegistered">
 		<p>You are not registered in dLibra. By registering you will

@@ -25,7 +25,7 @@ import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
-import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
+import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OAuthException;
@@ -58,20 +58,20 @@ public abstract class TemplatePage
 
 	public TemplatePage(PageParameters pageParameters)
 	{
+		getSession().bind();
 		DlibraUser userModel = getDlibraUserModel();
 		content = new WebMarkupContainer("content");
 		if (userModel == null
 				&& !ArrayUtils.contains(publicPages, this.getClass())) {
 			content.setVisible(false);
 			willBeRedirected = true;
-			getSession().setAttribute(
-				Constants.SESSION_REDIRECT_URI,
-				RequestCycle
-						.get()
-						.getUrlRenderer()
-						.renderFullUrl(
-							Url.parse(urlFor(this.getClass(), pageParameters)
-									.toString())));
+			String url = RequestCycle
+					.get()
+					.getUrlRenderer()
+					.renderFullUrl(
+						Url.parse(urlFor(this.getClass(), pageParameters)
+								.toString()));
+			getSession().setAttribute(Constants.SESSION_REDIRECT_URI, url);
 			goToPage(AuthenticationPage.class, pageParameters);
 		}
 		if (userModel == null) {
@@ -125,7 +125,7 @@ public abstract class TemplatePage
 		if (!user.isRegistered()) {
 			try {
 				String message;
-				if (!DlibraService.createWorkspace(user)) {
+				if (!DlibraService.createUser(user)) {
 					message = "An account for this username already existed "
 							+ "in dLibra, you have been registered with it.";
 				}
@@ -171,7 +171,7 @@ public abstract class TemplatePage
 	protected void startMyExpAuthorization()
 	{
 		String oauthCallbackURL = WicketUtils.getCompleteUrl(this,
-			MyExpImportPage.class, false);
+			AuthenticationPage.class, false);
 
 		OAuthService service = MyExpApi.getOAuthService(oauthCallbackURL);
 		Token requestToken = service.getRequestToken();
@@ -215,10 +215,11 @@ public abstract class TemplatePage
 	 * @throws OAuthException
 	 * @throws JAXBException
 	 */
-	protected User retrieveMyExpUser(Token accessToken, OAuthService service)
+	protected MyExpUser retrieveMyExpUser(Token accessToken,
+			OAuthService service)
 		throws OAuthException, JAXBException
 	{
-		User myExpUser;
+		MyExpUser myExpUser;
 		Response response = OAuthHelpService.sendRequest(service, Verb.GET,
 			MyExpApi.WHOAMI_URL, accessToken);
 		myExpUser = createMyExpUserModel(response.getBody());
@@ -231,14 +232,14 @@ public abstract class TemplatePage
 	}
 
 
-	private User createMyExpUserModel(String xml)
+	private MyExpUser createMyExpUserModel(String xml)
 		throws JAXBException
 	{
-		JAXBContext jc = JAXBContext.newInstance(User.class);
+		JAXBContext jc = JAXBContext.newInstance(MyExpUser.class);
 
 		Unmarshaller u = jc.createUnmarshaller();
 		StringBuffer xmlStr = new StringBuffer(xml);
-		return (User) u.unmarshal(new StreamSource(new StringReader(xmlStr
+		return (MyExpUser) u.unmarshal(new StreamSource(new StringReader(xmlStr
 				.toString())));
 	}
 

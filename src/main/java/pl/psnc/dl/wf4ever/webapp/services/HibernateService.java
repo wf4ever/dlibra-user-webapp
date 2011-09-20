@@ -82,4 +82,5 @@ public class HibernateService
 
 		return user;
 	}
+
 }

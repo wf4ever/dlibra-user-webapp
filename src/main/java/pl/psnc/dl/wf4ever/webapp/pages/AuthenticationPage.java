@@ -17,8 +17,8 @@ import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
+import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
 import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
-import pl.psnc.dl.wf4ever.webapp.model.myexp.User;
 import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
@@ -60,14 +60,12 @@ public class AuthenticationPage
 
 		if (!pageParameters.get(MyExpApi.OAUTH_VERIFIER).isEmpty()) {
 			OAuthService service = MyExpApi.getOAuthService(WicketUtils
-					.getCompleteUrl(this, MyExpImportPage.class, true));
+					.getCompleteUrl(this, AuthenticationPage.class, true));
 
 			Token accessToken = retrieveAccessToken(pageParameters, service);
-			getSession().setAttribute(Constants.SESSION_TEMPORARY_ACCESS_TOKEN,
-				accessToken);
 
 			try {
-				User user = retrieveMyExpUser(accessToken, service);
+				MyExpUser user = retrieveMyExpUser(accessToken, service);
 
 				if (user.getOpenId() == null) {
 					throw new Exception(

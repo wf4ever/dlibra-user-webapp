@@ -111,7 +111,7 @@ public class OAuthAccessTokenEndpointPage
 				String token = DlibraService.getAccessToken(data.getUserId(),
 					data.getClientId());
 				json = String.format(
-					"{\"access_token\": \"%s\", \"token\": \"bearer\"}", token);
+					"{\"access_token\": \"%s\", \"token_type\": \"bearer\"}", token);
 				status = 200;
 				HibernateService.deleteCode(data);
 			}

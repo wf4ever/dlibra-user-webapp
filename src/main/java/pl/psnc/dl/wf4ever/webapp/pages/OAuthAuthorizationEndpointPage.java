@@ -3,8 +3,6 @@
  */
 package pl.psnc.dl.wf4ever.webapp.pages;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -20,7 +18,7 @@ import pl.psnc.dl.wf4ever.webapp.model.AuthCodeData;
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.OAuthClient;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
-import pl.psnc.dl.wf4ever.webapp.utils.Constants;
+import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 
 /**
  * @author Piotr Hołubowicz
@@ -181,7 +179,6 @@ public class OAuthAuthorizationEndpointPage
 		}
 
 
-		@SuppressWarnings("unchecked")
 		private String prepareAuthCodeResponse(OAuthClient client)
 			throws Exception
 		{
@@ -191,12 +188,7 @@ public class OAuthAuthorizationEndpointPage
 
 			AuthCodeData data = new AuthCodeData(code, providedRedirectURI,
 					user.getUsername(), client.getClientId());
-			if (getSession().getAttribute(Constants.SESSION_AUTH_CODE_DATA) == null) {
-				getSession().setAttribute(Constants.SESSION_AUTH_CODE_DATA,
-					new HashMap<String, AuthCodeData>());
-			}
-			((Map<String, AuthCodeData>) getSession().getAttribute(
-				Constants.SESSION_AUTH_CODE_DATA)).put(code, data);
+			HibernateService.storeCode(data);
 			String url = client.getRedirectionURI() + "?";
 			url += ("code=" + code);
 			if (state != null) {

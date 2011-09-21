@@ -3,8 +3,6 @@
  */
 package pl.psnc.dl.wf4ever.webapp.pages;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.IRequestCycle;
@@ -14,7 +12,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import pl.psnc.dl.wf4ever.webapp.model.AuthCodeData;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
-import pl.psnc.dl.wf4ever.webapp.utils.Constants;
+import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 
 /**
  * @author Piotr Hołubowicz
@@ -38,14 +36,11 @@ public class OAuthAccessTokenEndpointPage
 	private int status;
 
 
-	@SuppressWarnings("unchecked")
 	public OAuthAccessTokenEndpointPage(PageParameters pageParameters)
 	{
 		super(pageParameters);
 
-		prepareResponse(
-			(Map<String, AuthCodeData>) getSession().getAttribute(
-				Constants.SESSION_AUTH_CODE_DATA), pageParameters);
+		prepareResponse(pageParameters);
 
 		getRequestCycle().replaceAllRequestHandlers(new IRequestHandler() {
 
@@ -73,8 +68,7 @@ public class OAuthAccessTokenEndpointPage
 	}
 
 
-	private void prepareResponse(Map<String, AuthCodeData> authCodeData,
-			PageParameters pageParameters)
+	private void prepareResponse(PageParameters pageParameters)
 	{
 		String error = null;
 		String errorDesc = null;
@@ -84,29 +78,32 @@ public class OAuthAccessTokenEndpointPage
 			error = "invalid_request";
 			errorDesc = "Grant type or code missing";
 		}
-		else if (!pageParameters.get("grant_type").toString().equals("authorization_code")) {
+		else if (!pageParameters.get("grant_type").toString()
+				.equals("authorization_code")) {
 			error = "unsupported_grant_type";
-			errorDesc = "grant type: " + pageParameters.get("grant_type").toString();
+			errorDesc = "grant type: "
+					+ pageParameters.get("grant_type").toString();
 		}
 		else {
 			String code = pageParameters.get("code").toString();
-			if (authCodeData == null || !authCodeData.containsKey(code)) {
+			data = HibernateService.loadCode(code);
+			if (data == null) {
 				error = "invalid_grant";
 				errorDesc = "Code " + code + " is not valid";
 			}
-			else {
-				data = authCodeData.get(code);
-				if (data.getProvidedRedirectURI() != null
-						&& (pageParameters.get("redirect_uri") == null || !pageParameters
-								.get("redirect_uri").toString().equals(
-									data.getProvidedRedirectURI()))) {
-					error = "invalid_grant";
-					errorDesc = "Redirect URI is not valid";
-				}
+			else if (data.getProvidedRedirectURI() != null
+					&& (pageParameters.get("redirect_uri") == null || !pageParameters
+							.get("redirect_uri").toString()
+							.equals(data.getProvidedRedirectURI()))) {
+				error = "invalid_grant";
+				errorDesc = "Redirect URI is not valid";
 			}
+
 		}
 		if (error != null) {
-			json = String.format("{\"error\": \"%s\", \"error_description\": \"%s\"}", error, errorDesc);
+			json = String.format(
+				"{\"error\": \"%s\", \"error_description\": \"%s\"}", error,
+				errorDesc);
 			status = 400;
 		}
 		else {
@@ -116,6 +113,7 @@ public class OAuthAccessTokenEndpointPage
 				json = String.format(
 					"{\"access_token\": \"%s\", \"token\": \"bearer\"}", token);
 				status = 200;
+				HibernateService.deleteCode(data);
 			}
 			catch (Exception e) {
 				json = e.getMessage();

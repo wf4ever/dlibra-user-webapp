@@ -3,10 +3,19 @@
  */
 package pl.psnc.dl.wf4ever.webapp.model;
 
+import java.util.Date;
+
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author Piotr Hołubowicz
  *
  */
+@Entity
+@Table(name = "tempAuthCodeData")
 public class AuthCodeData
 {
 
@@ -17,6 +26,14 @@ public class AuthCodeData
 	private String userId;
 
 	private String clientId;
+
+	private Date created;
+
+
+	public AuthCodeData()
+	{
+
+	}
 
 
 	/**
@@ -33,12 +50,20 @@ public class AuthCodeData
 		this.providedRedirectURI = providedRedirectURI;
 		this.userId = userId;
 		this.clientId = clientId;
+		this.created = new Date();
 	}
 
 
+	@Id
 	public String getCode()
 	{
 		return code;
+	}
+
+
+	public void setCode(String code)
+	{
+		this.code = code;
 	}
 
 
@@ -48,15 +73,54 @@ public class AuthCodeData
 	}
 
 
+	public void setProvidedRedirectURI(String providedRedirectURI)
+	{
+		this.providedRedirectURI = providedRedirectURI;
+	}
+
+
+	@Basic
 	public String getUserId()
 	{
 		return userId;
 	}
 
 
+	public void setUserId(String userId)
+	{
+		this.userId = userId;
+	}
+
+
+	@Basic
 	public String getClientId()
 	{
 		return clientId;
+	}
+
+
+	public void setClientId(String clientId)
+	{
+		this.clientId = clientId;
+	}
+
+
+	/**
+	 * @return the created
+	 */
+	@Basic
+	public Date getCreated()
+	{
+		return created;
+	}
+
+
+	/**
+	 * @param created the created to set
+	 */
+	public void setCreated(Date created)
+	{
+		this.created = created;
 	}
 
 }

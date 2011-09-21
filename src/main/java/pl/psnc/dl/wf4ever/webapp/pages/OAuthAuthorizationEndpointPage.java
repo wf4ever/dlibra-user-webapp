@@ -16,6 +16,7 @@ import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
+import pl.psnc.dl.wf4ever.webapp.model.AuthCodeData;
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.OAuthClient;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
@@ -41,6 +42,8 @@ public class OAuthAuthorizationEndpointPage
 	private OAuthClient client;
 
 	private String state;
+
+	private String providedRedirectURI;
 
 
 	public OAuthAuthorizationEndpointPage(PageParameters pageParameters)
@@ -85,9 +88,9 @@ public class OAuthAuthorizationEndpointPage
 					log.warn("Missing redirect URI.");
 				}
 				else {
-					String redirectUri = pageParameters.get("redirect_uri")
+					providedRedirectURI = pageParameters.get("redirect_uri")
 							.toString();
-					if (!client.getRedirectionURI().equals(redirectUri)) {
+					if (!client.getRedirectionURI().equals(providedRedirectURI)) {
 						error("Redirect URI does not match client redirect URI.");
 						return null;
 					}
@@ -186,9 +189,8 @@ public class OAuthAuthorizationEndpointPage
 			String code = UUID.randomUUID().toString().replaceAll("-", "")
 					.substring(0, 20);
 
-			AuthCodeData data = new AuthCodeData(code,
-					client.getRedirectionURI(), user.getUsername(),
-					client.getClientId());
+			AuthCodeData data = new AuthCodeData(code, providedRedirectURI,
+					user.getUsername(), client.getClientId());
 			if (getSession().getAttribute(Constants.SESSION_AUTH_CODE_DATA) == null) {
 				getSession().setAttribute(Constants.SESSION_AUTH_CODE_DATA,
 					new HashMap<String, AuthCodeData>());

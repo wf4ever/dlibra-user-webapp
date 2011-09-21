@@ -12,6 +12,7 @@ import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
+import pl.psnc.dl.wf4ever.webapp.model.AuthCodeData;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 
@@ -81,7 +82,7 @@ public class OAuthAccessTokenEndpointPage
 				|| pageParameters.get("code") == null) {
 			error = "invalid_request";
 		}
-		else if (!pageParameters.get("grant_type").equals("authorization_code")) {
+		else if (!pageParameters.get("grant_type").toString().equals("authorization_code")) {
 			error = "unsupported_grant_type";
 		}
 		else {
@@ -91,10 +92,10 @@ public class OAuthAccessTokenEndpointPage
 			}
 			else {
 				data = authCodeData.get(code);
-				if (pageParameters.get("redirect_uri") != null
-						&& data.getRedirectURI() != null
-						&& !pageParameters.get("redirect_uri").equals(
-							data.getRedirectURI())) {
+				if (data.getProvidedRedirectURI() != null
+						&& (pageParameters.get("redirect_uri") == null || !pageParameters
+								.get("redirect_uri").toString().equals(
+									data.getProvidedRedirectURI()))) {
 					error = "invalid_grant";
 				}
 			}

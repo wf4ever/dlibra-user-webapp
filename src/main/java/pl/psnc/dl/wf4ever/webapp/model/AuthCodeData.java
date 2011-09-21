@@ -1,7 +1,7 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp.pages;
+package pl.psnc.dl.wf4ever.webapp.model;
 
 /**
  * @author Piotr Hołubowicz
@@ -12,7 +12,7 @@ public class AuthCodeData
 
 	private String code;
 
-	private String redirectURI;
+	private String providedRedirectURI;
 
 	private String userId;
 
@@ -21,15 +21,16 @@ public class AuthCodeData
 
 	/**
 	 * @param code
-	 * @param redirectURI
+	 * @param clientRedirectURI May not be null, used for redirection
+	 * @param providedRedirectURI May be null, if not than it is validated by access token endpoint
 	 * @param userId
 	 * @param clientId
 	 */
-	public AuthCodeData(String code, String redirectURI, String userId,
+	public AuthCodeData(String code, String providedRedirectURI, String userId,
 			String clientId)
 	{
 		this.code = code;
-		this.redirectURI = redirectURI;
+		this.providedRedirectURI = providedRedirectURI;
 		this.userId = userId;
 		this.clientId = clientId;
 	}
@@ -41,9 +42,9 @@ public class AuthCodeData
 	}
 
 
-	public String getRedirectURI()
+	public String getProvidedRedirectURI()
 	{
-		return redirectURI;
+		return providedRedirectURI;
 	}
 
 

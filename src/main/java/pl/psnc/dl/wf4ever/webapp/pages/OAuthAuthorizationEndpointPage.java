@@ -3,10 +3,10 @@
  */
 package pl.psnc.dl.wf4ever.webapp.pages;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -15,12 +15,11 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.request.mapper.parameter.PageParameters.NamedPair;
 
 import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.OAuthClient;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
-import pl.psnc.dl.wf4ever.webapp.services.OAuthHelpService;
+import pl.psnc.dl.wf4ever.webapp.utils.Constants;
 
 /**
  * @author Piotr Hołubowicz
@@ -49,30 +48,21 @@ public class OAuthAuthorizationEndpointPage
 		super(pageParameters);
 		if (willBeRedirected)
 			return;
-		if (pageParameters.get(OAuthHelpService.QUERY_PARAM_RESPONSE_TYPE)
-				.isNull()) {
+		if (pageParameters.get("response_type").isNull()) {
 			error("Missing response type.");
 		}
 		else {
-			String responseType = pageParameters.get(
-				OAuthHelpService.QUERY_PARAM_RESPONSE_TYPE).toString();
-			if (responseType.equals(OAuthHelpService.RESPONSE_TYPE_AUTH_CODE)) {
-				error("Authorization code flow is not supported yet.");
-			}
-			else if (responseType.equals(OAuthHelpService.RESPONSE_TYPE_TOKEN)) {
-				this.client = processImplicitGrantFlow(pageParameters);
+			String responseType = pageParameters.get("response_type")
+					.toString();
+			if (responseType.equals("token") || responseType.equals("code")) {
+				this.client = processImplicitGrantOrAuthCodeFlow(pageParameters);
+				content.add(new AuthorizeFragment("entry", "validRequest",
+						content, client, responseType));
 			}
 			else {
 				error(String.format("Unknown response type: %s.", responseType));
+				content.add(new Fragment("entry", "invalidRequest", content));
 			}
-		}
-
-		if (client != null) {
-			content.add(new AuthorizeFragment("entry", "validRequest", content,
-					client));
-		}
-		else {
-			content.add(new Fragment("entry", "invalidRequest", content));
 		}
 	}
 
@@ -81,52 +71,37 @@ public class OAuthAuthorizationEndpointPage
 	 * @param pageParameters
 	 * @return 
 	 */
-	private OAuthClient processImplicitGrantFlow(PageParameters pageParameters)
+	private OAuthClient processImplicitGrantOrAuthCodeFlow(
+			PageParameters pageParameters)
 	{
-		if (pageParameters.get(OAuthHelpService.QUERY_PARAM_CLIENT_ID).isNull()) {
+		if (pageParameters.get("client_id").isNull()) {
 			error("Missing client id.");
 		}
 		else {
-			String clientId = pageParameters.get(
-				OAuthHelpService.QUERY_PARAM_CLIENT_ID).toString();
+			String clientId = pageParameters.get("client_id").toString();
 			try {
 				OAuthClient client = DlibraService.getClient(clientId);
-				if (pageParameters.get(
-					OAuthHelpService.QUERY_PARAM_REDIRECT_URI).isNull()) {
-					error("Missing redirect URI.");
+				if (pageParameters.get("redirect_uri").isNull()) {
+					log.warn("Missing redirect URI.");
 				}
 				else {
-					String redirectUri = pageParameters.get(
-						OAuthHelpService.QUERY_PARAM_REDIRECT_URI).toString();
+					String redirectUri = pageParameters.get("redirect_uri")
+							.toString();
 					if (!client.getRedirectionURI().equals(redirectUri)) {
 						error("Redirect URI does not match client redirect URI.");
-					}
-					else {
-						if (!pageParameters.get(
-							OAuthHelpService.QUERY_PARAM_STATE).isNull()) {
-							state = pageParameters.get(
-								OAuthHelpService.QUERY_PARAM_STATE).toString();
-						}
-						return client;
+						return null;
 					}
 				}
+				if (!pageParameters.get("state").isNull()) {
+					state = pageParameters.get("state").toString();
+				}
+				return client;
 			}
 			catch (Exception e) {
 				error("Invalid client id: " + e.getMessage() + ".");
 			}
 		}
 		return null;
-	}
-
-
-	private String createResponseURL(String redirectionURI,
-			PageParameters params)
-	{
-		List<String> p = new ArrayList<String>();
-		for (NamedPair np : params.getAllNamed()) {
-			p.add(np.getKey() + "=" + np.getValue());
-		}
-		return redirectionURI + "#" + StringUtils.join(p, "&");
 	}
 
 	private class AuthorizeFragment
@@ -141,7 +116,8 @@ public class OAuthAuthorizationEndpointPage
 
 		@SuppressWarnings("serial")
 		public AuthorizeFragment(String id, String markupId,
-				MarkupContainer markupProvider, final OAuthClient client)
+				MarkupContainer markupProvider, final OAuthClient client,
+				final String responseType)
 		{
 			super(id, markupId, markupProvider);
 			Form< ? > form = new Form<Void>("form");
@@ -153,21 +129,14 @@ public class OAuthAuthorizationEndpointPage
 				public void onSubmit()
 				{
 					super.onSubmit();
-					DlibraUser user = getDlibraUserModel();
 					try {
-						String token = DlibraService.getAccessToken(
-							user.getUsername(), client.getClientId());
-						PageParameters params = new PageParameters();
-						params.add(OAuthHelpService.QUERY_PARAM_ACCESS_TOKEN,
-							token);
-						params.add(OAuthHelpService.QUERY_PARAM_TOKEN_TYPE,
-							"bearer");
-						if (state != null) {
-							params.add(OAuthHelpService.QUERY_PARAM_STATE,
-								state);
+						String url;
+						if (responseType.equals("token")) {
+							url = prepareTokenResponse(client);
 						}
-						String url = createResponseURL(
-							client.getRedirectionURI(), params);
+						else {
+							url = prepareAuthCodeResponse(client);
+						}
 						getRequestCycle().scheduleRequestHandlerAfterCurrent(
 							new RedirectRequestHandler(url));
 					}
@@ -176,6 +145,7 @@ public class OAuthAuthorizationEndpointPage
 						log.error(e);
 					}
 				}
+
 			});
 			form.add(new Button("reject") {
 
@@ -183,17 +153,65 @@ public class OAuthAuthorizationEndpointPage
 				public void onSubmit()
 				{
 					super.onSubmit();
-					PageParameters params = new PageParameters();
-					params.add("error", "access_denied");
-					if (state != null) {
-						params.add(OAuthHelpService.QUERY_PARAM_STATE, state);
-					}
-					String url = createResponseURL(client.getRedirectionURI(),
-						params);
+					String url = prepareDeniedResponse(client);
 					getRequestCycle().scheduleRequestHandlerAfterCurrent(
 						new RedirectRequestHandler(url));
 				}
 			});
+
+		}
+
+
+		private String prepareTokenResponse(OAuthClient client)
+			throws Exception
+		{
+			DlibraUser user = getDlibraUserModel();
+			String token = DlibraService.getAccessToken(user.getUsername(),
+				client.getClientId());
+			String url = client.getRedirectionURI() + "#";
+			url += ("access_token=" + token);
+			url += "&token_type=bearer";
+			if (state != null) {
+				url += ("&state=" + state);
+			}
+			return url;
+		}
+
+
+		@SuppressWarnings("unchecked")
+		private String prepareAuthCodeResponse(OAuthClient client)
+			throws Exception
+		{
+			DlibraUser user = getDlibraUserModel();
+			String code = UUID.randomUUID().toString().replaceAll("-", "")
+					.substring(0, 20);
+
+			AuthCodeData data = new AuthCodeData(code,
+					client.getRedirectionURI(), user.getUsername(),
+					client.getClientId());
+			if (getSession().getAttribute(Constants.SESSION_AUTH_CODE_DATA) == null) {
+				getSession().setAttribute(Constants.SESSION_AUTH_CODE_DATA,
+					new HashMap<String, AuthCodeData>());
+			}
+			((Map<String, AuthCodeData>) getSession().getAttribute(
+				Constants.SESSION_AUTH_CODE_DATA)).put(code, data);
+			String url = client.getRedirectionURI() + "?";
+			url += ("code=" + code);
+			if (state != null) {
+				url += ("&state=" + state);
+			}
+			return url;
+		}
+
+
+		private String prepareDeniedResponse(OAuthClient client)
+		{
+			String url = client.getRedirectionURI() + "#";
+			url += "error=access_denied";
+			if (state != null) {
+				url += ("&state=" + state);
+			}
+			return url;
 		}
 
 	}

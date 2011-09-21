@@ -9,6 +9,7 @@ import pl.psnc.dl.wf4ever.webapp.pages.AuthenticationPage;
 import pl.psnc.dl.wf4ever.webapp.pages.DlibraRegistrationPage;
 import pl.psnc.dl.wf4ever.webapp.pages.ErrorPage;
 import pl.psnc.dl.wf4ever.webapp.pages.HelpPage;
+import pl.psnc.dl.wf4ever.webapp.pages.OAuthAccessTokenEndpointPage;
 import pl.psnc.dl.wf4ever.webapp.pages.OAuthAuthorizationEndpointPage;
 
 /**
@@ -33,6 +34,7 @@ public class UserManagementApplication
 		mountPage("/authenticate", AuthenticationPage.class);
 		mountPage("/register", DlibraRegistrationPage.class);
 		mountPage("/authorize", OAuthAuthorizationEndpointPage.class);
+		mountPage("/accesstoken", OAuthAccessTokenEndpointPage.class);
 		mountPage("/error", ErrorPage.class);
 		mountPage("/help", HelpPage.class);
 

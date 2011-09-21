@@ -21,22 +21,6 @@ public class OAuthHelpService
 
 	private static final Logger log = Logger.getLogger(OAuthHelpService.class);
 
-	public static final String RESPONSE_TYPE_AUTH_CODE = "code";
-
-	public static final String RESPONSE_TYPE_TOKEN = "token";
-
-	public static final String QUERY_PARAM_RESPONSE_TYPE = "response_type";
-
-	public static final String QUERY_PARAM_CLIENT_ID = "client_id";
-
-	public static final String QUERY_PARAM_REDIRECT_URI = "redirect_uri";
-
-	public static final String QUERY_PARAM_STATE = "state";
-
-	public static final String QUERY_PARAM_ACCESS_TOKEN = "access_token";
-
-	public static final String QUERY_PARAM_TOKEN_TYPE = "token_type";
-
 
 	/**
 	 * Executes a request with no body.

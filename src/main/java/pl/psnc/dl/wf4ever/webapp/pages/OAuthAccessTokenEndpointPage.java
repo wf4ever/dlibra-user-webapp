@@ -77,18 +77,22 @@ public class OAuthAccessTokenEndpointPage
 			PageParameters pageParameters)
 	{
 		String error = null;
+		String errorDesc = null;
 		AuthCodeData data = null;
 		if (pageParameters.get("grant_type") == null
 				|| pageParameters.get("code") == null) {
 			error = "invalid_request";
+			errorDesc = "Grant type or code missing";
 		}
 		else if (!pageParameters.get("grant_type").toString().equals("authorization_code")) {
 			error = "unsupported_grant_type";
+			errorDesc = "grant type: " + pageParameters.get("grant_type").toString();
 		}
 		else {
 			String code = pageParameters.get("code").toString();
 			if (authCodeData == null || !authCodeData.containsKey(code)) {
 				error = "invalid_grant";
+				errorDesc = "Code " + code + " is not valid";
 			}
 			else {
 				data = authCodeData.get(code);
@@ -97,11 +101,12 @@ public class OAuthAccessTokenEndpointPage
 								.get("redirect_uri").toString().equals(
 									data.getProvidedRedirectURI()))) {
 					error = "invalid_grant";
+					errorDesc = "Redirect URI is not valid";
 				}
 			}
 		}
 		if (error != null) {
-			json = String.format("{\"error\": \"%s\"}", error);
+			json = String.format("{\"error\": \"%s\", \"error_description\": \"%s\"}", error, errorDesc);
 			status = 400;
 		}
 		else {

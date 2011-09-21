@@ -3,6 +3,8 @@
  */
 package pl.psnc.dl.wf4ever.webapp.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,7 +14,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "client")
 public class OAuthClient
+	implements Serializable
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -396954799246175590L;
 
 	private String clientId;
 

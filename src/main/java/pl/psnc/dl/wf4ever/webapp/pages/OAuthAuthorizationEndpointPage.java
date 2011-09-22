@@ -57,8 +57,13 @@ public class OAuthAuthorizationEndpointPage
 					.toString();
 			if (responseType.equals("token") || responseType.equals("code")) {
 				this.client = processImplicitGrantOrAuthCodeFlow(pageParameters);
-				content.add(new AuthorizeFragment("entry", "validRequest",
-						content, client, responseType));
+				if (client != null) {
+					content.add(new AuthorizeFragment("entry", "validRequest",
+							content, client, responseType));
+				}
+				else {
+					content.add(new Fragment("entry", "invalidRequest", content));
+				}
 			}
 			else {
 				error(String.format("Unknown response type: %s.", responseType));

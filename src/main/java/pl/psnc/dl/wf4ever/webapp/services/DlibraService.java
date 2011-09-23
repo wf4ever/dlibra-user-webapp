@@ -7,23 +7,22 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.util.crypt.Base64;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.OAuthClient;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 
 /**
  * @author Piotr Hołubowicz
@@ -51,8 +50,6 @@ public class DlibraService
 	private static final String URI_ACCESS_TOKEN = URI_PATH_BASE
 			+ "/accesstoken";
 
-	private static final int USERNAME_LENGTH = 20;
-
 	private static final Token WFADMIN_ACCESS_TOKEN = generateAccessToken(
 		"wfadmin", "wfadmin!!!");
 
@@ -74,15 +71,13 @@ public class DlibraService
 	}
 
 
-	public static boolean createUser(DlibraUser user)
+	public static boolean createUser(OpenIdUser user)
 		throws Exception
 	{
 		boolean created = true;
 
-		String username = generateUsername(user);
-
 		String url = createUsersURL().toString();
-		String payload = username;
+		String payload = Base64.encodeBase64URLSafeString(user.getOpenId().getBytes());
 		try {
 			OAuthHelpService.sendRequest(dLibraService, Verb.POST, url,
 				WFADMIN_ACCESS_TOKEN, payload, "text/plain");
@@ -97,24 +92,16 @@ public class DlibraService
 			}
 		}
 
-		user.setUsername(username);
-		HibernateService.storeUser(user);
 		return created;
 	}
 
 
-	public static void deleteUser(DlibraUser user)
+	public static void deleteUser(OpenIdUser user)
 		throws Exception
 	{
-		String url = createUserIdURL(user.getUsername()).toString();
-		try {
-			OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url,
-				WFADMIN_ACCESS_TOKEN);
-		}
-		finally {
-			user.setUsername(null);
-			HibernateService.deleteUser(user);
-		}
+		String url = createUserIdURL(user.getOpenId()).toString();
+		OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url,
+			WFADMIN_ACCESS_TOKEN);
 	}
 
 
@@ -155,22 +142,6 @@ public class DlibraService
 	}
 
 
-	private static String generateUsername(DlibraUser model)
-	{
-		if (model.getOpenId().length() <= USERNAME_LENGTH) {
-			return model.getOpenId();
-		}
-		if (model.getOpenIdData() != null
-				&& model.getOpenIdData().getEmailAddress() != null) {
-			return StringUtils
-					.left(model.getOpenIdData().getEmailAddress(),
-						USERNAME_LENGTH).replaceAll("\\s", "_")
-					.replaceAll("\\W", "");
-		}
-		return "OpenID-" + new Date().getTime();
-	}
-
-
 	private static Token generateAccessToken(String username, String password)
 	{
 		String token = Base64.encodeBase64String((username + ":" + password)
@@ -197,7 +168,7 @@ public class DlibraService
 	private static URL createUserIdURL(String userId)
 	{
 		try {
-			String path = String.format(URI_USER_ID, userId);
+			String path = String.format(URI_USER_ID, Base64.encodeBase64URLSafeString(userId.getBytes()));
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
 		}
 		catch (Exception e) {

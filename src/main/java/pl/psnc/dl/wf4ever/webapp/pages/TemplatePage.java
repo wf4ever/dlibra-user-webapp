@@ -24,8 +24,8 @@ import org.scribe.model.Verb;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OAuthException;
@@ -59,9 +59,9 @@ public abstract class TemplatePage
 	public TemplatePage(PageParameters pageParameters)
 	{
 		getSession().bind();
-		DlibraUser userModel = getDlibraUserModel();
+		OpenIdUser user = getOpenIdUserModel();
 		content = new WebMarkupContainer("content");
-		if (userModel == null
+		if (user == null
 				&& !ArrayUtils.contains(publicPages, this.getClass())) {
 			content.setVisible(false);
 			willBeRedirected = true;
@@ -74,12 +74,12 @@ public abstract class TemplatePage
 			getSession().setAttribute(Constants.SESSION_REDIRECT_URI, url);
 			goToPage(AuthenticationPage.class, pageParameters);
 		}
-		if (userModel == null) {
+		if (user == null) {
 			sidebarPanel = new LoggedOutPanel("sidebar");
 		}
 		else {
 			try {
-				sidebarPanel = new LoggedInPanel("sidebar", userModel);
+				sidebarPanel = new LoggedInPanel("sidebar", user);
 			}
 			catch (Exception e) {
 				error(e.getMessage());
@@ -98,14 +98,14 @@ public abstract class TemplatePage
 	}
 
 
-	public DlibraUser getDlibraUserModel()
+	public OpenIdUser getOpenIdUserModel()
 	{
-		return (DlibraUser) getSession().getAttribute(
+		return (OpenIdUser) getSession().getAttribute(
 			Constants.SESSION_USER_MODEL);
 	}
 
 
-	public boolean logIn(DlibraUser user)
+	public boolean logIn(OpenIdUser user)
 	{
 		try {
 			getSession().setAttribute(Constants.SESSION_USER_MODEL, user);
@@ -120,9 +120,9 @@ public abstract class TemplatePage
 	}
 
 
-	private void register(DlibraUser user)
+	private void register(OpenIdUser user)
 	{
-		if (!user.isRegistered()) {
+		if (!DlibraService.userExistsInDlibra(user.getOpenId())) {
 			try {
 				String message;
 				if (!DlibraService.createUser(user)) {

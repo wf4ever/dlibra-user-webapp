@@ -16,10 +16,8 @@ import org.openid4java.message.AuthRequest;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.MyExpUser;
-import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
-import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 import pl.psnc.dl.wf4ever.webapp.services.MyExpApi;
 import pl.psnc.dl.wf4ever.webapp.services.OpenIdService;
 import pl.psnc.dl.wf4ever.webapp.utils.Constants;
@@ -36,7 +34,8 @@ public class AuthenticationPage
 
 	private static final long serialVersionUID = -8975579933617712699L;
 
-	private static final Logger log = Logger.getLogger(AuthenticationPage.class);
+	private static final Logger log = Logger
+			.getLogger(AuthenticationPage.class);
 
 	private static final String GOOGLE_URL = "https://www.google.com/accounts/o8/id";
 
@@ -86,10 +85,10 @@ public class AuthenticationPage
 			processOpenIdResponse(pageParameters);
 		}
 
-		final DlibraUser tempUser = new DlibraUser();
+		final OpenIdUser tempUser = new OpenIdUser();
 
-		Form<DlibraUser> form = new Form<DlibraUser>("openIdForm",
-				new CompoundPropertyModel<DlibraUser>(tempUser)) {
+		Form<OpenIdUser> form = new Form<OpenIdUser>("openIdForm",
+				new CompoundPropertyModel<OpenIdUser>(tempUser)) {
 
 			@Override
 			protected void onSubmit()
@@ -142,19 +141,13 @@ public class AuthenticationPage
 			DiscoveryInformation discoveryInformation = (DiscoveryInformation) session
 					.getAttribute(Constants.SESSION_DISCOVERY_INFORMATION);
 
-			OpenIdData openIdData = OpenIdService.processReturn(
+			OpenIdUser openIdUser = OpenIdService.processReturn(
 				discoveryInformation, pageParameters, returnToUrl);
-			if (openIdData == null) {
+			if (openIdUser == null) {
 				error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider.");
 				return;
 			}
-			DlibraUser user = HibernateService.loadUser(openIdData.getOpenId());
-			if (user == null) {
-				user = new DlibraUser();
-				user.setOpenId(openIdData.getOpenId());
-			}
-			user.setOpenIdData(openIdData);
-			logIn(user);
+			logIn(openIdUser);
 			if (getSession().getAttribute(Constants.SESSION_REDIRECT_URI) == null) {
 				goToPage(DlibraRegistrationPage.class, null);
 			}
@@ -162,8 +155,9 @@ public class AuthenticationPage
 				getRequestCycle().scheduleRequestHandlerAfterCurrent(
 					new RedirectRequestHandler((String) getSession()
 							.getAttribute(Constants.SESSION_REDIRECT_URI)));
-				log.debug("Redirecting to: " + (String) getSession()
-							.getAttribute(Constants.SESSION_REDIRECT_URI));
+				log.debug("Redirecting to: "
+						+ (String) getSession().getAttribute(
+							Constants.SESSION_REDIRECT_URI));
 				getSession().setAttribute(Constants.SESSION_REDIRECT_URI, null);
 			}
 		}

@@ -15,8 +15,8 @@ import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import pl.psnc.dl.wf4ever.webapp.model.AuthCodeData;
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
 import pl.psnc.dl.wf4ever.webapp.model.OAuthClient;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
 
@@ -171,8 +171,8 @@ public class OAuthAuthorizationEndpointPage
 		private String prepareTokenResponse(OAuthClient client)
 			throws Exception
 		{
-			DlibraUser user = getDlibraUserModel();
-			String token = DlibraService.getAccessToken(user.getUsername(),
+			OpenIdUser user = getOpenIdUserModel();
+			String token = DlibraService.getAccessToken(user.getOpenId(),
 				client.getClientId());
 			String url = client.getRedirectionURI() + "#";
 			url += ("access_token=" + token);
@@ -187,12 +187,12 @@ public class OAuthAuthorizationEndpointPage
 		private String prepareAuthCodeResponse(OAuthClient client)
 			throws Exception
 		{
-			DlibraUser user = getDlibraUserModel();
+			OpenIdUser user = getOpenIdUserModel();
 			String code = UUID.randomUUID().toString().replaceAll("-", "")
 					.substring(0, 20);
 
 			AuthCodeData data = new AuthCodeData(code, providedRedirectURI,
-					user.getUsername(), client.getClientId());
+					user.getOpenId(), client.getClientId());
 			HibernateService.storeCode(data);
 			String url = client.getRedirectionURI() + "?";
 			url += ("code=" + code);

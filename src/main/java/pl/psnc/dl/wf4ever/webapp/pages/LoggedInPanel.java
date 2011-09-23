@@ -9,8 +9,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
-import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 
 /**
  * @author Piotr Hołubowicz
@@ -20,22 +19,21 @@ public class LoggedInPanel
 	extends Panel
 {
 
-	Form<OpenIdData> userDetails;
+	Form<OpenIdUser> userDetails;
 
 
-	public LoggedInPanel(String id, DlibraUser model)
+	public LoggedInPanel(String id, OpenIdUser user)
 		throws Exception
 	{
-		super(id, new CompoundPropertyModel<DlibraUser>(model));
+		super(id, new CompoundPropertyModel<OpenIdUser>(user));
 		setOutputMarkupId(true);
 
-		if (model == null || model.getOpenId() == null) {
+		if (user == null || user.getOpenId() == null) {
 			throw new Exception("User is not logged in");
 		}
-		
-		userDetails = new Form<OpenIdData>("userDetails",
-				new CompoundPropertyModel<OpenIdData>(
-						model.getOpenIdData()));
+
+		userDetails = new Form<OpenIdUser>("userDetails",
+				new CompoundPropertyModel<OpenIdUser>(user));
 		userDetails.add(new Label("fullName"));
 		//			userDetails.add(new Label("openId"));
 		userDetails.add(new Label("emailAddress"));
@@ -43,7 +41,7 @@ public class LoggedInPanel
 		userDetails.add(new Label("language"));
 		userDetails.setOutputMarkupId(true);
 		add(userDetails);
-		
+
 		@SuppressWarnings("serial")
 		Link<String> logout = new Link<String>("logout") {
 
@@ -53,7 +51,7 @@ public class LoggedInPanel
 				TemplatePage page = (TemplatePage) getPage();
 				page.logOut();
 			}
-			
+
 		};
 		add(logout);
 	}

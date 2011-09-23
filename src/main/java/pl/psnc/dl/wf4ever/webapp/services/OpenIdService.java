@@ -28,7 +28,7 @@ import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
 
-import pl.psnc.dl.wf4ever.webapp.model.OpenIdData;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 
 /**
  * Most of this code modeled after ConsumerServlet, part of the openid4java 
@@ -200,10 +200,10 @@ public class OpenIdService
 	 * Processes the returned information from an authentication request
 	 * from the OP.
 	 */
-	public static OpenIdData processReturn(DiscoveryInformation discoveryInformation,
+	public static OpenIdUser processReturn(DiscoveryInformation discoveryInformation,
 			PageParameters pageParameters, String returnToUrl)
 	{
-		OpenIdData data = null;
+		OpenIdUser data = null;
 		try {
 			// Verify the Information returned from the OP
 			/// This is required according to the spec
@@ -220,7 +220,7 @@ public class OpenIdService
 							.getExtension(AxMessage.OPENID_NS_AX);
 					if (extension instanceof FetchResponse) {
 						if (data == null) {
-							data = new OpenIdData();
+							data = new OpenIdUser();
 						}
 						provisionRegistrationModel(verifiedIdentifier,
 							(FetchResponse) extension, data);
@@ -234,7 +234,7 @@ public class OpenIdService
 							.getExtension(SRegMessage.OPENID_NS_SREG);
 					if (extension instanceof SRegResponse) {
 						if (data == null) {
-							data = new OpenIdData();
+							data = new OpenIdUser();
 						}
 						provisionRegistrationModel(verifiedIdentifier,
 							(SRegResponse) extension, data);
@@ -259,7 +259,7 @@ public class OpenIdService
 
 	private static void provisionRegistrationModel(
 			Identifier verifiedIdentifier, FetchResponse axResponse,
-			OpenIdData ret)
+			OpenIdUser ret)
 	{
 		ret.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;
@@ -304,7 +304,7 @@ public class OpenIdService
 
 
 	private static void provisionRegistrationModel(
-			Identifier verifiedIdentifier, SRegResponse res, OpenIdData ret)
+			Identifier verifiedIdentifier, SRegResponse res, OpenIdUser ret)
 	{
 		ret.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;

@@ -91,7 +91,7 @@ public class DlibraRegistrationPage
 							infoMessage = "Account has been deleted.";
 						}
 						else {
-							if (!DlibraService.createUser(user)) {
+							if (!DlibraService.createUser(user.getOpenId())) {
 								infoMessage = "An account for this username already existed "
 										+ "in dLibra, you have been registered with it.";
 							}

@@ -71,13 +71,13 @@ public class DlibraService
 	}
 
 
-	public static boolean createUser(OpenIdUser user)
+	public static boolean createUser(String openId)
 		throws Exception
 	{
 		boolean created = true;
 
 		String url = createUsersURL().toString();
-		String payload = Base64.encodeBase64URLSafeString(user.getOpenId().getBytes());
+		String payload = Base64.encodeBase64URLSafeString(openId.getBytes());
 		try {
 			OAuthHelpService.sendRequest(dLibraService, Verb.POST, url,
 				WFADMIN_ACCESS_TOKEN, payload, "text/plain");

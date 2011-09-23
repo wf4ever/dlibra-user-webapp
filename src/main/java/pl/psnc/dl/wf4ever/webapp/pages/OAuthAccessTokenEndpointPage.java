@@ -13,6 +13,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import pl.psnc.dl.wf4ever.webapp.model.AuthCodeData;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 import pl.psnc.dl.wf4ever.webapp.services.HibernateService;
+import pl.psnc.dl.wf4ever.webapp.services.OAuthException;
 
 /**
  * @author Piotr Hołubowicz
@@ -108,15 +109,33 @@ public class OAuthAccessTokenEndpointPage
 		}
 		else {
 			try {
-				String token = DlibraService.getAccessToken(data.getUserId(),
-					data.getClientId());
+				String token;
+				try {
+					token = DlibraService.getAccessToken(data.getUserId(),
+						data.getClientId());
+				}
+				catch (OAuthException e) {
+					if (e.getResponse().getCode() == 404) {
+						DlibraService.createUser(data.getUserId());
+						token = DlibraService.getAccessToken(data.getUserId(),
+							data.getClientId());
+					}
+					else {
+						throw e;
+					}
+				}
+
 				json = String.format(
-					"{\"access_token\": \"%s\", \"token_type\": \"bearer\"}", token);
+					"{\"access_token\": \"%s\", \"token_type\": \"bearer\"}",
+					token);
 				status = 200;
 				HibernateService.deleteCode(data);
 			}
 			catch (Exception e) {
-				json = e.getMessage();
+				json = String
+						.format(
+							"{\"error\": \"invalid_request\", \"error_description\": \"%s\"}",
+							e.getMessage());
 				status = 500;
 			}
 		}

@@ -125,7 +125,7 @@ public abstract class TemplatePage
 		if (!DlibraService.userExistsInDlibra(user.getOpenId())) {
 			try {
 				String message;
-				if (!DlibraService.createUser(user)) {
+				if (!DlibraService.createUser(user.getOpenId())) {
 					message = "An account for this username already existed "
 							+ "in dLibra, you have been registered with it.";
 				}

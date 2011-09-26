@@ -6,6 +6,7 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.IRequestHandler;
@@ -39,6 +40,8 @@ public class AuthenticationPage
 
 	private static final String GOOGLE_URL = "https://www.google.com/accounts/o8/id";
 
+	private static final String YAHOO_URL = "http://yahoo.com";
+
 	private String returnToUrl;
 
 
@@ -69,6 +72,12 @@ public class AuthenticationPage
 				if (user.getOpenId() == null) {
 					throw new Exception(
 							"Your myExperiment profile does not contain any openID.");
+				}
+				if (user.getOpenId().startsWith("https://www.google.com")) {
+					user.setOpenId(GOOGLE_URL);
+				}
+				if (user.getOpenId().startsWith("https://me.yahoo.com")) {
+					user.setOpenId(YAHOO_URL);
 				}
 				applyForAuthentication(user.getOpenId());
 				getSession()
@@ -105,13 +114,20 @@ public class AuthenticationPage
 
 		Form< ? > form2 = new Form<Void>("form");
 		content.add(form2);
-		form2.add(new Button("logInWithGoogle") {
+		form2.add(new Link<String>("logInWithGoogle") {
 
 			@Override
-			public void onSubmit()
+			public void onClick()
 			{
-				super.onSubmit();
 				applyForAuthentication(GOOGLE_URL);
+			}
+		});
+		form2.add(new Link<String>("logInWithYahoo") {
+
+			@Override
+			public void onClick()
+			{
+				applyForAuthentication(YAHOO_URL);
 			}
 		});
 

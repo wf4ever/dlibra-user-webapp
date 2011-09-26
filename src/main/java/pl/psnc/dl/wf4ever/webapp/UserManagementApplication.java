@@ -31,6 +31,7 @@ public class UserManagementApplication
 	public void init()
 	{
 		super.init();
+		mountPage("/import", AuthenticationPage.class); // legacy
 		mountPage("/authenticate", AuthenticationPage.class);
 		mountPage("/register", DlibraRegistrationPage.class);
 		mountPage("/authorize", OAuthAuthorizationEndpointPage.class);

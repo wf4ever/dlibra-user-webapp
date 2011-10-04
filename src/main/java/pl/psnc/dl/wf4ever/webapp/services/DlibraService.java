@@ -197,7 +197,7 @@ public class DlibraService
 	}
 
 
-	public static void sendResource(String path, String roName, String content,
+	public static void sendResource(String path, String roName, byte[] bs,
 			String contentType, DlibraUser user)
 		throws Exception
 	{
@@ -206,7 +206,7 @@ public class DlibraService
 		OAuthRequest request = new OAuthRequest(Verb.PUT, url);
 		request.addHeader("Content-Type", contentType != null ? contentType
 				: "text/plain");
-		request.addPayload(content);
+		request.addPayload(bs);
 		dLibraService.signRequest(user.getDlibraAccessToken(), request);
 		Response response = request.send();
 		if (response.getCode() != HttpURLConnection.HTTP_OK) {

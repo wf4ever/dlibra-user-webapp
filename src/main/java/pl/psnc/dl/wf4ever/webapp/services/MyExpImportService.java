@@ -219,7 +219,7 @@ public class MyExpImportService
 
 			model.setMessage(String.format("Uploading metadata file %s",
 				filename));
-			DlibraService.sendResource(filename, roName, rdf,
+			DlibraService.sendResource(filename, roName, rdf.getBytes(),
 				"application/rdf+xml", user);
 		}
 

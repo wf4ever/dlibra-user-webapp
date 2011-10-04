@@ -17,10 +17,17 @@
 				</p>
 			</form>
 			<form wicket:id="form">
-				<p>
-					<input type="submit" wicket:id="logInWithGoogle"
-						value="Log in with Google" />
-				</p>
+				<p>Or sign in with:</p>
+				<table style="width: 300px">
+					<tbody>
+						<tr>
+							<td><a wicket:id="logInWithGoogle"><img
+									src="images/google.png" /></a></td>
+							<td><a wicket:id="logInWithYahoo"><img
+									src="images/yahoo.png" /></a></td>
+						</tr>
+					</tbody>
+				</table>
 				<p>&nbsp;</p>
 				<p>
 					If you registered in myExperiment with an OpenID you may let this

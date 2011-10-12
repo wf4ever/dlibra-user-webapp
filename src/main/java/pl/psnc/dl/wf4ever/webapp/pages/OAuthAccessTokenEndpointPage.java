@@ -111,13 +111,13 @@ public class OAuthAccessTokenEndpointPage
 			try {
 				String token;
 				try {
-					token = DlibraService.getAccessToken(data.getUserId(),
+					token = DlibraService.createAccessToken(data.getUserId(),
 						data.getClientId());
 				}
 				catch (OAuthException e) {
 					if (e.getResponse().getCode() == 404) {
 						DlibraService.createUser(data.getUserId());
-						token = DlibraService.getAccessToken(data.getUserId(),
+						token = DlibraService.createAccessToken(data.getUserId(),
 							data.getClientId());
 					}
 					else {

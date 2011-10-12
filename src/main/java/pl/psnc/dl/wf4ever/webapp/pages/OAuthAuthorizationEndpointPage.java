@@ -151,7 +151,7 @@ public class OAuthAuthorizationEndpointPage extends TemplatePage {
 		private String prepareTokenResponse(OAuthClient client)
 				throws Exception {
 			OpenIdUser user = getOpenIdUserModel();
-			String token = DlibraService.getAccessToken(user.getOpenId(),
+			String token = DlibraService.createAccessToken(user.getOpenId(),
 					client.getClientId());
 			String url = client.getRedirectionURI() + "#";
 			url += ("access_token=" + token);

@@ -5,6 +5,7 @@ import java.util.Locale;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 
+import pl.psnc.dl.wf4ever.webapp.pages.AccessTokensPage;
 import pl.psnc.dl.wf4ever.webapp.pages.AuthenticationPage;
 import pl.psnc.dl.wf4ever.webapp.pages.DlibraRegistrationPage;
 import pl.psnc.dl.wf4ever.webapp.pages.ErrorPage;
@@ -36,6 +37,7 @@ public class UserManagementApplication
 		mountPage("/register", DlibraRegistrationPage.class);
 		mountPage("/authorize", OAuthAuthorizationEndpointPage.class);
 		mountPage("/accesstoken", OAuthAccessTokenEndpointPage.class);
+		mountPage("/tokens", AccessTokensPage.class);
 		mountPage("/error", ErrorPage.class);
 		mountPage("/help", HelpPage.class);
 

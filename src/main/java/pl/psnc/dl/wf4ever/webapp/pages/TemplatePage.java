@@ -89,6 +89,7 @@ public abstract class TemplatePage
 
 		add(new BookmarkablePageLink<Void>("home", getApplication()
 				.getHomePage()));
+		add(new BookmarkablePageLink<Void>("tokens", AccessTokensPage.class));
 		add(new BookmarkablePageLink<Void>("about", AboutPage.class));
 		add(new BookmarkablePageLink<Void>("help", HelpPage.class));
 

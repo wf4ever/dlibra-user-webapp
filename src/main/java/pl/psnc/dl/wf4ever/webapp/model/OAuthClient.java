@@ -21,6 +21,8 @@ public class OAuthClient
 	 * 
 	 */
 	private static final long serialVersionUID = -396954799246175590L;
+	
+	public static final String OOB = "OOB";
 
 	private String clientId;
 

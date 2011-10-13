@@ -36,11 +36,9 @@ import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 /**
  * 
  * @author Piotr Hołubowicz
- *
+ * 
  */
-public abstract class TemplatePage
-	extends WebPage
-{
+public abstract class TemplatePage extends WebPage {
 
 	private static final Logger log = Logger.getLogger(TemplatePage.class);
 
@@ -52,36 +50,31 @@ public abstract class TemplatePage
 
 	protected boolean willBeRedirected = false;
 
-	private static final Class< ? >[] publicPages = { AuthenticationPage.class,
-			AboutPage.class, HelpPage.class};
+	private static final Class<?>[] publicPages = { AuthenticationPage.class,
+			AboutPage.class, HelpPage.class };
 
-
-	public TemplatePage(PageParameters pageParameters)
-	{
+	public TemplatePage(PageParameters pageParameters) {
 		getSession().bind();
 		OpenIdUser user = getOpenIdUserModel();
 		content = new WebMarkupContainer("content");
-		if (user == null
-				&& !ArrayUtils.contains(publicPages, this.getClass())) {
+		if (user == null && !ArrayUtils.contains(publicPages, this.getClass())) {
 			content.setVisible(false);
 			willBeRedirected = true;
 			String url = RequestCycle
 					.get()
 					.getUrlRenderer()
 					.renderFullUrl(
-						Url.parse(urlFor(this.getClass(), pageParameters)
-								.toString()));
+							Url.parse(urlFor(this.getClass(), pageParameters)
+									.toString()));
 			getSession().setAttribute(Constants.SESSION_REDIRECT_URI, url);
 			goToPage(AuthenticationPage.class, pageParameters);
 		}
 		if (user == null) {
 			sidebarPanel = new LoggedOutPanel("sidebar");
-		}
-		else {
+		} else {
 			try {
 				sidebarPanel = new LoggedInPanel("sidebar", user);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				error(e.getMessage());
 				sidebarPanel = new LoggedOutPanel("sidebar");
 			}
@@ -89,7 +82,8 @@ public abstract class TemplatePage
 
 		add(new BookmarkablePageLink<Void>("home", getApplication()
 				.getHomePage()));
-		add(new BookmarkablePageLink<Void>("tokens", AccessTokensPage.class));
+		add(new BookmarkablePageLink<Void>("tokens", AccessTokensPage.class)
+				.setVisible(user != null));
 		add(new BookmarkablePageLink<Void>("about", AboutPage.class));
 		add(new BookmarkablePageLink<Void>("help", HelpPage.class));
 
@@ -98,81 +92,65 @@ public abstract class TemplatePage
 		content.add(new FeedbackPanel("feedback"));
 	}
 
-
-	public OpenIdUser getOpenIdUserModel()
-	{
+	public OpenIdUser getOpenIdUserModel() {
 		return (OpenIdUser) getSession().getAttribute(
-			Constants.SESSION_USER_MODEL);
+				Constants.SESSION_USER_MODEL);
 	}
 
-
-	public boolean logIn(OpenIdUser user)
-	{
+	public boolean logIn(OpenIdUser user) {
 		try {
 			getSession().setAttribute(Constants.SESSION_USER_MODEL, user);
 			sidebarPanel.replaceWith(new LoggedInPanel("sidebar", user));
 			register(user);
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			error(e.getMessage());
 			return false;
 		}
 	}
 
-
-	private void register(OpenIdUser user)
-	{
+	private void register(OpenIdUser user) {
 		if (!DlibraService.userExistsInDlibra(user.getOpenId())) {
 			try {
 				String message;
 				if (!DlibraService.createUser(user.getOpenId())) {
 					message = "An account for this username already existed "
 							+ "in dLibra, you have been registered with it.";
-				}
-				else {
+				} else {
 					message = "New account has been created.";
 				}
 				getSession().info(message);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				getSession().error(
-					e.getMessage() != null ? e.getMessage() : "Unknown error");
+						e.getMessage() != null ? e.getMessage()
+								: "Unknown error");
 			}
 		}
 
 	}
 
-
-	public void logOut()
-	{
+	public void logOut() {
 		getSession().setAttribute(Constants.SESSION_USER_MODEL, null);
 		reloadPage();
 	}
 
-
-	protected void goToPage(Class< ? extends TemplatePage> pageClass,
-			PageParameters pageParameters)
-	{
+	protected void goToPage(Class<? extends TemplatePage> pageClass,
+			PageParameters pageParameters) {
 		String url = urlFor(pageClass, pageParameters).toString();
 		log.debug("Will redirect to: " + url);
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
-			new RedirectRequestHandler(url));
+				new RedirectRequestHandler(url));
 	}
 
-
-	private void reloadPage()
-	{
+	private void reloadPage() {
 		String url = urlFor(this.getClass(), null).toString();
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
-			new RedirectRequestHandler(url));
+				new RedirectRequestHandler(url));
 	}
 
-
-	protected void startMyExpAuthorization()
-	{
+	protected void startMyExpAuthorization() {
 		String oauthCallbackURL = WicketUtils.getCompleteUrl(this,
-			AuthenticationPage.class, false);
+				AuthenticationPage.class, false);
 
 		OAuthService service = MyExpApi.getOAuthService(oauthCallbackURL);
 		Token requestToken = service.getRequestToken();
@@ -182,9 +160,8 @@ public abstract class TemplatePage
 		log.debug("Request token: " + requestToken.toString() + " service: "
 				+ service.getAuthorizationUrl(requestToken));
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(
-			new RedirectRequestHandler(authorizationUrl));
+				new RedirectRequestHandler(authorizationUrl));
 	}
-
 
 	/**
 	 * @param pageParameters
@@ -192,14 +169,13 @@ public abstract class TemplatePage
 	 * @return
 	 */
 	protected Token retrieveAccessToken(PageParameters pageParameters,
-			OAuthService service)
-	{
+			OAuthService service) {
 		Token accessToken = null;
 		if (!pageParameters.get(MyExpApi.OAUTH_VERIFIER).isEmpty()) {
 			Verifier verifier = new Verifier(pageParameters.get(
-				MyExpApi.OAUTH_VERIFIER).toString());
+					MyExpApi.OAUTH_VERIFIER).toString());
 			Token requestToken = (Token) getSession().getAttribute(
-				Constants.SESSION_REQUEST_TOKEN);
+					Constants.SESSION_REQUEST_TOKEN);
 			log.debug("Request token: " + requestToken.toString()
 					+ " verifier: " + verifier.getValue() + " service: "
 					+ service.getAuthorizationUrl(requestToken));
@@ -207,7 +183,6 @@ public abstract class TemplatePage
 		}
 		return accessToken;
 	}
-
 
 	/**
 	 * @param user
@@ -217,25 +192,20 @@ public abstract class TemplatePage
 	 * @throws JAXBException
 	 */
 	protected MyExpUser retrieveMyExpUser(Token accessToken,
-			OAuthService service)
-		throws OAuthException, JAXBException
-	{
+			OAuthService service) throws OAuthException, JAXBException {
 		MyExpUser myExpUser;
 		Response response = OAuthHelpService.sendRequest(service, Verb.GET,
-			MyExpApi.WHOAMI_URL, accessToken);
+				MyExpApi.WHOAMI_URL, accessToken);
 		myExpUser = createMyExpUserModel(response.getBody());
 
 		response = OAuthHelpService.sendRequest(service, Verb.GET,
-			String.format(MyExpApi.GET_USER_URL, myExpUser.getId()),
-			accessToken);
+				String.format(MyExpApi.GET_USER_URL, myExpUser.getId()),
+				accessToken);
 		myExpUser = createMyExpUserModel(response.getBody());
 		return myExpUser;
 	}
 
-
-	private MyExpUser createMyExpUserModel(String xml)
-		throws JAXBException
-	{
+	private MyExpUser createMyExpUserModel(String xml) throws JAXBException {
 		JAXBContext jc = JAXBContext.newInstance(MyExpUser.class);
 
 		Unmarshaller u = jc.createUnmarshaller();

@@ -385,8 +385,15 @@ img.aligncenter {
 	padding: 0;
 }
 
-table.resourceList {
-	width: 500px;
+table.tokensList {
+	border-spacing: 1;
+	width: 550px;
+	text-align: left;
+	font-size: small;
+}
+
+table.tokensList td {
+	padding: 5px;
 }
 
 tr.even {

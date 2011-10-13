@@ -1,6 +1,7 @@
 package pl.psnc.dl.wf4ever.webapp.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -16,7 +17,7 @@ public class OAuthClientList
 	 */
 	private static final long serialVersionUID = 1476500812402240650L;
 
-	protected List<OAuthClient> list;
+	protected List<OAuthClient> list = new ArrayList<OAuthClient>();
 
 
 	public OAuthClientList()

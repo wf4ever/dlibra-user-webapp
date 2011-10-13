@@ -25,6 +25,7 @@ import org.scribe.oauth.OAuthService;
 import pl.psnc.dl.wf4ever.webapp.model.AccessToken;
 import pl.psnc.dl.wf4ever.webapp.model.AccessTokenList;
 import pl.psnc.dl.wf4ever.webapp.model.OAuthClient;
+import pl.psnc.dl.wf4ever.webapp.model.OAuthClientList;
 import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 
 /**
@@ -51,6 +52,9 @@ public class DlibraService {
 
 	private static final String URI_ACCESS_TOKEN = URI_PATH_BASE
 			+ "/accesstoken";
+
+	private static final String URI_ACCESS_TOKEN_ID = URI_PATH_BASE
+			+ "/accesstoken/%s";
 
 	private static final Token WFADMIN_ACCESS_TOKEN = generateAccessToken(
 			"wfadmin", "wfadmin!!!");
@@ -99,7 +103,16 @@ public class DlibraService {
 		String url = createClientIdURL(clientId).toString();
 		Response response = OAuthHelpService.sendRequest(dLibraService,
 				Verb.GET, url, WFADMIN_ACCESS_TOKEN);
-		return createClient(response.getBody());
+		return (OAuthClient) unmarshall(response.getBody(), OAuthClient.class);
+	}
+
+	public static List<OAuthClient> getClients() throws OAuthException,
+			JAXBException {
+		String url = getClientsURL().toString();
+		Response response = OAuthHelpService.sendRequest(dLibraService,
+				Verb.GET, url, WFADMIN_ACCESS_TOKEN);
+		return ((OAuthClientList) unmarshall(response.getBody(),
+				OAuthClientList.class)).getList();
 	}
 
 	public static String createAccessToken(String userId, String clientId)
@@ -120,26 +133,22 @@ public class DlibraService {
 		String url = getAccessTokensURL(userId).toString();
 		Response response = OAuthHelpService.sendRequest(dLibraService,
 				Verb.GET, url, WFADMIN_ACCESS_TOKEN);
-		return createAccessTokenList(response.getBody()).getList();
+		return ((AccessTokenList) unmarshall(response.getBody(),
+				AccessTokenList.class)).getList();
 	}
 
-	private static OAuthClient createClient(String xml) throws JAXBException {
-		JAXBContext jc = JAXBContext.newInstance(OAuthClient.class);
-
-		Unmarshaller u = jc.createUnmarshaller();
-		StringBuffer xmlStr = new StringBuffer(xml);
-		return (OAuthClient) u.unmarshal(new StreamSource(new StringReader(
-				xmlStr.toString())));
+	public static void deleteAccessToken(String token) throws Exception {
+		String url = createAccessTokenIdURL(token).toString();
+		OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url,
+				WFADMIN_ACCESS_TOKEN);
 	}
 
-	private static AccessTokenList createAccessTokenList(String xml)
+	private static Object unmarshall(String xml, Class<?> resultClass)
 			throws JAXBException {
-		JAXBContext jc = JAXBContext.newInstance(AccessTokenList.class);
-
+		JAXBContext jc = JAXBContext.newInstance(resultClass);
 		Unmarshaller u = jc.createUnmarshaller();
 		StringBuffer xmlStr = new StringBuffer(xml);
-		return (AccessTokenList) u.unmarshal(new StreamSource(new StringReader(
-				xmlStr.toString())));
+		return u.unmarshal(new StreamSource(new StringReader(xmlStr.toString())));
 	}
 
 	private static Token generateAccessToken(String username, String password) {
@@ -181,10 +190,30 @@ public class DlibraService {
 		}
 	}
 
+	private static URL getClientsURL() {
+		try {
+			String path = URI_CLIENT;
+			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
+		} catch (Exception e) {
+			log.error(e);
+			return null;
+		}
+	}
+
 	private static URL createAccessTokenURL() {
 		try {
 			return new URI(URI_SCHEME, URI_HOST, URI_ACCESS_TOKEN, null)
 					.toURL();
+		} catch (Exception e) {
+			log.error(e);
+			return null;
+		}
+	}
+
+	private static URL createAccessTokenIdURL(String accessToken) {
+		try {
+			String path = String.format(URI_ACCESS_TOKEN_ID, accessToken);
+			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
 		} catch (Exception e) {
 			log.error(e);
 			return null;

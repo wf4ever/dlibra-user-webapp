@@ -4,7 +4,12 @@
 package pl.psnc.dl.wf4ever.webapp.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
+import javax.persistence.Basic;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -24,19 +29,18 @@ public class AccessToken implements Serializable {
 
 	private OAuthClient client;
 
+	private Date created;
+
+	private Date lastUsed;
+
 	public AccessToken() {
 
-	}
-
-	public AccessToken(String token, OAuthClient client) {
-		super();
-		this.token = token;
-		this.client = client;
 	}
 
 	/**
 	 * @return the token
 	 */
+	@Id
 	@XmlElement
 	public String getToken() {
 		return token;
@@ -53,6 +57,8 @@ public class AccessToken implements Serializable {
 	/**
 	 * @return the client
 	 */
+	@ManyToOne
+	@JoinColumn(nullable = false)
 	@XmlElement
 	public OAuthClient getClient() {
 		return client;
@@ -64,6 +70,33 @@ public class AccessToken implements Serializable {
 	 */
 	public void setClient(OAuthClient client) {
 		this.client = client;
+	}
+
+	@Basic
+	@XmlElement
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	/**
+	 * @return the lastUsed
+	 */
+	@Basic
+	@XmlElement
+	public Date getLastUsed() {
+		return lastUsed;
+	}
+
+	/**
+	 * @param lastUsed
+	 *            the lastUsed to set
+	 */
+	public void setLastUsed(Date lastUsed) {
+		this.lastUsed = lastUsed;
 	}
 
 }

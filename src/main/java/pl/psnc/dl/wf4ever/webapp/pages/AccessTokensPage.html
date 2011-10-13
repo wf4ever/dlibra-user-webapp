@@ -4,13 +4,31 @@
 		<h2 class="title">Your access tokens</h2>
 		<div class="entry">
 			<form wicket:id="form">
-				<table class="resourceList">
+				<table class="tokensList">
+					<tr>
+						<th>Application</th>
+						<th>Created</th>
+						<th>Used</th>
+					</tr>
 					<tr wicket:id="tokensListView">
 						<td><label wicket:id="clientName"></label></td>
 						<td><label wicket:id="created"></label></td>
 						<td><label wicket:id="lastUsed"></label></td>
+						<td><input type="submit" wicket:id="revoke" value="Revoke" /></td>
 					</tr>
 				</table>
+			</form>
+		</div>
+		<h2 class="title">Generate an access token</h2>
+		<div class="entry">
+			<form wicket:id="form2">
+				<p>
+					Generate an access token for an Out Of Band application: <select
+						wicket:id="oobClients" />
+				</p>
+				<p>
+					<input type="submit" value="Generate"></input>
+				</p>
 			</form>
 		</div>
 	</div>

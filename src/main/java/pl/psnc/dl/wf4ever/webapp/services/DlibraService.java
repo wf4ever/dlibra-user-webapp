@@ -193,8 +193,7 @@ public class DlibraService {
 
 	private static URL getAccessTokensURL(String userId) {
 		try {
-			userId = String.format(URI_USER_ID,
-					Base64.encodeBase64URLSafeString(userId.getBytes()));
+			userId = Base64.encodeBase64URLSafeString(userId.getBytes());
 			return new URI(URI_SCHEME, URI_HOST, URI_ACCESS_TOKEN, "user_id="
 					+ userId, null).toURL();
 		} catch (Exception e) {

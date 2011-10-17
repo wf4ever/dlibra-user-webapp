@@ -31,14 +31,14 @@ import org.openid4java.message.sreg.SRegResponse;
 import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 
 /**
- * Most of this code modeled after ConsumerServlet, part of the openid4java 
- * sample code available at 
- * http://code.google.com/p/openid4java/wiki/SampleConsumer, some code added by J Steven Perry.
+ * Most of this code modeled after ConsumerServlet, part of the openid4java
+ * sample code available at
+ * http://code.google.com/p/openid4java/wiki/SampleConsumer, some code added by
+ * J Steven Perry.
  * 
  * @author Piotr Hołubowicz
-*/
-public class OpenIdService
-{
+ */
+public class OpenIdService {
 
 	private static final Logger log = Logger.getLogger(OpenIdService.class);
 
@@ -57,7 +57,7 @@ public class OpenIdService
 		myopenidAxFields
 				.put("Country", "http://schema.openid.net/country/home");
 		myopenidAxFields.put("Language",
-			"http://schema.openid.net/pref/language");
+				"http://schema.openid.net/pref/language");
 		myopenidAxFields.put("Email", "http://schema.openid.net/contact/email");
 	}
 
@@ -70,29 +70,27 @@ public class OpenIdService
 		sRegFields.add("language");
 	}
 
-
 	/**
 	 * Perform discovery on the User-Supplied identifier and return the
-	 * DiscoveryInformation object that results from Association with the
-	 * OP. This will probably be needed by the caller (stored in Session
-	 * perhaps?).
+	 * DiscoveryInformation object that results from Association with the OP.
+	 * This will probably be needed by the caller (stored in Session perhaps?).
 	 * 
-	 * I'm not thrilled about ConsumerManager being static, but it is
-	 * very important to openid4java that the ConsumerManager object be the
-	 * same instance all through a conversation (discovery, auth request, 
-	 * auth response) with the OP. I didn't dig terribly deeply, but suspect
-	 * that part of the key exchange or the nonce uses the ConsumerManager's
-	 * hash, or some other instance-specific construct to do its thing.
+	 * I'm not thrilled about ConsumerManager being static, but it is very
+	 * important to openid4java that the ConsumerManager object be the same
+	 * instance all through a conversation (discovery, auth request, auth
+	 * response) with the OP. I didn't dig terribly deeply, but suspect that
+	 * part of the key exchange or the nonce uses the ConsumerManager's hash, or
+	 * some other instance-specific construct to do its thing.
 	 * 
-	 * @param userSuppliedIdentifier The User-Supplied identifier. It may already
-	 *  be normalized.
-	 *
-	 *  @return DiscoveryInformation - The resulting DisoveryInformation object
-	 *  returned by openid4java following successful association with the OP.
+	 * @param userSuppliedIdentifier
+	 *            The User-Supplied identifier. It may already be normalized.
+	 * 
+	 * @return DiscoveryInformation - The resulting DisoveryInformation object
+	 *         returned by openid4java following successful association with the
+	 *         OP.
 	 */
 	public static DiscoveryInformation performDiscoveryOnUserSuppliedIdentifier(
-			String userSuppliedIdentifier)
-	{
+			String userSuppliedIdentifier) {
 		ConsumerManager consumerManager = getConsumerManager();
 		try {
 			// Perform discover on the User-Supplied Identifier
@@ -102,43 +100,42 @@ public class OpenIdService
 			// Pass the discoveries to the associate() method...
 			return consumerManager.associate(discoveries);
 
-		}
-		catch (DiscoveryException e) {
+		} catch (DiscoveryException e) {
 			String message = "Error occurred during discovery!";
 			log.error(message, e);
 			throw new RuntimeException(message, e);
 		}
 	}
 
-
 	/**
 	 * Create an OpenID Auth Request, using the DiscoveryInformation object
 	 * return by the openid4java library.
 	 * 
-	 * This method also uses the Exchange Attribute Extension to grant
-	 * the Relying Party (RP).
+	 * This method also uses the Exchange Attribute Extension to grant the
+	 * Relying Party (RP).
 	 * 
-	 * @param discoveryInformation The DiscoveryInformation that should have
-	 *  been previously obtained from a call to 
-	 *  performDiscoveryOnUserSuppliedIdentifier().
-	 *  
-	 *  @param returnToUrl The URL to which the OP will redirect once the
-	 *   authentication call is complete.
-	 *  
+	 * @param discoveryInformation
+	 *            The DiscoveryInformation that should have been previously
+	 *            obtained from a call to
+	 *            performDiscoveryOnUserSuppliedIdentifier().
+	 * 
+	 * @param returnToUrl
+	 *            The URL to which the OP will redirect once the authentication
+	 *            call is complete.
+	 * 
 	 * @return AuthRequest - A "good-to-go" AuthRequest object packed with all
-	 *  kinds of great OpenID goodies for the OpenID Provider (OP). The caller
-	 *  must take this object and forward it on to the OP. Or call
-	 *  processAuthRequest() - part of this Service Class.
+	 *         kinds of great OpenID goodies for the OpenID Provider (OP). The
+	 *         caller must take this object and forward it on to the OP. Or call
+	 *         processAuthRequest() - part of this Service Class.
 	 */
 	public static AuthRequest createOpenIdAuthRequest(
-			DiscoveryInformation discoveryInformation, String returnToUrl)
-	{
+			DiscoveryInformation discoveryInformation, String returnToUrl) {
 		AuthRequest ret = null;
 		//
 		try {
 			// Create the AuthRequest object
 			ret = getConsumerManager().authenticate(discoveryInformation,
-				returnToUrl);
+					returnToUrl);
 			ret.addExtension(createSRegRequest());
 			boolean myOpenID = discoveryInformation.getOPEndpoint().getHost()
 					.equals("www.myopenid.com");
@@ -146,8 +143,7 @@ public class OpenIdService
 					: createAttributeExchangeRequest();
 			ret.addExtension(axRequest);
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			String message = "Exception occurred while building AuthRequest object!";
 			log.error(message, e);
 			throw new RuntimeException(message, e);
@@ -155,39 +151,31 @@ public class OpenIdService
 		return ret;
 	}
 
-
-	public static FetchRequest createAttributeExchangeRequest()
-	{
+	public static FetchRequest createAttributeExchangeRequest() {
 		FetchRequest fetch = FetchRequest.createFetchRequest();
 		try {
 			for (Map.Entry<String, String> e : axFields.entrySet()) {
 				fetch.addAttribute(e.getKey(), e.getValue(), true);
 			}
-		}
-		catch (MessageException e) {
+		} catch (MessageException e) {
 			log.warn("Erorr when adding attributes", e);
 		}
 		return fetch;
 	}
 
-
-	public static FetchRequest createAttributeExchangeRequestMyOpenID()
-	{
+	public static FetchRequest createAttributeExchangeRequestMyOpenID() {
 		FetchRequest fetch = FetchRequest.createFetchRequest();
 		try {
 			for (Map.Entry<String, String> e : myopenidAxFields.entrySet()) {
 				fetch.addAttribute(e.getKey(), e.getValue(), false);
 			}
-		}
-		catch (MessageException e) {
+		} catch (MessageException e) {
 			log.warn("Erorr when adding attributes", e);
 		}
 		return fetch;
 	}
 
-
-	public static SRegRequest createSRegRequest()
-	{
+	public static SRegRequest createSRegRequest() {
 		SRegRequest fetch = SRegRequest.createFetchRequest();
 		for (String e : sRegFields) {
 			fetch.addAttribute(e, false);
@@ -195,18 +183,16 @@ public class OpenIdService
 		return fetch;
 	}
 
-
 	/**
-	 * Processes the returned information from an authentication request
-	 * from the OP.
+	 * Processes the returned information from an authentication request from
+	 * the OP.
 	 */
-	public static OpenIdUser processReturn(DiscoveryInformation discoveryInformation,
-			PageParameters pageParameters, String returnToUrl)
-	{
-		OpenIdUser data = null;
+	public static OpenIdUser processReturn(
+			DiscoveryInformation discoveryInformation,
+			PageParameters pageParameters, String returnToUrl) {
 		try {
 			// Verify the Information returned from the OP
-			/// This is required according to the spec
+			// / This is required according to the spec
 			ParameterList response = new ParameterList(
 					convertToMap(pageParameters));
 			VerificationResult verificationResult = getConsumerManager()
@@ -219,117 +205,111 @@ public class OpenIdService
 					MessageExtension extension = authSuccess
 							.getExtension(AxMessage.OPENID_NS_AX);
 					if (extension instanceof FetchResponse) {
-						if (data == null) {
-							data = new OpenIdUser();
-						}
-						provisionRegistrationModel(verifiedIdentifier,
-							(FetchResponse) extension, data);
+						return provisionRegistrationModel(verifiedIdentifier,
+								(FetchResponse) extension);
 					}
-				}
-				else {
+				} else {
 					log.warn("Authentication response does not have a axMessage extension");
 				}
 				if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG)) {
 					MessageExtension extension = authSuccess
 							.getExtension(SRegMessage.OPENID_NS_SREG);
 					if (extension instanceof SRegResponse) {
-						if (data == null) {
-							data = new OpenIdUser();
-						}
-						provisionRegistrationModel(verifiedIdentifier,
-							(SRegResponse) extension, data);
+						return provisionRegistrationModel(verifiedIdentifier,
+								(SRegResponse) extension);
 					}
-				}
-				else {
+				} else {
 					log.warn("Authentication response does not have a SRegMessage extension");
 				}
-			}
-			else {
+				log.warn("No extensions supported, provisioning only the OpenID");
+				return provisionRegistrationModel(verifiedIdentifier);
+			} else {
 				log.warn("Verified identifier is null");
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			String message = "Exception occurred while verifying response!";
 			log.error(message, e);
 			throw new RuntimeException(message, e);
 		}
-		return data;
+		return null;
 	}
 
+	private static OpenIdUser provisionRegistrationModel(
+			Identifier verifiedIdentifier) {
+		OpenIdUser user = new OpenIdUser();
+		user.setOpenId(verifiedIdentifier.getIdentifier());
+		return user;
+	}
 
-	private static void provisionRegistrationModel(
-			Identifier verifiedIdentifier, FetchResponse axResponse,
-			OpenIdUser ret)
-	{
-		ret.setOpenId(verifiedIdentifier.getIdentifier());
+	private static OpenIdUser provisionRegistrationModel(
+			Identifier verifiedIdentifier, FetchResponse axResponse) {
+		OpenIdUser user = new OpenIdUser();
+		user.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;
 		value = axResponse.getAttributeValue("Email");
-		if (value != null && ret.getEmailAddress() == null) {
-			ret.setEmailAddress(value);
+		if (value != null && user.getEmailAddress() == null) {
+			user.setEmailAddress(value);
 		}
 		value = axResponse.getAttributeValue("FirstName");
-		if (value != null && ret.getFirstName() == null) {
-			ret.setFirstName(value);
+		if (value != null && user.getFirstName() == null) {
+			user.setFirstName(value);
 		}
 		value = axResponse.getAttributeValue("LastName");
-		if (value != null && ret.getLastName() == null) {
-			ret.setLastName(value);
+		if (value != null && user.getLastName() == null) {
+			user.setLastName(value);
 		}
 		value = axResponse.getAttributeValue("FullName");
-		if (value != null && ret.getFullName() == null) {
-			ret.setFullName(value);
+		if (value != null && user.getFullName() == null) {
+			user.setFullName(value);
 		}
 		value = axResponse.getAttributeValue("Language");
-		if (value != null && ret.getLanguage() == null) {
-			ret.setLanguage(value);
+		if (value != null && user.getLanguage() == null) {
+			user.setLanguage(value);
 		}
 		value = axResponse.getAttributeValue("Country");
-		if (value != null && ret.getCountry() == null) {
-			ret.setCountry(value);
+		if (value != null && user.getCountry() == null) {
+			user.setCountry(value);
 		}
-		if (ret.getFullName() == null) {
-			if (ret.getFirstName() != null && ret.getLastName() != null) {
-				ret.setFullName(ret.getFirstName() + " " + ret.getLastName());
-			}
-			else {
-				if (ret.getFirstName() != null) {
-					ret.setFullName(ret.getFirstName());
-				}
-				else {
-					ret.setFullName(ret.getLastName());
+		if (user.getFullName() == null) {
+			if (user.getFirstName() != null && user.getLastName() != null) {
+				user.setFullName(user.getFirstName() + " " + user.getLastName());
+			} else {
+				if (user.getFirstName() != null) {
+					user.setFullName(user.getFirstName());
+				} else {
+					user.setFullName(user.getLastName());
 				}
 			}
 		}
+		return user;
 	}
 
-
-	private static void provisionRegistrationModel(
-			Identifier verifiedIdentifier, SRegResponse res, OpenIdUser ret)
-	{
-		ret.setOpenId(verifiedIdentifier.getIdentifier());
+	private static OpenIdUser provisionRegistrationModel(
+			Identifier verifiedIdentifier, SRegResponse res) {
+		OpenIdUser user = new OpenIdUser();
+		user.setOpenId(verifiedIdentifier.getIdentifier());
 		String value;
 		value = res.getAttributeValue("email");
-		if (value != null && ret.getEmailAddress() == null) {
-			ret.setEmailAddress(value);
+		if (value != null && user.getEmailAddress() == null) {
+			user.setEmailAddress(value);
 		}
 		value = res.getAttributeValue("fullname");
-		if (value != null && ret.getFullName() == null) {
-			ret.setFullName(value);
+		if (value != null && user.getFullName() == null) {
+			user.setFullName(value);
 		}
 		value = res.getAttributeValue("language");
-		if (value != null && ret.getLanguage() == null) {
-			ret.setLanguage(value);
+		if (value != null && user.getLanguage() == null) {
+			user.setLanguage(value);
 		}
 		value = res.getAttributeValue("country");
-		if (value != null && ret.getCountry() == null) {
-			ret.setCountry(value);
+		if (value != null && user.getCountry() == null) {
+			user.setCountry(value);
 		}
+		return user;
 	}
 
-
 	private static Map<String, String> convertToMap(
-			PageParameters pageParameters)
-	{
+			PageParameters pageParameters) {
 		Map<String, String> res = new HashMap<String, String>();
 		for (NamedPair np : pageParameters.getAllNamed()) {
 			res.put(np.getKey(), np.getValue());
@@ -339,11 +319,10 @@ public class OpenIdService
 
 	private static ConsumerManager consumerManager;
 
-
 	/**
-	 * Retrieves an instance of the ConsumerManager object. It is static
-	 * (see note in Class-level JavaDoc comments above) because openid4java
-	 * likes it that way.
+	 * Retrieves an instance of the ConsumerManager object. It is static (see
+	 * note in Class-level JavaDoc comments above) because openid4java likes it
+	 * that way.
 	 * 
 	 * Note: if you are planning to debug the code, set the lifespan parameter
 	 * of the InMemoryNonceVerifier high enough to outlive your debug cycle, or
@@ -352,10 +331,9 @@ public class OpenIdService
 	 * making) that has nothing to do with either your code or openid4java.
 	 * 
 	 * @return ConsumerManager - The ConsumerManager object that handles
-	 *  communication with the openid4java API.
+	 *         communication with the openid4java API.
 	 */
-	private static ConsumerManager getConsumerManager()
-	{
+	private static ConsumerManager getConsumerManager() {
 		if (consumerManager == null) {
 			consumerManager = new ConsumerManager();
 			consumerManager

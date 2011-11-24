@@ -32,7 +32,8 @@ import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
  * @author Piotr Hołubowicz
  * 
  */
-public class DlibraService {
+public class DlibraService
+{
 
 	private static final Logger log = Logger.getLogger(DlibraService.class);
 
@@ -50,42 +51,44 @@ public class DlibraService {
 
 	private static final String URI_CLIENT_ID = URI_CLIENT + "/%s";
 
-	private static final String URI_ACCESS_TOKEN = URI_PATH_BASE
-			+ "/accesstoken";
+	private static final String URI_ACCESS_TOKEN = URI_PATH_BASE + "/accesstokens";
 
-	private static final String URI_ACCESS_TOKEN_ID = URI_PATH_BASE
-			+ "/accesstoken/%s";
+	private static final String URI_ACCESS_TOKEN_ID = URI_PATH_BASE + "/accesstokens/%s";
 
-	private static final Token WFADMIN_ACCESS_TOKEN = generateAccessToken(
-			"wfadmin", "wfadmin!!!");
+	private static final Token WFADMIN_ACCESS_TOKEN = generateAccessToken("wfadmin", "wfadmin!!!");
 
-	private static final OAuthService dLibraService = DlibraApi
-			.getOAuthService();
+	private static final OAuthService dLibraService = DlibraApi.getOAuthService();
 
-	public static boolean userExistsInDlibra(String username) {
+
+	public static boolean userExistsInDlibra(String username)
+	{
 		String url = createUserIdURL(username).toString();
 		try {
-			OAuthHelpService.sendRequest(dLibraService, Verb.GET, url,
-					WFADMIN_ACCESS_TOKEN);
+			OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
 			return true;
-		} catch (OAuthException e) {
+		}
+		catch (OAuthException e) {
 			return false;
 		}
 	}
 
-	public static boolean createUser(String openId) throws Exception {
+
+	public static boolean createUser(String openId, String username)
+		throws Exception
+	{
 		boolean created = true;
 
-		String url = createUsersURL().toString();
-		String payload = Base64.encodeBase64URLSafeString(openId.getBytes());
+		String url = createUserIdURL(openId).toString();
+		String payload = username != null && !username.isEmpty() ? username : openId;
 		try {
-			OAuthHelpService.sendRequest(dLibraService, Verb.POST, url,
-					WFADMIN_ACCESS_TOKEN, payload, "text/plain");
-		} catch (OAuthException e) {
+			OAuthHelpService.sendRequest(dLibraService, Verb.PUT, url, WFADMIN_ACCESS_TOKEN, payload, "text/plain");
+		}
+		catch (OAuthException e) {
 			if (e.getResponse().getCode() == HttpURLConnection.HTTP_CONFLICT) {
 				log.warn("Registering a user that already exists in dLibra");
 				created = false;
-			} else {
+			}
+			else {
 				throw e;
 			}
 		}
@@ -93,34 +96,40 @@ public class DlibraService {
 		return created;
 	}
 
-	public static void deleteUser(OpenIdUser user) throws Exception {
+
+	public static void deleteUser(OpenIdUser user)
+		throws Exception
+	{
 		String url = createUserIdURL(user.getOpenId()).toString();
-		OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url,
-				WFADMIN_ACCESS_TOKEN);
+		OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url, WFADMIN_ACCESS_TOKEN);
 	}
 
-	public static OAuthClient getClient(String clientId) throws Exception {
+
+	public static OAuthClient getClient(String clientId)
+		throws Exception
+	{
 		String url = createClientIdURL(clientId).toString();
-		Response response = OAuthHelpService.sendRequest(dLibraService,
-				Verb.GET, url, WFADMIN_ACCESS_TOKEN);
+		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
 		return (OAuthClient) unmarshall(response.getBody(), OAuthClient.class);
 	}
 
-	public static List<OAuthClient> getClients() throws OAuthException,
-			JAXBException {
+
+	public static List<OAuthClient> getClients()
+		throws OAuthException, JAXBException
+	{
 		String url = getClientsURL().toString();
-		Response response = OAuthHelpService.sendRequest(dLibraService,
-				Verb.GET, url, WFADMIN_ACCESS_TOKEN);
-		return ((OAuthClientList) unmarshall(response.getBody(),
-				OAuthClientList.class)).getList();
+		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
+		return ((OAuthClientList) unmarshall(response.getBody(), OAuthClientList.class)).getList();
 	}
 
+
 	public static String createAccessToken(String userId, String clientId)
-			throws Exception {
+		throws Exception
+	{
 		String url = createAccessTokenURL().toString();
 		String payload = clientId + "\r\n" + userId;
-		Response response = OAuthHelpService.sendRequest(dLibraService,
-				Verb.POST, url, WFADMIN_ACCESS_TOKEN, payload, "text/plain");
+		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.POST, url, WFADMIN_ACCESS_TOKEN, payload,
+			"text/plain");
 		String at = response.getHeader("Location");
 		if (at.indexOf('/') < 0) {
 			throw new Exception("Invalid response: " + response.getBody());
@@ -128,104 +137,114 @@ public class DlibraService {
 		return at.substring(at.lastIndexOf('/') + 1);
 	}
 
+
 	public static List<AccessToken> getAccessTokens(String userId)
-			throws OAuthException, JAXBException {
+		throws OAuthException, JAXBException
+	{
 		String url = getAccessTokensURL(userId).toString();
-		Response response = OAuthHelpService.sendRequest(dLibraService,
-				Verb.GET, url, WFADMIN_ACCESS_TOKEN);
-		return ((AccessTokenList) unmarshall(response.getBody(),
-				AccessTokenList.class)).getList();
+		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
+		return ((AccessTokenList) unmarshall(response.getBody(), AccessTokenList.class)).getList();
 	}
 
-	public static void deleteAccessToken(String token) throws Exception {
+
+	public static void deleteAccessToken(String token)
+		throws Exception
+	{
 		String url = createAccessTokenIdURL(token).toString();
-		OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url,
-				WFADMIN_ACCESS_TOKEN);
+		OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url, WFADMIN_ACCESS_TOKEN);
 	}
 
-	private static Object unmarshall(String xml, Class<?> resultClass)
-			throws JAXBException {
+
+	private static Object unmarshall(String xml, Class< ? > resultClass)
+		throws JAXBException
+	{
 		JAXBContext jc = JAXBContext.newInstance(resultClass);
 		Unmarshaller u = jc.createUnmarshaller();
 		StringBuffer xmlStr = new StringBuffer(xml);
 		return u.unmarshal(new StreamSource(new StringReader(xmlStr.toString())));
 	}
 
-	private static Token generateAccessToken(String username, String password) {
-		String token = Base64.encodeBase64String((username + ":" + password)
-				.getBytes());
+
+	private static Token generateAccessToken(String username, String password)
+	{
+		String token = Base64.encodeBase64String((username + ":" + password).getBytes());
 		token = StringUtils.trim(token);
-		log.debug(String.format("Username %s, password %s, access token %s",
-				username, password, token));
+		log.debug(String.format("Username %s, password %s, access token %s", username, password, token));
 		return new Token(token, null);
 	}
 
-	private static URL createUsersURL() {
-		try {
-			return new URI(URI_SCHEME, URI_HOST, URI_USERS, null).toURL();
-		} catch (Exception e) {
-			log.error(e);
-			return null;
-		}
-	}
 
-	private static URL createUserIdURL(String userId) {
+	private static URL createUserIdURL(String userId)
+	{
 		try {
-			String path = String.format(URI_USER_ID,
-					Base64.encodeBase64URLSafeString(userId.getBytes()));
+			String path = String.format(URI_USER_ID, Base64.encodeBase64URLSafeString(userId.getBytes()));
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error(e);
 			return null;
 		}
 	}
 
-	private static URL createClientIdURL(String clientId) {
+
+	private static URL createClientIdURL(String clientId)
+	{
 		try {
 			String path = String.format(URI_CLIENT_ID, clientId);
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error(e);
 			return null;
 		}
 	}
 
-	private static URL getClientsURL() {
+
+	private static URL getClientsURL()
+	{
 		try {
 			String path = URI_CLIENT;
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error(e);
 			return null;
 		}
 	}
 
-	private static URL createAccessTokenURL() {
+
+	private static URL createAccessTokenURL()
+	{
 		try {
-			return new URI(URI_SCHEME, URI_HOST, URI_ACCESS_TOKEN, null)
-					.toURL();
-		} catch (Exception e) {
+			return new URI(URI_SCHEME, URI_HOST, URI_ACCESS_TOKEN, null).toURL();
+		}
+		catch (Exception e) {
 			log.error(e);
 			return null;
 		}
 	}
 
-	private static URL createAccessTokenIdURL(String accessToken) {
+
+	private static URL createAccessTokenIdURL(String accessToken)
+	{
 		try {
 			String path = String.format(URI_ACCESS_TOKEN_ID, accessToken);
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error(e);
 			return null;
 		}
 	}
 
-	private static URL getAccessTokensURL(String userId) {
+
+	private static URL getAccessTokensURL(String userId)
+	{
 		try {
 			userId = Base64.encodeBase64URLSafeString(userId.getBytes());
-			return new URI(URI_SCHEME, URI_HOST, URI_ACCESS_TOKEN, "user_id="
-					+ userId, null).toURL();
-		} catch (Exception e) {
+			return new URI(URI_SCHEME, URI_HOST, URI_ACCESS_TOKEN, "user_id=" + userId, null).toURL();
+		}
+		catch (Exception e) {
 			log.error(e);
 			return null;
 		}

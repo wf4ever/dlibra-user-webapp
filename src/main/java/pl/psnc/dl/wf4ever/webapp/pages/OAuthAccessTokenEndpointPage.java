@@ -29,8 +29,7 @@ public class OAuthAccessTokenEndpointPage
 	 */
 	private static final long serialVersionUID = 3793214124123802219L;
 
-	private static final Logger log = Logger
-			.getLogger(OAuthAccessTokenEndpointPage.class);
+	private static final Logger log = Logger.getLogger(OAuthAccessTokenEndpointPage.class);
 
 	private String json;
 
@@ -48,8 +47,7 @@ public class OAuthAccessTokenEndpointPage
 			@Override
 			public void respond(IRequestCycle requestCycle)
 			{
-				WebResponse response = ((WebResponse) requestCycle
-						.getResponse());
+				WebResponse response = ((WebResponse) requestCycle.getResponse());
 				response.setStatus(status);
 				response.setContentType("application/json;charset=UTF-8");
 				response.addHeader("Cache-control", "no-store");
@@ -74,16 +72,13 @@ public class OAuthAccessTokenEndpointPage
 		String error = null;
 		String errorDesc = null;
 		AuthCodeData data = null;
-		if (pageParameters.get("grant_type") == null
-				|| pageParameters.get("code") == null) {
+		if (pageParameters.get("grant_type") == null || pageParameters.get("code") == null) {
 			error = "invalid_request";
 			errorDesc = "Grant type or code missing";
 		}
-		else if (!pageParameters.get("grant_type").toString()
-				.equals("authorization_code")) {
+		else if (!pageParameters.get("grant_type").toString().equals("authorization_code")) {
 			error = "unsupported_grant_type";
-			errorDesc = "grant type: "
-					+ pageParameters.get("grant_type").toString();
+			errorDesc = "grant type: " + pageParameters.get("grant_type").toString();
 		}
 		else {
 			String code = pageParameters.get("code").toString();
@@ -93,8 +88,7 @@ public class OAuthAccessTokenEndpointPage
 				errorDesc = "Code " + code + " is not valid";
 			}
 			else if (data.getProvidedRedirectURI() != null
-					&& (pageParameters.get("redirect_uri") == null || !pageParameters
-							.get("redirect_uri").toString()
+					&& (pageParameters.get("redirect_uri") == null || !pageParameters.get("redirect_uri").toString()
 							.equals(data.getProvidedRedirectURI()))) {
 				error = "invalid_grant";
 				errorDesc = "Redirect URI is not valid";
@@ -102,40 +96,32 @@ public class OAuthAccessTokenEndpointPage
 
 		}
 		if (error != null) {
-			json = String.format(
-				"{\"error\": \"%s\", \"error_description\": \"%s\"}", error,
-				errorDesc);
+			json = String.format("{\"error\": \"%s\", \"error_description\": \"%s\"}", error, errorDesc);
 			status = 400;
 		}
 		else {
 			try {
 				String token;
 				try {
-					token = DlibraService.createAccessToken(data.getUserId(),
-						data.getClientId());
+					token = DlibraService.createAccessToken(data.getUserId(), data.getClientId());
 				}
 				catch (OAuthException e) {
 					if (e.getResponse().getCode() == 404) {
-						DlibraService.createUser(data.getUserId());
-						token = DlibraService.createAccessToken(data.getUserId(),
-							data.getClientId());
+						// FIXME: this puts openID as username
+						DlibraService.createUser(data.getUserId(), data.getUserId());
+						token = DlibraService.createAccessToken(data.getUserId(), data.getClientId());
 					}
 					else {
 						throw e;
 					}
 				}
 
-				json = String.format(
-					"{\"access_token\": \"%s\", \"token_type\": \"bearer\"}",
-					token);
+				json = String.format("{\"access_token\": \"%s\", \"token_type\": \"bearer\"}", token);
 				status = 200;
 				HibernateService.deleteCode(data);
 			}
 			catch (Exception e) {
-				json = String
-						.format(
-							"{\"error\": \"invalid_request\", \"error_description\": \"%s\"}",
-							e.getMessage());
+				json = String.format("{\"error\": \"invalid_request\", \"error_description\": \"%s\"}", e.getMessage());
 				status = 500;
 			}
 		}

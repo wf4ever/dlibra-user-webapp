@@ -30,8 +30,7 @@ public class DlibraRegistrationPage
 	private static final long serialVersionUID = 1L;
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(DlibraRegistrationPage.class);
+	private static final Logger log = Logger.getLogger(DlibraRegistrationPage.class);
 
 	private boolean userRegistered;
 
@@ -64,8 +63,7 @@ public class DlibraRegistrationPage
 
 		userRegistered = DlibraService.userExistsInDlibra(user.getOpenId());
 
-		Form<OpenIdUser> form = new Form<OpenIdUser>("form",
-				new CompoundPropertyModel<OpenIdUser>(user));
+		Form<OpenIdUser> form = new Form<OpenIdUser>("form", new CompoundPropertyModel<OpenIdUser>(user));
 		form.setOutputMarkupId(true);
 		content.add(form);
 
@@ -76,54 +74,50 @@ public class DlibraRegistrationPage
 		final WebMarkupContainer credentials = createCredentialsDiv(user);
 		form.add(credentials);
 
-		form.add(
-			new AjaxButton("registerButtonText", new PropertyModel<String>(
-					this, "registerButtonText")) {
+		form.add(new AjaxButton("registerButtonText", new PropertyModel<String>(this, "registerButtonText")) {
 
-				@Override
-				protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
-				{
-					OpenIdUser user = (OpenIdUser) getForm().getModelObject();
-					try {
-						String infoMessage;
-						if (userRegistered) {
-							DlibraService.deleteUser(user);
-							infoMessage = "Account has been deleted.";
+			@Override
+			protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
+			{
+				OpenIdUser user = (OpenIdUser) getForm().getModelObject();
+				try {
+					String infoMessage;
+					if (userRegistered) {
+						DlibraService.deleteUser(user);
+						infoMessage = "Account has been deleted.";
+					}
+					else {
+						if (!DlibraService.createUser(user.getOpenId(), user.getFullName())) {
+							infoMessage = "An account for this username already existed "
+									+ "in dLibra, you have been registered with it.";
 						}
 						else {
-							if (!DlibraService.createUser(user.getOpenId())) {
-								infoMessage = "An account for this username already existed "
-										+ "in dLibra, you have been registered with it.";
-							}
-							else {
-								infoMessage = "New account has been created.";
-							}
+							infoMessage = "New account has been created.";
 						}
-						getSession().info(infoMessage);
-						setResponsePage(getPage());
 					}
-					catch (Exception e) {
-						error(e.getMessage() != null ? e.getMessage()
-								: "Unknown error");
-					}
-					userRegistered = DlibraService.userExistsInDlibra(user
-							.getOpenId());
-					target.add(message);
-					target.add(this);
-					WebMarkupContainer div = createCredentialsDiv(user);
-					getParent().replace(div);
-					Fragment f = createMessageFragment(content);
-					getParent().replace(f);
-					target.add(getParent());
-
+					getSession().info(infoMessage);
+					setResponsePage(getPage());
 				}
-
-
-				@Override
-				protected void onError(AjaxRequestTarget arg0, Form< ? > arg1)
-				{
+				catch (Exception e) {
+					error(e.getMessage() != null ? e.getMessage() : "Unknown error");
 				}
-			}).setOutputMarkupId(true);
+				userRegistered = DlibraService.userExistsInDlibra(user.getOpenId());
+				target.add(message);
+				target.add(this);
+				WebMarkupContainer div = createCredentialsDiv(user);
+				getParent().replace(div);
+				Fragment f = createMessageFragment(content);
+				getParent().replace(f);
+				target.add(getParent());
+
+			}
+
+
+			@Override
+			protected void onError(AjaxRequestTarget arg0, Form< ? > arg1)
+			{
+			}
+		}).setOutputMarkupId(true);
 	}
 
 
@@ -151,11 +145,14 @@ public class DlibraRegistrationPage
 		}
 		return f;
 	}
-	
-	public String getRegisterButtonText() {
+
+
+	public String getRegisterButtonText()
+	{
 		if (userRegistered) {
 			return "Delete account in dLibra";
-		} else {
+		}
+		else {
 			return "Create account in dLibra";
 		}
 	}

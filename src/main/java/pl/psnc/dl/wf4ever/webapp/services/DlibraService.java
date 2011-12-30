@@ -41,7 +41,7 @@ public class DlibraService
 
 	private static final String URI_HOST = "sandbox.wf4ever-project.org";
 
-	private static final String URI_PATH_BASE = "/rosrs4";
+	private static final String URI_PATH_BASE = "/rosrs5";
 
 	private static final String URI_USERS = URI_PATH_BASE + "/users";
 

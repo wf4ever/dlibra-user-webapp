@@ -5,7 +5,7 @@
 	<groupId>pl.psnc.dl.wf4ever</groupId>
 	<artifactId>ums</artifactId>
 	<packaging>war</packaging>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>2.2.0-SNAPSHOT</version>
 	<name>Wf4Ever User Management Service</name>
 	<description></description>
 
@@ -93,11 +93,12 @@
 			<artifactId>openid4java-consumer</artifactId>
 			<version>0.9.6</version>
 			<type>pom</type>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.8.1.2</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>xercesImpl</artifactId>
+					<groupId>xerces</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.scribe</groupId>
@@ -105,11 +106,14 @@
 			<version>1.2.1</version>
 		</dependency>
 		<dependency>
+<<<<<<< HEAD
 			<groupId>org.apache.wicket</groupId>
 			<artifactId>wicket-extensions</artifactId>
 			<version>${wicket.version}</version>
 		</dependency>
 		<dependency>
+=======
+>>>>>>> 2.0.0
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.0.1</version>
@@ -129,6 +133,14 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.5</version>
 		</dependency>
+<<<<<<< HEAD
+=======
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.18</version>
+		</dependency>
+>>>>>>> 2.0.0
 	</dependencies>
 
 	<build>
@@ -170,7 +182,11 @@
 	</build>
 
 	<properties>
+<<<<<<< HEAD
 		<wicket.version>1.5.0</wicket.version>
+=======
+		<wicket.version>1.5.1</wicket.version>
+>>>>>>> 2.0.0
 		<jetty.version>6.1.4</jetty.version>
 	</properties>
 

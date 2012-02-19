@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @author Piotr Hołubowicz
  *
  */
-public class OpenIdData
+public class OpenIdUser
 	implements Serializable
 {
 

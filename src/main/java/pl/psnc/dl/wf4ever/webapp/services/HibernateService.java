@@ -8,7 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
+import pl.psnc.dl.wf4ever.webapp.model.AuthCodeData;
 
 /**
  * @author Piotr Hołubowicz
@@ -43,43 +43,43 @@ public class HibernateService
 	}
 
 
-	public static boolean userExists(String openId)
-	{
-		return loadUser(openId) != null;
-	}
-
-
-	public static void storeUser(DlibraUser user)
+	public static void storeCode(AuthCodeData data)
 	{
 		Session session = getSessionFactory().getCurrentSession();
 		session.beginTransaction();
 
-		session.saveOrUpdate(user);
+		session.saveOrUpdate(data);
 
 		session.getTransaction().commit();
 	}
 
 
-	public static void deleteUser(DlibraUser user)
+	public static void deleteCode(AuthCodeData data)
 	{
 		Session session = getSessionFactory().getCurrentSession();
 		session.beginTransaction();
 
-		session.delete(user);
+		session.delete(data);
 
 		session.getTransaction().commit();
 	}
 
 
-	public static DlibraUser loadUser(String openId)
+	/**
+	 * 
+	 * @param code
+	 * @return authorization code data or null
+	 */
+	public static AuthCodeData loadCode(String code)
 	{
 		Session session = getSessionFactory().getCurrentSession();
 		session.beginTransaction();
 
-		DlibraUser user = (DlibraUser) session.get(DlibraUser.class, openId);
+		AuthCodeData data = (AuthCodeData) session
+				.get(AuthCodeData.class, code);
 
 		session.getTransaction().commit();
 
-		return user;
+		return data;
 	}
 }

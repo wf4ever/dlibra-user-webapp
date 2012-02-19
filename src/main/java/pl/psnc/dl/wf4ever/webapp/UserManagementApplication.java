@@ -5,11 +5,13 @@ import java.util.Locale;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 
+import pl.psnc.dl.wf4ever.webapp.pages.AccessTokensPage;
 import pl.psnc.dl.wf4ever.webapp.pages.AuthenticationPage;
 import pl.psnc.dl.wf4ever.webapp.pages.DlibraRegistrationPage;
 import pl.psnc.dl.wf4ever.webapp.pages.ErrorPage;
 import pl.psnc.dl.wf4ever.webapp.pages.HelpPage;
-import pl.psnc.dl.wf4ever.webapp.pages.MyExpImportPage;
+import pl.psnc.dl.wf4ever.webapp.pages.OAuthAccessTokenEndpointPage;
+import pl.psnc.dl.wf4ever.webapp.pages.OAuthAuthorizationEndpointPage;
 
 /**
  * 
@@ -30,12 +32,15 @@ public class UserManagementApplication
 	public void init()
 	{
 		super.init();
+		mountPage("/import", AuthenticationPage.class); // legacy
 		mountPage("/authenticate", AuthenticationPage.class);
 		mountPage("/register", DlibraRegistrationPage.class);
-		mountPage("/import", MyExpImportPage.class);
+		mountPage("/authorize", OAuthAuthorizationEndpointPage.class);
+		mountPage("/accesstoken", OAuthAccessTokenEndpointPage.class);
+		mountPage("/tokens", AccessTokensPage.class);
 		mountPage("/error", ErrorPage.class);
 		mountPage("/help", HelpPage.class);
-		
+
 		Locale.setDefault(Locale.ENGLISH);
 	}
 

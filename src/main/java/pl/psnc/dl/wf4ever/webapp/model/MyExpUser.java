@@ -1,15 +1,12 @@
 /**
  * 
  */
-package pl.psnc.dl.wf4ever.webapp.model.myexp;
+package pl.psnc.dl.wf4ever.webapp.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -17,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlRootElement(name = "user")
-public class User
+public class MyExpUser
 	implements Serializable
 {
 
@@ -44,14 +41,8 @@ public class User
 
 	private String website;
 
-	private List<PackHeader> packs = new ArrayList<PackHeader>();
 
-	private List<WorkflowHeader> workflows = new ArrayList<WorkflowHeader>();
-
-	private List<FileHeader> files = new ArrayList<FileHeader>();
-
-
-	public User()
+	public MyExpUser()
 	{
 
 	}
@@ -185,64 +176,5 @@ public class User
 		this.resource = resource;
 	}
 
-
-	/**
-	 * @return the workflows
-	 */
-	@XmlElementWrapper(name = "workflows")
-	@XmlElement(name = "workflow")
-	public List<WorkflowHeader> getWorkflows()
-	{
-		return workflows;
-	}
-
-
-	/**
-	 * @param workflows the workflows to set
-	 */
-	public void setWorkflows(List<WorkflowHeader> workflows)
-	{
-		this.workflows = workflows;
-	}
-
-
-	/**
-	 * @return the packs
-	 */
-	@XmlElementWrapper(name = "packs")
-	@XmlElement(name = "pack")
-	public List<PackHeader> getPacks()
-	{
-		return packs;
-	}
-
-
-	/**
-	 * @param packs the packs to set
-	 */
-	public void setPacks(List<PackHeader> packs)
-	{
-		this.packs = packs;
-	}
-
-
-	/**
-	 * @return the files
-	 */
-	@XmlElementWrapper(name = "files")
-	@XmlElement(name = "file")
-	public List<FileHeader> getFiles()
-	{
-		return files;
-	}
-
-
-	/**
-	 * @param files the files to set
-	 */
-	public void setFiles(List<FileHeader> files)
-	{
-		this.files = files;
-	}
 
 }

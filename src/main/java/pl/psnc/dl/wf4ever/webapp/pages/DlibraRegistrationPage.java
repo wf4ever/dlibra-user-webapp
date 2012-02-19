@@ -1,22 +1,18 @@
 package pl.psnc.dl.wf4ever.webapp.pages;
 
-import java.util.Properties;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.scribe.model.Token;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 import pl.psnc.dl.wf4ever.webapp.services.DlibraService;
 
 /**
@@ -33,8 +29,10 @@ public class DlibraRegistrationPage
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger
-			.getLogger(DlibraRegistrationPage.class);
+	@SuppressWarnings("unused")
+	private static final Logger log = Logger.getLogger(DlibraRegistrationPage.class);
+
+	private boolean userRegistered;
 
 
 	/**
@@ -61,114 +59,73 @@ public class DlibraRegistrationPage
 		if (willBeRedirected)
 			return;
 
-		final DlibraUser user = getDlibraUserModel();
+		final OpenIdUser user = getOpenIdUserModel();
 
-		Form<DlibraUser> form = new Form<DlibraUser>("form",
-				new CompoundPropertyModel<DlibraUser>(user));
+		userRegistered = DlibraService.userExistsInDlibra(user.getOpenId());
+
+		Form<OpenIdUser> form = new Form<OpenIdUser>("form", new CompoundPropertyModel<OpenIdUser>(user));
 		form.setOutputMarkupId(true);
 		content.add(form);
 
-		final WebMarkupContainer message = createMessageFragment(user, content);
+		final WebMarkupContainer message = createMessageFragment(content);
 		message.setOutputMarkupId(true);
 		form.add(message);
 
 		final WebMarkupContainer credentials = createCredentialsDiv(user);
 		form.add(credentials);
 
-		final Button importButton = new Button("myExpImportButton") {
+		form.add(new AjaxButton("registerButtonText", new PropertyModel<String>(this, "registerButtonText")) {
 
 			@Override
-			public void onSubmit()
+			protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
 			{
-				tryLoadTestToken(user);
-				if (user.getMyExpAccessToken() != null) {
-					goToPage(MyExpImportPage.class, null);
-				}
-				else {
-					startMyExpAuthorization();
-				}
-			}
-		};
-		importButton.setEnabled(user.isRegistered());
-		form.add(importButton).setOutputMarkupId(true);
-
-		form.add(
-			new AjaxButton("registerButtonText", new PropertyModel<String>(
-					user, "registerButtonText")) {
-
-				@Override
-				protected void onSubmit(AjaxRequestTarget target, Form< ? > form)
-				{
-					DlibraUser user = (DlibraUser) getForm().getModelObject();
-					try {
-						String infoMessage;
-						if (user.isRegistered()) {
-							DlibraService.deleteWorkspace(user);
-							infoMessage = "Account has been deleted.";
+				OpenIdUser user = (OpenIdUser) getForm().getModelObject();
+				try {
+					String infoMessage;
+					if (userRegistered) {
+						DlibraService.deleteUser(user);
+						infoMessage = "Account has been deleted.";
+					}
+					else {
+						if (!DlibraService.createUser(user.getOpenId(), user.getFullName())) {
+							infoMessage = "An account for this username already existed "
+									+ "in dLibra, you have been registered with it.";
 						}
 						else {
-							if (!DlibraService.createWorkspace(user)) {
-								infoMessage = "An account for this username already existed "
-										+ "in dLibra, you have been registered with it.";
-							}
-							else {
-								infoMessage = "New account has been created.";
-							}
+							infoMessage = "New account has been created.";
 						}
-						getSession().info(infoMessage);
-						setResponsePage(getPage());
 					}
-					catch (Exception e) {
-						error(e.getMessage() != null ? e.getMessage()
-								: "Unknown error");
-					}
-					target.add(message);
-					target.add(this);
-					importButton.setEnabled(user.isRegistered());
-					target.add(importButton);
-					WebMarkupContainer div = createCredentialsDiv(user);
-					getParent().replace(div);
-					Fragment f = createMessageFragment(user, content);
-					getParent().replace(f);
-					target.add(getParent());
-
+					getSession().info(infoMessage);
+					setResponsePage(getPage());
 				}
-
-
-				@Override
-				protected void onError(AjaxRequestTarget arg0, Form< ? > arg1)
-				{
+				catch (Exception e) {
+					error(e.getMessage() != null ? e.getMessage() : "Unknown error");
 				}
-			}).setOutputMarkupId(true);
-	}
+				userRegistered = DlibraService.userExistsInDlibra(user.getOpenId());
+				target.add(message);
+				target.add(this);
+				WebMarkupContainer div = createCredentialsDiv(user);
+				getParent().replace(div);
+				Fragment f = createMessageFragment(content);
+				getParent().replace(f);
+				target.add(getParent());
 
-
-	protected void tryLoadTestToken(DlibraUser user)
-	{
-		Properties props = new Properties();
-		try {
-			props.load(getClass().getClassLoader().getResourceAsStream(
-				"testToken.properties"));
-			String token = props.getProperty("token");
-			String secret = props.getProperty("secret");
-			if (token != null && secret != null) {
-				user.setMyExpAccessToken(new Token(token, secret));
 			}
-		}
-		catch (Exception e) {
-			log.debug("Failed to load properties: " + e.getMessage());
-		}
+
+
+			@Override
+			protected void onError(AjaxRequestTarget arg0, Form< ? > arg1)
+			{
+			}
+		}).setOutputMarkupId(true);
 	}
 
 
-	private WebMarkupContainer createCredentialsDiv(DlibraUser model)
+	private WebMarkupContainer createCredentialsDiv(OpenIdUser model)
 	{
 		WebMarkupContainer div = new WebMarkupContainer("credentials");
-		if (model.isRegistered()) {
-			div.add(new Label("username", new PropertyModel<String>(model,
-					"username")));
-			div.add(new Label("password", new PropertyModel<String>(model,
-					"password")));
+		if (userRegistered) {
+			div.add(new Label("openId", model.getOpenId()));
 		}
 		else {
 			div.setVisible(false);
@@ -177,13 +134,11 @@ public class DlibraRegistrationPage
 	}
 
 
-	private Fragment createMessageFragment(DlibraUser model,
-			MarkupContainer container)
+	private Fragment createMessageFragment(MarkupContainer container)
 	{
 		Fragment f;
-		if (model.isRegistered()) {
-			f = new RegisteredFragment("message", "registered", container,
-					model);
+		if (userRegistered) {
+			f = new Fragment("message", "registered", container);
 		}
 		else {
 			f = new Fragment("message", "notRegistered", container);
@@ -191,19 +146,15 @@ public class DlibraRegistrationPage
 		return f;
 	}
 
-	@SuppressWarnings("serial")
-	private class RegisteredFragment
-		extends Fragment
+
+	public String getRegisterButtonText()
 	{
-
-		public RegisteredFragment(String id, String markupId,
-				MarkupContainer markupProvider, DlibraUser model)
-		{
-			super(id, markupId, markupProvider);
-			add(new Label("dLibraAccessTokenString", new PropertyModel<String>(
-					model, "dlibraAccessTokenString")));
+		if (userRegistered) {
+			return "Delete account in dLibra";
 		}
-
+		else {
+			return "Create account in dLibra";
+		}
 	}
 
 }

@@ -14,7 +14,5 @@ public class Constants
 
 	public static final String SESSION_USER_MODEL = "userModel";
 
-	public static final String SESSION_TEMPORARY_ACCESS_TOKEN = "tempAccessToken";
-
 	public static final String SESSION_REDIRECT_URI = "redirectURI";
 }

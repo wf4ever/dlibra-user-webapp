@@ -3,200 +3,147 @@
  */
 package pl.psnc.dl.wf4ever.webapp.services;
 
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Date;
-import java.util.UUID;
+import java.util.List;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.util.crypt.Base64;
-import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
-import pl.psnc.dl.wf4ever.webapp.model.DlibraUser;
+import pl.psnc.dl.wf4ever.webapp.model.AccessToken;
+import pl.psnc.dl.wf4ever.webapp.model.AccessTokenList;
+import pl.psnc.dl.wf4ever.webapp.model.OAuthClient;
+import pl.psnc.dl.wf4ever.webapp.model.OAuthClientList;
+import pl.psnc.dl.wf4ever.webapp.model.OpenIdUser;
 
 /**
  * @author Piotr Hołubowicz
- *
+ * 
  */
 public class DlibraService
 {
 
 	private static final Logger log = Logger.getLogger(DlibraService.class);
 
+<<<<<<< HEAD
 	public static final String DEFAULT_VERSION = "v1";
 
+=======
+>>>>>>> 2.0.0
 	private static final String URI_SCHEME = "http";
 
 	private static final String URI_HOST = "sandbox.wf4ever-project.org";
 
-	private static final String URI_PATH_BASE = "/rosrs3";
+	private static final String URI_PATH_BASE = "/rosrs5";
 
-	private static final String URI_WORKSPACE = URI_PATH_BASE + "/workspaces";
+	private static final String URI_USERS = URI_PATH_BASE + "/users";
 
-	private static final String URI_WORKSPACE_ID = URI_WORKSPACE + "/%s";
+	private static final String URI_USER_ID = URI_USERS + "/%s";
 
-	private static final String URI_ROS = URI_WORKSPACE_ID + "/ROs";
+	private static final String URI_CLIENT = URI_PATH_BASE + "/clients";
 
-	private static final String URI_RO_ID = URI_ROS + "/%s";
+	private static final String URI_CLIENT_ID = URI_CLIENT + "/%s";
 
-	private static final String URI_VERSION_ID = URI_RO_ID + "/%s";
+	private static final String URI_ACCESS_TOKEN = URI_PATH_BASE + "/accesstokens";
 
-	private static final String URI_RESOURCE = URI_VERSION_ID + "/%s";
+	private static final String URI_ACCESS_TOKEN_ID = URI_PATH_BASE + "/accesstokens/%s";
 
-	private static final int PASSWORD_LENGTH = 20;
+	private static final Token WFADMIN_ACCESS_TOKEN = generateAccessToken("wfadmin", "wfadmin!!!");
 
-	private static final int USERNAME_LENGTH = 20;
-
-	private static final Token WFADMIN_ACCESS_TOKEN = generateAccessToken(
-		"wfadmin", "wfadmin!!!");
-
-	private static final OAuthService dLibraService = DlibraApi
-			.getOAuthService();
+	private static final OAuthService dLibraService = DlibraApi.getOAuthService();
 
 
 	public static boolean userExistsInDlibra(String username)
 	{
-		String url = createWorkspaceIdURL(username).toString();
-		OAuthRequest request = new OAuthRequest(Verb.GET, url);
-		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
-		Response response = request.send();
-		return response.getCode() == HttpURLConnection.HTTP_OK;
+		String url = createUserIdURL(username).toString();
+		try {
+			OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
+			return true;
+		}
+		catch (OAuthException e) {
+			return false;
+		}
 	}
 
 
-	public static boolean createWorkspace(DlibraUser user)
+	public static boolean createUser(String openId, String username)
 		throws Exception
 	{
 		boolean created = true;
 
-		String username = generateUsername(user);
-		String password = generatePassword();
-		Token token = generateAccessToken(username, password);
-
-		String url = createWorkspaceURL().toString();
-		OAuthRequest request = new OAuthRequest(Verb.POST, url);
-		request.addHeader("Content-Type", "text/plain");
-		request.addPayload(username + "\r\n" + password);
-		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
-		Response response = request.send();
-		if (response.getCode() != HttpURLConnection.HTTP_CREATED) {
-			if (response.getCode() == HttpURLConnection.HTTP_CONFLICT) {
+		String url = createUserIdURL(openId).toString();
+		String payload = username != null && !username.isEmpty() ? username : openId;
+		try {
+			OAuthHelpService.sendRequest(dLibraService, Verb.PUT, url, WFADMIN_ACCESS_TOKEN, payload, "text/plain");
+		}
+		catch (OAuthException e) {
+			if (e.getResponse().getCode() == HttpURLConnection.HTTP_CONFLICT) {
 				log.warn("Registering a user that already exists in dLibra");
 				created = false;
 			}
 			else {
-				throw new Exception("Error when creating workspace, response: "
-						+ response.getCode() + " " + response.getBody());
+				throw e;
 			}
 		}
 
-		user.setUsername(username);
-		user.setPassword(password);
-		user.setDlibraAccessToken(token);
-
-		HibernateService.storeUser(user);
 		return created;
 	}
 
 
-	public static void deleteWorkspace(DlibraUser user)
+	public static void deleteUser(OpenIdUser user)
 		throws Exception
 	{
-		String url = createWorkspaceIdURL(user.getUsername()).toString();
-		OAuthRequest request = new OAuthRequest(Verb.DELETE, url);
-		dLibraService.signRequest(WFADMIN_ACCESS_TOKEN, request);
-		Response response = request.send();
-
-		user.setDlibraAccessToken(null);
-		HibernateService.deleteUser(user);
-
-		if (response.getCode() != HttpURLConnection.HTTP_CONFLICT) {
-			throw new Exception("Error when deleting workspace, response: "
-					+ response.getCode() + " " + response.getBody());
-		}
+		String url = createUserIdURL(user.getOpenId()).toString();
+		OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url, WFADMIN_ACCESS_TOKEN);
 	}
 
 
-	public static boolean createResearchObjectAndVersion(String name,
-			DlibraUser model, boolean ignoreIfExists)
+	public static OAuthClient getClient(String clientId)
 		throws Exception
 	{
-		return createResearchObject(name, model, ignoreIfExists)
-				&& createVersion(name, model, ignoreIfExists);
+		String url = createClientIdURL(clientId).toString();
+		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
+		return (OAuthClient) unmarshall(response.getBody(), OAuthClient.class);
 	}
 
 
-	/**
-	 * Creates a Research Object.
-	 * @param name RO identifier
-	 * @param user dLibra user model
-	 * @param ignoreIfExists should it finish without throwing exception if ROSRS returns 409?
-	 * @return true only if ROSRS returns 201 Created
-	 * @throws Exception if ROSRS doesn't return 201 Created (or 409 if ignoreIfExists is true)
-	 */
-	public static boolean createResearchObject(String name, DlibraUser user,
-			boolean ignoreIfExists)
-		throws Exception
+	public static List<OAuthClient> getClients()
+		throws OAuthException, JAXBException
 	{
-		String url = createROsURL(user.getUsername()).toString();
-		OAuthRequest request = new OAuthRequest(Verb.POST, url);
-		request.addHeader("Content-type", "text/plain");
-		request.addPayload(name);
-		dLibraService.signRequest(user.getDlibraAccessToken(), request);
-		Response response = request.send();
-		if (response.getCode() == HttpURLConnection.HTTP_CREATED) {
-			return true;
-		}
-		else if (response.getCode() == HttpURLConnection.HTTP_CONFLICT
-				&& ignoreIfExists) {
-			return false;
-		}
-		else {
-			throw new Exception("Error when creating RO " + name
-					+ ", response: " + response.getCode() + " "
-					+ response.getBody());
-		}
+		String url = getClientsURL().toString();
+		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
+		return ((OAuthClientList) unmarshall(response.getBody(), OAuthClientList.class)).getList();
 	}
 
 
-	/**
-	 * Creates a version "main" in a RO.
-	 * @param roName RO identifier
-	 * @param user dLibra user model
-	 * @param ignoreIfExists should it finish without throwing exception if ROSRS returns 409?
-	 * @return true only if ROSRS returns 201 Created
-	 * @throws Exception if ROSRS doesn't return 201 Created (or 409 if ignoreIfExists is true)
-	 */
-	public static boolean createVersion(String roName, DlibraUser user,
-			boolean ignoreIfExists)
+	public static String createAccessToken(String userId, String clientId)
 		throws Exception
 	{
-		String url = createROIdURL(user.getUsername(), roName).toString();
-		OAuthRequest request = new OAuthRequest(Verb.POST, url);
-		request.addHeader("Content-type", "text/plain");
-		request.addPayload(DEFAULT_VERSION);
-		dLibraService.signRequest(user.getDlibraAccessToken(), request);
-		Response response = request.send();
-		if (response.getCode() == HttpURLConnection.HTTP_CREATED) {
-			return true;
+		String url = createAccessTokenURL().toString();
+		String payload = clientId + "\r\n" + userId;
+		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.POST, url, WFADMIN_ACCESS_TOKEN, payload,
+			"text/plain");
+		String at = response.getHeader("Location");
+		if (at.indexOf('/') < 0) {
+			throw new Exception("Invalid response: " + response.getBody());
 		}
-		else if (response.getCode() == HttpURLConnection.HTTP_CONFLICT
-				&& ignoreIfExists) {
-			return false;
-		}
-		else {
-			throw new Exception("Error when creating version, response: "
-					+ response.getCode() + " " + response.getBody());
-		}
+		return at.substring(at.lastIndexOf('/') + 1);
 	}
 
 
+<<<<<<< HEAD
 	public static void sendResource(String path, String roName, byte[] bs,
 			String contentType, DlibraUser user)
 		throws Exception
@@ -214,58 +161,48 @@ public class DlibraService
 					+ ", response: " + response.getCode() + " "
 					+ response.getBody());
 		}
+=======
+	public static List<AccessToken> getAccessTokens(String userId)
+		throws OAuthException, JAXBException
+	{
+		String url = getAccessTokensURL(userId).toString();
+		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
+		return ((AccessTokenList) unmarshall(response.getBody(), AccessTokenList.class)).getList();
+>>>>>>> 2.0.0
 	}
 
 
-	private static String generatePassword()
+	public static void deleteAccessToken(String token)
+		throws Exception
 	{
-		return UUID.randomUUID().toString().substring(0, PASSWORD_LENGTH);
+		String url = createAccessTokenIdURL(token).toString();
+		OAuthHelpService.sendRequest(dLibraService, Verb.DELETE, url, WFADMIN_ACCESS_TOKEN);
 	}
 
 
-	private static String generateUsername(DlibraUser model)
+	private static Object unmarshall(String xml, Class< ? > resultClass)
+		throws JAXBException
 	{
-		if (model.getOpenId().length() <= USERNAME_LENGTH) {
-			return model.getOpenId();
-		}
-		if (model.getOpenIdData() != null
-				&& model.getOpenIdData().getEmailAddress() != null) {
-			return StringUtils
-					.left(model.getOpenIdData().getEmailAddress(),
-						USERNAME_LENGTH).replaceAll("\\s", "_")
-					.replaceAll("\\W", "");
-		}
-		return "OpenID-" + new Date().getTime();
+		JAXBContext jc = JAXBContext.newInstance(resultClass);
+		Unmarshaller u = jc.createUnmarshaller();
+		StringBuffer xmlStr = new StringBuffer(xml);
+		return u.unmarshal(new StreamSource(new StringReader(xmlStr.toString())));
 	}
 
 
-	public static Token generateAccessToken(String username, String password)
+	private static Token generateAccessToken(String username, String password)
 	{
-		String token = Base64.encodeBase64String((username + ":" + password)
-				.getBytes());
+		String token = Base64.encodeBase64String((username + ":" + password).getBytes());
 		token = StringUtils.trim(token);
-		log.debug(String.format("Username %s, password %s, access token %s",
-			username, password, token));
+		log.debug(String.format("Username %s, password %s, access token %s", username, password, token));
 		return new Token(token, null);
 	}
 
 
-	private static URL createWorkspaceURL()
+	private static URL createUserIdURL(String userId)
 	{
 		try {
-			return new URI(URI_SCHEME, URI_HOST, URI_WORKSPACE, null).toURL();
-		}
-		catch (Exception e) {
-			log.error(e);
-			return null;
-		}
-	}
-
-
-	private static URL createWorkspaceIdURL(String workspaceId)
-	{
-		try {
-			String path = String.format(URI_WORKSPACE_ID, workspaceId);
+			String path = String.format(URI_USER_ID, Base64.encodeBase64URLSafeString(userId.getBytes()));
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
 		}
 		catch (Exception e) {
@@ -275,10 +212,10 @@ public class DlibraService
 	}
 
 
-	private static URL createROsURL(String workspaceId)
+	private static URL createClientIdURL(String clientId)
 	{
 		try {
-			String path = String.format(URI_ROS, workspaceId);
+			String path = String.format(URI_CLIENT_ID, clientId);
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
 		}
 		catch (Exception e) {
@@ -288,10 +225,10 @@ public class DlibraService
 	}
 
 
-	private static URL createROIdURL(String workspaceId, String roId)
+	private static URL getClientsURL()
 	{
 		try {
-			String path = String.format(URI_RO_ID, workspaceId, roId);
+			String path = URI_CLIENT;
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
 		}
 		catch (Exception e) {
@@ -301,13 +238,36 @@ public class DlibraService
 	}
 
 
-	private static URL createResourceURL(String workspaceId, String roId,
-			String versionId, String resource)
+	private static URL createAccessTokenURL()
 	{
 		try {
-			String path = String.format(URI_RESOURCE, workspaceId, roId, DEFAULT_VERSION,
-				resource);
+			return new URI(URI_SCHEME, URI_HOST, URI_ACCESS_TOKEN, null).toURL();
+		}
+		catch (Exception e) {
+			log.error(e);
+			return null;
+		}
+	}
+
+
+	private static URL createAccessTokenIdURL(String accessToken)
+	{
+		try {
+			String path = String.format(URI_ACCESS_TOKEN_ID, accessToken);
 			return new URI(URI_SCHEME, URI_HOST, path, null).toURL();
+		}
+		catch (Exception e) {
+			log.error(e);
+			return null;
+		}
+	}
+
+
+	private static URL getAccessTokensURL(String userId)
+	{
+		try {
+			userId = Base64.encodeBase64URLSafeString(userId.getBytes());
+			return new URI(URI_SCHEME, URI_HOST, URI_ACCESS_TOKEN, "user_id=" + userId, null).toURL();
 		}
 		catch (Exception e) {
 			log.error(e);

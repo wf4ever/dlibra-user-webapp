@@ -27,7 +27,7 @@ import pl.psnc.dl.wf4ever.webapp.utils.WicketUtils;
 /**
  * 
  * @author Piotr Hołubowicz
- *
+ * 
  */
 public class AuthenticationPage
 	extends TemplatePage
@@ -35,14 +35,13 @@ public class AuthenticationPage
 
 	private static final long serialVersionUID = -8975579933617712699L;
 
-	private static final Logger log = Logger
-			.getLogger(AuthenticationPage.class);
+	private static final Logger log = Logger.getLogger(AuthenticationPage.class);
 
 	private static final String GOOGLE_URL = "https://www.google.com/accounts/o8/id";
 
 	private static final String YAHOO_URL = "http://yahoo.com";
 
-	private String returnToUrl;
+	private final String returnToUrl;
 
 
 	public AuthenticationPage()
@@ -57,12 +56,11 @@ public class AuthenticationPage
 		super(pageParameters);
 
 		// FIXME replaceAll because "../" gets inserted, don't know why
-		returnToUrl = WicketUtils.getCompleteUrl(this,
-			AuthenticationPage.class, true).replaceAll("\\.\\./", "");
+		returnToUrl = WicketUtils.getCompleteUrl(this, AuthenticationPage.class, true).replaceAll("\\.\\./", "");
 
 		if (!pageParameters.get(MyExpApi.OAUTH_VERIFIER).isEmpty()) {
-			OAuthService service = MyExpApi.getOAuthService(WicketUtils
-					.getCompleteUrl(this, AuthenticationPage.class, true));
+			OAuthService service = MyExpApi.getOAuthService(WicketUtils.getCompleteUrl(this, AuthenticationPage.class,
+				true));
 
 			Token accessToken = retrieveAccessToken(pageParameters, service);
 
@@ -70,8 +68,7 @@ public class AuthenticationPage
 				MyExpUser user = retrieveMyExpUser(accessToken, service);
 
 				if (user.getOpenId() == null) {
-					throw new Exception(
-							"Your myExperiment profile does not contain any openID.");
+					throw new Exception("Your myExperiment profile does not contain any openID.");
 				}
 				if (user.getOpenId().startsWith("https://www.google.com")) {
 					user.setOpenId(GOOGLE_URL);
@@ -80,10 +77,7 @@ public class AuthenticationPage
 					user.setOpenId(YAHOO_URL);
 				}
 				applyForAuthentication(user.getOpenId());
-				getSession()
-						.info(
-							"You have been logged in using OpenID: "
-									+ user.getOpenId());
+				getSession().info("You have been logged in using OpenID: " + user.getOpenId());
 			}
 			catch (Exception e) {
 				error(e.getMessage());
@@ -96,8 +90,7 @@ public class AuthenticationPage
 
 		final OpenIdUser tempUser = new OpenIdUser();
 
-		Form<OpenIdUser> form = new Form<OpenIdUser>("openIdForm",
-				new CompoundPropertyModel<OpenIdUser>(tempUser)) {
+		Form<OpenIdUser> form = new Form<OpenIdUser>("openIdForm", new CompoundPropertyModel<OpenIdUser>(tempUser)) {
 
 			@Override
 			protected void onSubmit()
@@ -131,15 +124,6 @@ public class AuthenticationPage
 			}
 		});
 
-		form2.add(new Button("logInWithMyExp") {
-
-			@Override
-			public void onSubmit()
-			{
-				super.onSubmit();
-				startMyExpAuthorization();
-			}
-		});
 	}
 
 
@@ -157,8 +141,7 @@ public class AuthenticationPage
 			DiscoveryInformation discoveryInformation = (DiscoveryInformation) session
 					.getAttribute(Constants.SESSION_DISCOVERY_INFORMATION);
 
-			OpenIdUser openIdUser = OpenIdService.processReturn(
-				discoveryInformation, pageParameters, returnToUrl);
+			OpenIdUser openIdUser = OpenIdService.processReturn(discoveryInformation, pageParameters, returnToUrl);
 			if (openIdUser == null) {
 				error("Open ID Confirmation Failed. No information was retrieved from the OpenID Provider.");
 				return;
@@ -169,11 +152,8 @@ public class AuthenticationPage
 			}
 			else {
 				getRequestCycle().scheduleRequestHandlerAfterCurrent(
-					new RedirectRequestHandler((String) getSession()
-							.getAttribute(Constants.SESSION_REDIRECT_URI)));
-				log.debug("Redirecting to: "
-						+ (String) getSession().getAttribute(
-							Constants.SESSION_REDIRECT_URI));
+					new RedirectRequestHandler((String) getSession().getAttribute(Constants.SESSION_REDIRECT_URI)));
+				log.debug("Redirecting to: " + (String) getSession().getAttribute(Constants.SESSION_REDIRECT_URI));
 				getSession().setAttribute(Constants.SESSION_REDIRECT_URI, null);
 			}
 		}
@@ -186,14 +166,11 @@ public class AuthenticationPage
 				.performDiscoveryOnUserSuppliedIdentifier(userSuppliedIdentifier);
 		// Store the discovery results in session.
 		Session session = getSession();
-		session.setAttribute(Constants.SESSION_DISCOVERY_INFORMATION,
-			discoveryInformation);
+		session.setAttribute(Constants.SESSION_DISCOVERY_INFORMATION, discoveryInformation);
 		// Create the AuthRequest
-		AuthRequest authRequest = OpenIdService.createOpenIdAuthRequest(
-			discoveryInformation, returnToUrl);
+		AuthRequest authRequest = OpenIdService.createOpenIdAuthRequest(discoveryInformation, returnToUrl);
 		// Now take the AuthRequest and forward it on to the OP
-		IRequestHandler reqHandler = new RedirectRequestHandler(
-				authRequest.getDestinationUrl(true));
+		IRequestHandler reqHandler = new RedirectRequestHandler(authRequest.getDestinationUrl(true));
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(reqHandler);
 	}
 

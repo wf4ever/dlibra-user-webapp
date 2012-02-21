@@ -176,7 +176,7 @@
 	</build>
 
 	<properties>
-		<wicket.version>1.5.1</wicket.version>
+		<wicket.version>1.5.4</wicket.version>
 		<jetty.version>6.1.4</jetty.version>
 	</properties>
 

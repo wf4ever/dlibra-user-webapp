@@ -37,11 +37,6 @@ public class DlibraService
 
 	private static final Logger log = Logger.getLogger(DlibraService.class);
 
-<<<<<<< HEAD
-	public static final String DEFAULT_VERSION = "v1";
-
-=======
->>>>>>> 2.0.0
 	private static final String URI_SCHEME = "http";
 
 	private static final String URI_HOST = "sandbox.wf4ever-project.org";
@@ -143,32 +138,12 @@ public class DlibraService
 	}
 
 
-<<<<<<< HEAD
-	public static void sendResource(String path, String roName, byte[] bs,
-			String contentType, DlibraUser user)
-		throws Exception
-	{
-		String url = createResourceURL(user.getUsername(), roName,
-			DEFAULT_VERSION, path).toString();
-		OAuthRequest request = new OAuthRequest(Verb.PUT, url);
-		request.addHeader("Content-Type", contentType != null ? contentType
-				: "text/plain");
-		request.addPayload(bs);
-		dLibraService.signRequest(user.getDlibraAccessToken(), request);
-		Response response = request.send();
-		if (response.getCode() != HttpURLConnection.HTTP_OK) {
-			throw new Exception("Error when sending resource " + path
-					+ ", response: " + response.getCode() + " "
-					+ response.getBody());
-		}
-=======
 	public static List<AccessToken> getAccessTokens(String userId)
 		throws OAuthException, JAXBException
 	{
 		String url = getAccessTokensURL(userId).toString();
 		Response response = OAuthHelpService.sendRequest(dLibraService, Verb.GET, url, WFADMIN_ACCESS_TOKEN);
 		return ((AccessTokenList) unmarshall(response.getBody(), AccessTokenList.class)).getList();
->>>>>>> 2.0.0
 	}
 
 

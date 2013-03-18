@@ -1,5 +1,0 @@
-This is the Wf4Ever User Management Service. It allows users to create workspaces in dLibra 
-and grant access to it to other Wf4Ever applications. Additionally, it contains a wizard for
-importing files, workflows and packs from users' accounts in http://www.myexperiment.org.
-
-This service is running here http://sandbox.wf4ever-project.org/users .
